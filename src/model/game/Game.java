@@ -18,22 +18,10 @@ public class Game implements NodeChangeListener {
         subscribeToNodes();
     }
 
-    public Field getField() {
-        return _field;
-    }
-
-    public int getMoveCount() {
-        return _moveCount;
-    }
-
-    public void start() { }
-
     public boolean moveNode(Node node, Point2D newPosition) {
-        boolean moved = _field.moveNodeTo(node, newPosition);
-        if (moved) {
-            _moveCount++;
-        }
-        return moved;
+        if (_gameOver)
+            return false;
+        return _field.moveNodeTo(node, newPosition);
     }
 
     public boolean hasWon() {
@@ -52,6 +40,14 @@ public class Game implements NodeChangeListener {
             _win = false;
         }
     }
+
+    public boolean isGameOver() { return _gameOver; }
+
+    public boolean isWin() { return _win; }
+
+    public Field getField() { return _field; }
+
+    public int getMoveCount() { return _moveCount; }
 
     private void subscribeToNodes() {
         for (Node node : _field.getNodes()) {
