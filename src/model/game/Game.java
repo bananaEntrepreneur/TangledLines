@@ -14,14 +14,15 @@ public class Game implements NodeChangeListener {
 
     public Game(Field field, int maxMoves) {
         _field = field;
-        _maxMoves = maxMoves;
+        _maxMoves = maxMoves > 0 ? maxMoves : 1;
+        subscribeToNodes();
     }
 
     public Field getField() {
         return _field;
     }
 
-    public int get_moveCount() {
+    public int getMoveCount() {
         return _moveCount;
     }
 
@@ -49,6 +50,12 @@ public class Game implements NodeChangeListener {
         if (_moveCount > _maxMoves) {
             _gameOver = true;
             _win = false;
+        }
+    }
+
+    private void subscribeToNodes() {
+        for (Node node : _field.getNodes()) {
+            node.addListener(this);
         }
     }
 }
