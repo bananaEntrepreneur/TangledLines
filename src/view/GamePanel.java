@@ -6,6 +6,8 @@ import model.units.Node;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 public class GamePanel extends JPanel {
@@ -19,15 +21,16 @@ public class GamePanel extends JPanel {
     private Node _hoveredNode = null;
     private Node _draggedNode = null;
     private Point _dragOffset = new Point();
+    private Point2D _dragCurrentPosition = null;
 
     public GamePanel(Game game) {
         _game = game;
         setBackground(BACKGROUND_COLOR);
         setPreferredSize(new Dimension(800, 600));
-        
-        MouseAdapter mouseAdapter = new MouseAdapter();
-        addMouseListener(mouseAdapter);
-        addMouseMotionListener(mouseAdapter);
+
+        MouseHandler mouseHandler = new MouseHandler();
+        addMouseListener(mouseHandler);
+        addMouseMotionListener(mouseHandler);
     }
 
     @Override
@@ -46,10 +49,18 @@ public class GamePanel extends JPanel {
     private void drawEdges(Graphics2D g2d) {
         g2d.setColor(EDGE_COLOR);
         g2d.setStroke(new BasicStroke(2));
-        
+
         for (Edge edge : _game.getField().getEdges()) {
             Point2D a = edge.getNodeA().getPosition();
             Point2D b = edge.getNodeB().getPosition();
+
+            if (edge.getNodeA() == _draggedNode && _dragCurrentPosition != null) {
+                a = _dragCurrentPosition;
+            }
+            if (edge.getNodeB() == _draggedNode && _dragCurrentPosition != null) {
+                b = _dragCurrentPosition;
+            }
+            
             g2d.drawLine(
                 (int) a.getX(), (int) a.getY(),
                 (int) b.getX(), (int) b.getY()
@@ -60,6 +71,11 @@ public class GamePanel extends JPanel {
     private void drawNodes(Graphics2D g2d) {
         for (Node node : _game.getField().getNodes()) {
             Point2D pos = node.getPosition();
+
+            if (node == _draggedNode && _dragCurrentPosition != null) {
+                pos = _dragCurrentPosition;
+            }
+            
             int x = (int) pos.getX() - NODE_RADIUS;
             int y = (int) pos.getY() - NODE_RADIUS;
 
@@ -117,11 +133,11 @@ public class GamePanel extends JPanel {
         return null;
     }
 
-    private class MouseAdapter extends java.awt.event.MouseAdapter {
+    private class MouseHandler extends MouseAdapter {
         @Override
-        public void mousePressed(java.awt.event.MouseEvent e) {
+        public void mousePressed(MouseEvent e) {
             if (_game.isGameOver()) return;
-            
+
             _draggedNode = findNodeAt(e.getPoint());
             if (_draggedNode != null) {
                 Point2D pos = _draggedNode.getPosition();
@@ -133,28 +149,35 @@ public class GamePanel extends JPanel {
         }
 
         @Override
-        public void mouseReleased(java.awt.event.MouseEvent e) {
-            _draggedNode = null;
-        }
-
-        @Override
-        public void mouseDragged(java.awt.event.MouseEvent e) {
+        public void mouseReleased(MouseEvent e) {
             if (_draggedNode != null && !_game.isGameOver()) {
                 Point2D newPosition = new Point2D.Double(
                     e.getX() - _dragOffset.x,
                     e.getY() - _dragOffset.y
                 );
                 _game.moveNode(_draggedNode, newPosition);
+            }
+            _draggedNode = null;
+            _dragCurrentPosition = null;
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (_draggedNode != null && !_game.isGameOver()) {
+                _dragCurrentPosition = new Point2D.Double(
+                    e.getX() - _dragOffset.x,
+                    e.getY() - _dragOffset.y
+                );
                 repaint();
             }
         }
 
         @Override
-        public void mouseMoved(java.awt.event.MouseEvent e) {
+        public void mouseMoved(MouseEvent e) {
             Node node = findNodeAt(e.getPoint());
             if (node != _hoveredNode) {
                 _hoveredNode = node;
-                setCursor(node != null ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : 
+                setCursor(node != null ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) :
                     Cursor.getDefaultCursor());
                 repaint();
             }

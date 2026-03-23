@@ -29,19 +29,7 @@ public class GameFrame extends JFrame {
     private JPanel createControlPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
-        
-        JButton resetButton = new JButton("Reset Game");
-        resetButton.addActionListener(e -> resetGame());
-        panel.add(resetButton);
-        
         return panel;
-    }
-
-    private void resetGame() {
-        JOptionPane.showMessageDialog(this, 
-            "Reset functionality requires game restart", 
-            "Info", 
-            JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void refresh() {
