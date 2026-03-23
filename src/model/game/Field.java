@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Field {
+    private static final double MIN_MOVE_DISTANCE_SQUARED = 1.0;
     private final List<Node> _nodes = new ArrayList<>();
     private final List<Edge> _edges = new ArrayList<>();
 
@@ -28,12 +29,26 @@ public class Field {
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
+        if (!isValidMove(node, newPosition))
+            return false;
+
+        node.setPosition(newPosition);
+        return true;
+    }
+
+    private boolean isValidMove(Node node, Point2D newPosition) {
         if (node == null || newPosition == null || !_nodes.contains(node)) {
             return false;
         }
+
         Point2D oldPos = node.getPosition();
-        node.setPosition(newPosition);
-        return !oldPos.equals(node.getPosition());
+        return hasMovedSignificantly(oldPos, newPosition);
+    }
+
+    private boolean hasMovedSignificantly(Point2D oldPos, Point2D newPos) {
+        double dx = oldPos.getX() - newPos.getX();
+        double dy = oldPos.getY() - newPos.getY();
+        return dx * dx + dy * dy >= MIN_MOVE_DISTANCE_SQUARED;
     }
 
     public List<Node> getNodes() { return List.copyOf(_nodes); }
