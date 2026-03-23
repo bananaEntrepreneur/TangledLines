@@ -36,17 +36,6 @@ public class Field {
         return !oldPos.equals(node.getPosition());
     }
 
-    public boolean hasIntersections() {
-        for (int i = 0; i < _edges.size(); i++) {
-            for (int j = i + 1; j < _edges.size(); j++) {
-                if (_edges.get(i).hasIntersection(_edges.get(j))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public List<Node> getNodes() { return List.copyOf(_nodes); }
 
     public List<Edge> getEdges() { return List.copyOf(_edges); }

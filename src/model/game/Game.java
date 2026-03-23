@@ -26,10 +26,6 @@ public class Game implements NodeChangeListener {
         return _field.moveNode(node, newPosition);
     }
 
-    public boolean hasWon() {
-        return !_field.hasIntersections();
-    }
-
     @Override
     public void onNodeMoved(Node node, Point2D oldPosition, Point2D newPosition) {
         if (_gameOver)
