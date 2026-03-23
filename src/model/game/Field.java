@@ -1,5 +1,7 @@
 package model.game;
 
+import model.factory.DefaultUnitFactory;
+import model.factory.UnitFactory;
 import model.units.Edge;
 import model.units.Node;
 
@@ -9,23 +11,28 @@ import java.util.List;
 
 public class Field {
     private static final double MIN_MOVE_DISTANCE_SQUARED = 1.0;
+    private final UnitFactory _factory;
     private final List<Node> _nodes = new ArrayList<>();
     private final List<Edge> _edges = new ArrayList<>();
 
-    public void addNode(Node node) {
-        if (node != null && !_nodes.contains(node))
-            _nodes.add(node);
+    public Field() {
+        this(new DefaultUnitFactory());
     }
 
-    public void addEdge(Edge edge) {
-        if (edge == null)
-                return;
+    public Field(UnitFactory factory) {
+        _factory = factory;
+    }
 
-        addNode(edge.getNodeA());
-        addNode(edge.getNodeB());
+    public Node createNode(Point2D position, boolean movable) {
+        Node node = _factory.createNode(position, movable);
+        addNode(node);
+        return node;
+    }
 
-        if (!_edges.contains(edge))
-            _edges.add(edge);
+    public Edge createEdge(Node nodeA, Node nodeB) {
+        Edge edge = _factory.createEdge(nodeA, nodeB);
+        addEdge(edge);
+        return edge;
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
@@ -34,6 +41,22 @@ public class Field {
 
         node.setPosition(newPosition);
         return true;
+    }
+
+    private void addNode(Node node) {
+        if (node != null && !_nodes.contains(node))
+            _nodes.add(node);
+    }
+
+    private void addEdge(Edge edge) {
+        if (edge == null)
+                return;
+
+        addNode(edge.getNodeA());
+        addNode(edge.getNodeB());
+
+        if (!_edges.contains(edge))
+            _edges.add(edge);
     }
 
     private boolean isValidMove(Node node, Point2D newPosition) {
