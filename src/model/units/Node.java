@@ -16,18 +16,6 @@ public class Node {
         _movable = movable;
     }
 
-    public Point2D getPosition() {
-        return _position;
-    }
-
-    public boolean isMovable() {
-        return _movable;
-    }
-
-    public void addListener(NodeChangeListener listener) {
-        _listeners.add(listener);
-    }
-
     public void setPosition(Point2D newPosition) {
         if (!_movable || newPosition == null || newPosition.equals(_position)) {
             return;
@@ -36,6 +24,12 @@ public class Node {
         _position = newPosition;
         notifyListeners(oldPosition, newPosition);
     }
+
+    public Point2D getPosition() { return _position; }
+
+    public boolean isMovable() { return _movable; }
+
+    public void addListener(NodeChangeListener listener) { _listeners.add(listener); }
 
     private void notifyListeners(Point2D oldPosition, Point2D newPosition) {
         for (NodeChangeListener listener : _listeners) {
