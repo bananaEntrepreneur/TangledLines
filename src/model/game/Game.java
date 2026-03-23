@@ -1,13 +1,16 @@
 package model.game;
 
+import model.listeners.NodeChangeListener;
 import model.units.Node;
 
 import java.awt.geom.Point2D;
 
-public class Game {
+public class Game implements NodeChangeListener {
     private final Field _field;
     private final int _maxMoves;
     private int _moveCount = 0;
+    private boolean _gameOver = false;
+    private boolean _win = false;
 
     public Game(Field field, int maxMoves) {
         _field = field;
@@ -34,5 +37,18 @@ public class Game {
 
     public boolean hasWon() {
         return !_field.hasIntersections();
+    }
+
+    @Override
+    public void onNodeMoved(Node node, Point2D oldPosition, Point2D newPosition) {
+        if (_gameOver)
+            return;
+
+        _moveCount++;
+
+        if (_moveCount > _maxMoves) {
+            _gameOver = true;
+            _win = false;
+        }
     }
 }
