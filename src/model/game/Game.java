@@ -21,7 +21,7 @@ public class Game implements NodeChangeListener {
     public boolean moveNode(Node node, Point2D newPosition) {
         if (_gameOver)
             return false;
-        return _field.moveNodeTo(node, newPosition);
+        return _field.moveNode(node, newPosition);
     }
 
     public boolean hasWon() {

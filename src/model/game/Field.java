@@ -9,13 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Field {
-    private List<Node> _nodes;
-    private List<Edge> _edges;
-
-    public Field() {
-        _nodes = new ArrayList<>();
-        _edges = new ArrayList<>();
-    }
+    private final List<Node> _nodes = new ArrayList<>();
+    private final List<Edge> _edges = new ArrayList<>();
 
     public void addNode(Node node) {
         _nodes.add(node);
@@ -26,21 +21,13 @@ public class Field {
         _edges.add(edge);
     }
 
-    public List<Node> getNodes() {
-        return new ArrayList<>(_nodes);
-    }
-
-    public List<Edge> getEdges() {
-        return new ArrayList<>(_edges);
-    }
-
-    public boolean moveNodeTo(Node node, Point2D newPosition) {
+    public boolean moveNode(Node node, Point2D newPosition) {
         if (node == null || newPosition == null || !_nodes.contains(node)) {
             return false;
         }
-
+        Point2D oldPos = node.getPosition();
         node.setPosition(newPosition);
-        return true;
+        return !oldPos.equals(node.getPosition());
     }
 
     public boolean hasIntersections() {
@@ -53,4 +40,8 @@ public class Field {
         }
         return false;
     }
+
+    public List<Node> getNodes() { return List.copyOf(_nodes); }
+
+    public List<Edge> getEdges() { return List.copyOf(_edges); }
 }
