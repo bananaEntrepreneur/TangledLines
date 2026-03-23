@@ -9,12 +9,11 @@ import java.util.List;
 public class Node {
     private Point2D _position;
     private final boolean _movable;
-    private final List<NodeChangeListener> _listeners;
+    private final List<NodeChangeListener> _listeners = new ArrayList<>();
 
     public Node(Point2D position, boolean movable) {
         _position = position;
         _movable = movable;
-        _listeners = new ArrayList<>();
     }
 
     public Point2D getPosition() {
@@ -30,7 +29,7 @@ public class Node {
     }
 
     public void setPosition(Point2D newPosition) {
-        if (!_movable) {
+        if (!_movable || newPosition == null || newPosition.equals(_position)) {
             return;
         }
         Point2D oldPosition = _position;
