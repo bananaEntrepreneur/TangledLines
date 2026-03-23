@@ -50,6 +50,8 @@ public class Game implements NodeChangeListener {
 
     public int getMoveCount() { return _moveCount; }
 
+    public int getMaxMoves() { return _maxMoves; }
+
     private void subscribeToNodes() {
         for (Node node : _field.getNodes()) {
             node.addListener(this);

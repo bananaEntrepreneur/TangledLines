@@ -94,28 +94,16 @@ public class GamePanel extends JPanel {
     private void drawStatus(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("Arial", Font.BOLD, 14));
-        
-        String status = "Moves: " + _game.getMoveCount() + "/" + 
-            (_game.getField().getEdges().isEmpty() ? 0 : _game.getClass().getName().contains("Game") ? 
-            getMoveLimit() : "∞");
-        
+
+        String status = "Moves: " + _game.getMoveCount() + "/" + _game.getMaxMoves();
+
         if (_game.isGameOver()) {
             status = _game.isWin() ? "YOU WIN!" : "GAME OVER";
             g2d.setColor(_game.isWin() ? Color.GREEN : Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 24));
         }
-        
-        g2d.drawString(status, 20, 30);
-    }
 
-    private int getMoveLimit() {
-        try {
-            java.lang.reflect.Field field = Game.class.getDeclaredField("_maxMoves");
-            field.setAccessible(true);
-            return (int) field.get(_game);
-        } catch (Exception e) {
-            return -1;
-        }
+        g2d.drawString(status, 20, 30);
     }
 
     private Node findNodeAt(Point point) {
