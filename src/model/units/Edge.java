@@ -25,6 +25,10 @@ public class Edge {
         return this.toLine().intersectsLine(other.toLine());
     }
 
+    public Node getNodeA() { return _nodeA; }
+
+    public Node getNodeB() { return _nodeB; }
+
     private boolean sharesNodeWith(Edge other) {
         return this._nodeA == other._nodeA || this._nodeA == other._nodeB ||
                this._nodeB == other._nodeA || this._nodeB == other._nodeB;

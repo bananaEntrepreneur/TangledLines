@@ -1,6 +1,5 @@
 package model.game;
 
-import model.listeners.NodeChangeListener;
 import model.units.Edge;
 import model.units.Node;
 
@@ -13,12 +12,19 @@ public class Field {
     private final List<Edge> _edges = new ArrayList<>();
 
     public void addNode(Node node) {
-        _nodes.add(node);
-        node.addListener((NodeChangeListener) this);
+        if (node != null && !_nodes.contains(node))
+            _nodes.add(node);
     }
 
     public void addEdge(Edge edge) {
-        _edges.add(edge);
+        if (edge == null)
+                return;
+
+        addNode(edge.getNodeA());
+        addNode(edge.getNodeB());
+
+        if (!_edges.contains(edge))
+            _edges.add(edge);
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
