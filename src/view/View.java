@@ -27,7 +27,7 @@ public class View implements NodeChangeListener {
     }
 
     @Override
-    public void onNodeMoved(Node node, Point2D oldPosition, Point2D newPosition) {
+    public void onNodeMoved(Node node, Point2D newPosition) {
         _frame.refresh();
     }
 }

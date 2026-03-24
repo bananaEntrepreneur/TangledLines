@@ -20,9 +20,8 @@ public class Node {
         if (!_movable || newPosition == null || newPosition.equals(_position)) {
             return;
         }
-        Point2D oldPosition = _position;
         _position = newPosition;
-        notifyListeners(oldPosition, newPosition);
+        notifyListeners(newPosition);
     }
 
     public Point2D getPosition() { return _position; }
@@ -31,9 +30,9 @@ public class Node {
 
     public void addListener(NodeChangeListener listener) { _listeners.add(listener); }
 
-    private void notifyListeners(Point2D oldPosition, Point2D newPosition) {
+    private void notifyListeners(Point2D newPosition) {
         for (NodeChangeListener listener : _listeners) {
-            listener.onNodeMoved(this, oldPosition, newPosition);
+            listener.onNodeMoved(this, newPosition);
         }
     }
 }

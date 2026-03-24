@@ -43,6 +43,10 @@ public class Field {
         return true;
     }
 
+    public List<Node> getNodes() { return List.copyOf(_nodes); }
+
+    public List<Edge> getEdges() { return List.copyOf(_edges); }
+
     private void addNode(Node node) {
         if (node != null && !_nodes.contains(node))
             _nodes.add(node);
@@ -73,8 +77,4 @@ public class Field {
         double dy = oldPos.getY() - newPos.getY();
         return dx * dx + dy * dy >= MIN_MOVE_DISTANCE_SQUARED;
     }
-
-    public List<Node> getNodes() { return List.copyOf(_nodes); }
-
-    public List<Edge> getEdges() { return List.copyOf(_edges); }
 }
