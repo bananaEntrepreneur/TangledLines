@@ -97,8 +97,12 @@ public class GamePanel extends JPanel {
 
         String status = "Moves: " + _game.getMoveCount() + "/" + _game.getMaxMoves();
 
-        if (_game.isGameOver()) {
-            status = _game.isWin() ? "YOU WIN!" : "GAME OVER";
+        if (_game.isAllLevelsComplete()) {
+            status = "ALL LEVELS COMPLETE!";
+            g2d.setColor(Color.GREEN);
+            g2d.setFont(new Font("Arial", Font.BOLD, 24));
+        } else if (_game.isGameOver()) {
+            status = _game.isWin() ? "LEVEL COMPLETE!" : "GAME OVER";
             g2d.setColor(_game.isWin() ? Color.GREEN : Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 24));
         }
