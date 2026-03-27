@@ -45,12 +45,12 @@ public class Game implements NodeChangeListener {
 
         _moveCount++;
 
-        if (_moveCount > _maxMoves) {
-            _gameOver = true;
-            _win = false;
-        } else if (!_intersectionChecker.hasIntersections(_field.getEdges())) {
+        if (!_intersectionChecker.hasIntersections(_field.getEdges())) {
             _gameOver = true;
             _win = true;
+        } else if (_moveCount >= _maxMoves) {
+            _gameOver = true;
+            _win = false;
         }
     }
 
