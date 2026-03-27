@@ -17,33 +17,6 @@ public class LevelManager {
         _levels = loadAllLevels(levelsDirectory);
     }
 
-    private List<Level> loadAllLevels(String directory) throws LevelLoadException {
-        File dir = new File(directory);
-        if (!dir.exists() || !dir.isDirectory()) {
-            return Collections.emptyList();
-        }
-
-        List<String> files = new ArrayList<>();
-        File[] levelFiles = dir.listFiles((d, name) -> name.endsWith(".json"));
-        if (levelFiles != null) {
-            Arrays.sort(levelFiles);
-            for (File file : levelFiles) {
-                files.add(file.getPath());
-            }
-        }
-
-        List<Level> levels = new ArrayList<>();
-        JsonLevelLoader loader = new JsonLevelLoader();
-        for (String path : files) {
-            try {
-                levels.add(loader.load(path));
-            } catch (IOException e) {
-                throw new LevelLoadException("Failed to load: " + path);
-            }
-        }
-        return levels;
-    }
-
     public Field getCurrentField() {
         if (_levels.isEmpty()) {
             throw new IllegalStateException("No levels available");
@@ -82,4 +55,30 @@ public class LevelManager {
         return _currentLevelIndex < _levels.size() - 1;
     }
 
+    private List<Level> loadAllLevels(String directory) throws LevelLoadException {
+        File dir = new File(directory);
+        if (!dir.exists() || !dir.isDirectory()) {
+            return Collections.emptyList();
+        }
+
+        List<String> files = new ArrayList<>();
+        File[] levelFiles = dir.listFiles((d, name) -> name.endsWith(".json"));
+        if (levelFiles != null) {
+            Arrays.sort(levelFiles);
+            for (File file : levelFiles) {
+                files.add(file.getPath());
+            }
+        }
+
+        List<Level> levels = new ArrayList<>();
+        JsonLevelLoader loader = new JsonLevelLoader();
+        for (String path : files) {
+            try {
+                levels.add(loader.load(path));
+            } catch (IOException e) {
+                throw new LevelLoadException("Failed to load: " + path);
+            }
+        }
+        return levels;
+    }
 }
