@@ -12,11 +12,11 @@ public class View implements NodeChangeListener {
 
     public View(Game game) {
         _game = game;
-        _frame = new GameFrame(game);
+        _frame = new GameFrame(game, this);
         subscribeToNodes();
     }
 
-    private void subscribeToNodes() {
+    public void subscribeToNodes() {
         for (Node node : _game.getField().getNodes()) {
             node.addListener(this);
         }
