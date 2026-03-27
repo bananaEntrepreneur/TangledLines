@@ -14,6 +14,7 @@ public class GamePanel extends JPanel {
     private static final int NODE_RADIUS = 15;
     private static final Color EDGE_COLOR = new Color(70, 130, 180);
     private static final Color NODE_COLOR = new Color(220, 20, 60);
+    private static final Color UNMOVABLE_NODE_COLOR = new Color(128, 128, 128);
     private static final Color NODE_HOVER_COLOR = new Color(255, 105, 180);
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245);
 
@@ -75,12 +76,14 @@ public class GamePanel extends JPanel {
             if (node == _draggedNode && _dragCurrentPosition != null) {
                 pos = _dragCurrentPosition;
             }
-            
+
             int x = (int) pos.getX() - NODE_RADIUS;
             int y = (int) pos.getY() - NODE_RADIUS;
 
             if (node == _hoveredNode || node == _draggedNode) {
                 g2d.setColor(NODE_HOVER_COLOR);
+            } else if (!node.isMovable()) {
+                g2d.setColor(UNMOVABLE_NODE_COLOR);
             } else {
                 g2d.setColor(NODE_COLOR);
             }
