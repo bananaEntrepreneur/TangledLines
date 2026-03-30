@@ -18,19 +18,19 @@ public class Edge {
         return new Line2D.Double(a.getX(), a.getY(), b.getX(), b.getY());
     }
 
-    public boolean hasIntersection(Edge other) {
-        if (sharesNodeWith(other)) {
+    public boolean intersects(Edge other) {
+        if (sharesEndpointWith(other)) {
             return false;
         }
-        return this.toLine().intersectsLine(other.toLine());
+        return toLine().intersectsLine(other.toLine());
     }
 
     public Node getNodeA() { return _nodeA; }
 
     public Node getNodeB() { return _nodeB; }
 
-    private boolean sharesNodeWith(Edge other) {
-        return this._nodeA == other._nodeA || this._nodeA == other._nodeB ||
-               this._nodeB == other._nodeA || this._nodeB == other._nodeB;
+    private boolean sharesEndpointWith(Edge other) {
+        return _nodeA == other._nodeA || _nodeA == other._nodeB
+            || _nodeB == other._nodeA || _nodeB == other._nodeB;
     }
 }

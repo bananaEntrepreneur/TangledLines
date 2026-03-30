@@ -125,8 +125,8 @@ class EdgeTest {
     }
 
     @Nested
-    @DisplayName("hasIntersection Tests - Intersecting Edges")
-    class HasIntersectionIntersectingTests {
+    @DisplayName("intersects Tests - Intersecting Edges")
+    class IntersectsIntersectingTests {
 
         @Test
         @DisplayName("Should detect intersection between crossing edges")
@@ -139,8 +139,8 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.hasIntersection(edge2));
-            assertTrue(edge2.hasIntersection(edge1));
+            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge2.intersects(edge1));
         }
 
         @Test
@@ -154,7 +154,7 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 50), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.hasIntersection(edge2));
+            assertTrue(edge1.intersects(edge2));
         }
 
         @Test
@@ -168,13 +168,13 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(50, 100), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.hasIntersection(edge2));
+            assertTrue(edge1.intersects(edge2));
         }
     }
 
     @Nested
-    @DisplayName("hasIntersection Tests - Non-Intersecting Edges")
-    class HasIntersectionNonIntersectingTests {
+    @DisplayName("intersects Tests - Non-Intersecting Edges")
+    class IntersectsNonIntersectingTests {
 
         @Test
         @DisplayName("Should return false for parallel non-overlapping edges")
@@ -187,7 +187,7 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 50), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
 
         @Test
@@ -201,7 +201,7 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(110, 110), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
 
         @Test
@@ -214,13 +214,13 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
     }
 
     @Nested
-    @DisplayName("hasIntersection Tests - Shared Nodes")
-    class HasIntersectionSharedNodesTests {
+    @DisplayName("intersects Tests - Shared Nodes")
+    class IntersectsSharedNodesTests {
 
         @Test
         @DisplayName("Should return false when edges share node A")
@@ -232,7 +232,7 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(0, 100), true);
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
 
         @Test
@@ -245,7 +245,7 @@ class EdgeTest {
             Node nodeA2 = new Node(new Point2D.Double(0, 100), true);
             Edge edge2 = new Edge(nodeA2, sharedNode);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
 
         @Test
@@ -256,8 +256,8 @@ class EdgeTest {
             Edge edge1 = new Edge(nodeA, nodeB);
             Edge edge2 = new Edge(nodeA, nodeB);
 
-            assertFalse(edge1.hasIntersection(edge2));
-            assertFalse(edge2.hasIntersection(edge1));
+            assertFalse(edge1.intersects(edge2));
+            assertFalse(edge2.intersects(edge1));
         }
 
         @Test
@@ -270,13 +270,13 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(0, 100), true);
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
     }
 
     @Nested
-    @DisplayName("hasIntersection Tests - Edge Cases")
-    class HasIntersectionEdgeCases {
+    @DisplayName("intersects Tests - Edge Cases")
+    class IntersectsEdgeCases {
 
         @Test
         @DisplayName("Should return false for zero-length edge (same node reference)")
@@ -288,7 +288,7 @@ class EdgeTest {
             Edge zeroLengthEdge = new Edge(isolatedNode, isolatedNode);
             Edge normalEdge = new Edge(nodeA, nodeB);
 
-            assertFalse(zeroLengthEdge.hasIntersection(normalEdge));
+            assertFalse(zeroLengthEdge.intersects(normalEdge));
         }
 
         @Test
@@ -302,7 +302,7 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(75, 0), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.hasIntersection(edge2));
+            assertTrue(edge1.intersects(edge2));
         }
 
         @Test
@@ -315,7 +315,7 @@ class EdgeTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
-            assertFalse(edge1.hasIntersection(edge2));
+            assertFalse(edge1.intersects(edge2));
         }
     }
 }
