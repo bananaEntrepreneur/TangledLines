@@ -30,7 +30,8 @@ public class LevelFactory {
 
         List<Node> nodes = field.getNodes();
         for (Level.EdgeData data : level.getEdges()) {
-            field.createEdge(nodes.get(data.nodeAIndex()), nodes.get(data.nodeBIndex()));
+            field.createEdge(nodes.get(data.nodeAIndex()),
+                nodes.get(data.nodeBIndex()));
         }
 
         return field;

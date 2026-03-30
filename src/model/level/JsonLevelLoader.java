@@ -32,13 +32,14 @@ public class JsonLevelLoader implements LevelLoader {
             throw new LevelLoadException("Level must have at least one node");
         }
 
-        int maxMoves = schema.maxMoves != null && schema.maxMoves > 0 
+        int maxMoves = (schema.maxMoves != null && schema.maxMoves > 0)
             ? schema.maxMoves : DEFAULT_MAX_MOVES;
 
         List<Level.NodeData> nodes = new ArrayList<>(schema.nodes.size());
         for (NodeSchema node : schema.nodes) {
             validateNode(node);
-            nodes.add(new Level.NodeData(node.x, node.y, node.movable != null ? node.movable : true));
+            nodes.add(new Level.NodeData(node.x, node.y,
+                node.movable != null ? node.movable : true));
         }
 
         List<Level.EdgeData> edges = new ArrayList<>();
@@ -62,9 +63,11 @@ public class JsonLevelLoader implements LevelLoader {
         if (edge.nodeA == null || edge.nodeB == null) {
             throw new LevelLoadException("Edge must have nodeA and nodeB indices");
         }
-        if (edge.nodeA < 0 || edge.nodeB < 0 || edge.nodeA >= nodeCount || edge.nodeB >= nodeCount) {
+        if (edge.nodeA < 0 || edge.nodeB < 0
+            || edge.nodeA >= nodeCount || edge.nodeB >= nodeCount) {
             throw new LevelLoadException(
-                String.format("Invalid edge indices (%d, %d) for %d nodes", edge.nodeA, edge.nodeB, nodeCount));
+                String.format("Invalid edge indices (%d, %d) for %d nodes",
+                    edge.nodeA, edge.nodeB, nodeCount));
         }
     }
 
