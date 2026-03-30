@@ -1,6 +1,5 @@
 package model.game;
 
-import model.factory.DefaultUnitFactory;
 import model.factory.UnitFactory;
 import model.units.Edge;
 import model.units.Node;
@@ -14,10 +13,6 @@ public class Field {
     private final UnitFactory _factory;
     private final List<Node> _nodes = new ArrayList<>();
     private final List<Edge> _edges = new ArrayList<>();
-
-    public Field() {
-        this(new DefaultUnitFactory());
-    }
 
     public Field(UnitFactory factory) {
         _factory = factory;
@@ -36,9 +31,9 @@ public class Field {
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
-        if (!isValidMove(node, newPosition))
+        if (!isValidMove(node, newPosition)) {
             return false;
-
+        }
         node.setPosition(newPosition);
         return true;
     }
@@ -48,28 +43,27 @@ public class Field {
     public List<Edge> getEdges() { return List.copyOf(_edges); }
 
     private void addNode(Node node) {
-        if (node != null && !_nodes.contains(node))
+        if (!_nodes.contains(node)) {
             _nodes.add(node);
+        }
     }
 
     private void addEdge(Edge edge) {
-        if (edge == null)
-                return;
-
+        if (edge == null) {
+            return;
+        }
         addNode(edge.getNodeA());
         addNode(edge.getNodeB());
-
-        if (!_edges.contains(edge))
+        if (!_edges.contains(edge)) {
             _edges.add(edge);
+        }
     }
 
     private boolean isValidMove(Node node, Point2D newPosition) {
         if (node == null || newPosition == null || !_nodes.contains(node)) {
             return false;
         }
-
-        Point2D oldPos = node.getPosition();
-        return hasMovedSignificantly(oldPos, newPosition);
+        return hasMovedSignificantly(node.getPosition(), newPosition);
     }
 
     private boolean hasMovedSignificantly(Point2D oldPos, Point2D newPos) {

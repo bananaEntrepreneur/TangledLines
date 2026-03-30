@@ -20,8 +20,8 @@ public class Game implements NodeChangeListener {
     public Game(LevelManager levelManager, IntersectionChecker intersectionChecker) {
         _levelManager = levelManager;
         _intersectionChecker = intersectionChecker;
-        _field = _levelManager.getCurrentField();
-        _maxMoves = _levelManager.getCurrentMaxMoves();
+        _field = levelManager.getCurrentField();
+        _maxMoves = levelManager.getCurrentMaxMoves();
     }
 
     public void start() {
@@ -33,15 +33,17 @@ public class Game implements NodeChangeListener {
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
-        if (_gameOver || _allLevelsComplete)
+        if (_gameOver || _allLevelsComplete) {
             return false;
+        }
         return _field.moveNode(node, newPosition);
     }
 
     @Override
     public void onNodeMoved(Node node, Point2D newPosition) {
-        if (_gameOver || _allLevelsComplete)
+        if (_gameOver || _allLevelsComplete) {
             return;
+        }
 
         _moveCount++;
 
@@ -58,46 +60,65 @@ public class Game implements NodeChangeListener {
         if (!_gameOver || !_win) {
             return false;
         }
+
         Field nextField = _levelManager.nextField();
         if (nextField == null) {
             _allLevelsComplete = true;
             return false;
         }
-        _field = nextField;
-        _maxMoves = _levelManager.getCurrentMaxMoves();
-        _moveCount = 0;
-        _gameOver = false;
-        _win = false;
-        subscribeToNodes();
+
+        resetForNewLevel(nextField);
         return true;
     }
 
     public void restartLevel() {
-        _field = _levelManager.getCurrentField();
+        resetForNewLevel(_levelManager.getCurrentField());
+    }
+
+    public boolean isGameOver() {
+        return _gameOver;
+    }
+
+    public boolean isWin() {
+        return _win;
+    }
+
+    public boolean isAllLevelsComplete() {
+        return _allLevelsComplete;
+    }
+
+    public Field getField() {
+        return _field;
+    }
+
+    public int getMoveCount() {
+        return _moveCount;
+    }
+
+    public int getMaxMoves() {
+        return _maxMoves;
+    }
+
+    public int getCurrentLevelIndex() {
+        return _levelManager.getCurrentLevelIndex();
+    }
+
+    public int getTotalLevels() {
+        return _levelManager.getTotalLevels();
+    }
+
+    public boolean hasNextLevel() {
+        return _levelManager.hasNextLevel();
+    }
+
+    private void resetForNewLevel(Field newField) {
+        _field = newField;
         _maxMoves = _levelManager.getCurrentMaxMoves();
         _moveCount = 0;
         _gameOver = false;
         _win = false;
         subscribeToNodes();
     }
-
-    public boolean isGameOver() { return _gameOver; }
-
-    public boolean isWin() { return _win; }
-
-    public boolean isAllLevelsComplete() { return _allLevelsComplete; }
-
-    public Field getField() { return _field; }
-
-    public int getMoveCount() { return _moveCount; }
-
-    public int getMaxMoves() { return _maxMoves; }
-
-    public int getCurrentLevelIndex() { return _levelManager.getCurrentLevelIndex(); }
-
-    public int getTotalLevels() { return _levelManager.getTotalLevels(); }
-
-    public boolean hasNextLevel() { return _levelManager.hasNextLevel(); }
 
     private void subscribeToNodes() {
         for (Node node : _field.getNodes()) {
