@@ -1,12 +1,16 @@
 package model.game;
 
+import model.game.intersection.IntersectionChecker;
+import model.game.state.FieldProvider;
+import model.game.state.GameState;
+import model.game.state.LevelNavigation;
 import model.level.LevelManager;
 import model.listeners.NodeChangeListener;
 import model.units.Node;
 
 import java.awt.geom.Point2D;
 
-public class Game implements NodeChangeListener {
+public class Game implements NodeChangeListener, GameState, FieldProvider, LevelNavigation {
     private final LevelManager _levelManager;
     private final IntersectionChecker _intersectionChecker;
     private Field _field;
@@ -56,6 +60,7 @@ public class Game implements NodeChangeListener {
         }
     }
 
+    @Override
     public boolean nextLevel() {
         if (!_gameOver || !_win) {
             return false;
@@ -71,45 +76,35 @@ public class Game implements NodeChangeListener {
         return true;
     }
 
-    public void restartLevel() {
-        resetForNewLevel(_levelManager.getCurrentField());
-    }
+    @Override
+    public void restartLevel() { resetForNewLevel(_levelManager.getCurrentField()); }
 
-    public boolean isGameOver() {
-        return _gameOver;
-    }
+    @Override
+    public boolean isGameOver() { return _gameOver; }
 
-    public boolean isWin() {
-        return _win;
-    }
+    @Override
+    public boolean isWin() { return _win; }
 
-    public boolean isAllLevelsComplete() {
-        return _allLevelsComplete;
-    }
+    @Override
+    public boolean isAllLevelsComplete() { return _allLevelsComplete; }
 
-    public Field getField() {
-        return _field;
-    }
+    @Override
+    public int getMoveCount() { return _moveCount; }
 
-    public int getMoveCount() {
-        return _moveCount;
-    }
+    @Override
+    public int getMaxMoves() { return _maxMoves; }
 
-    public int getMaxMoves() {
-        return _maxMoves;
-    }
+    @Override
+    public int getTotalLevels() { return _levelManager.getTotalLevels(); }
 
-    public int getCurrentLevelIndex() {
-        return _levelManager.getCurrentLevelIndex();
-    }
+    @Override
+    public Field getField() { return _field; }
 
-    public int getTotalLevels() {
-        return _levelManager.getTotalLevels();
-    }
+    @Override
+    public int getCurrentLevelIndex() { return _levelManager.getCurrentLevelIndex(); }
 
-    public boolean hasNextLevel() {
-        return _levelManager.hasNextLevel();
-    }
+    @Override
+    public boolean hasNextLevel() { return _levelManager.hasNextLevel(); }
 
     private void resetForNewLevel(Field newField) {
         _field = newField;
@@ -117,7 +112,8 @@ public class Game implements NodeChangeListener {
         _moveCount = 0;
         _gameOver = false;
         _win = false;
-        subscribeToNodes();
+        _started = false;
+        start();
     }
 
     private void subscribeToNodes() {
