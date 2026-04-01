@@ -1,7 +1,11 @@
 package model.level;
 
 import model.factory.DefaultUnitFactory;
+import model.factory.UnitFactory;
 import model.game.Field;
+import model.level.factory.LevelFactory;
+import model.level.loader.JsonLevelLoader;
+import model.level.loader.LevelLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,9 +15,16 @@ public class LevelManager {
     private final List<Level> _levels;
     private int _currentLevelIndex = 0;
     private final LevelFactory _factory;
+    private final LevelLoader _levelLoader;
 
     public LevelManager(String levelsDirectory) throws LevelLoadException {
-        _factory = new LevelFactory(new DefaultUnitFactory());
+        this(levelsDirectory, new JsonLevelLoader(), new DefaultUnitFactory());
+    }
+
+    public LevelManager(String levelsDirectory, LevelLoader levelLoader, UnitFactory unitFactory)
+            throws LevelLoadException {
+        _levelLoader = levelLoader;
+        _factory = new LevelFactory(unitFactory);
         _levels = loadAllLevels(levelsDirectory);
     }
 
@@ -62,7 +73,7 @@ public class LevelManager {
         }
 
         List<String> files = new ArrayList<>();
-        File[] levelFiles = dir.listFiles((d, name) -> name.endsWith(".json"));
+        File[] levelFiles = dir.listFiles((dirPath, name) -> name.endsWith(".json"));
         if (levelFiles != null) {
             Arrays.sort(levelFiles);
             for (File file : levelFiles) {
@@ -71,10 +82,9 @@ public class LevelManager {
         }
 
         List<Level> levels = new ArrayList<>();
-        JsonLevelLoader loader = new JsonLevelLoader();
         for (String path : files) {
             try {
-                levels.add(loader.load(path));
+                levels.add(_levelLoader.load(path));
             } catch (IOException e) {
                 throw new LevelLoadException("Failed to load: " + path);
             }
