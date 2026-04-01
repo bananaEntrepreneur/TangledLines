@@ -1,13 +1,16 @@
 package view;
 
 import model.game.Game;
+import model.game.state.GameState;
+import model.game.state.LevelNavigation;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GameFrame extends JFrame {
     private final GamePanel _gamePanel;
-    private final Game _game;
+    private final GameState _gameState;
+    private final LevelNavigation _levelNavigation;
     private final View _view;
     private JLabel _levelLabel;
     private JButton _nextLevelButton;
@@ -15,7 +18,8 @@ public class GameFrame extends JFrame {
 
     public GameFrame(Game game, View view) {
         super("Tangled Lines");
-        _game = game;
+        _gameState = game;
+        _levelNavigation = game;
         _view = view;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,17 +35,23 @@ public class GameFrame extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    public void refresh() {
+        _gamePanel.repaint();
+        updateLevelLabel();
+        updateButtons();
+    }
+
     private JPanel createControlPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        _levelLabel = new JLabel("Level 1/" + _game.getTotalLevels());
+        _levelLabel = new JLabel("Level 1/" + _gameState.getTotalLevels());
         panel.add(_levelLabel);
 
         _nextLevelButton = new JButton("Next Level");
         _nextLevelButton.setEnabled(false);
         _nextLevelButton.addActionListener(e -> {
-            if (_game.nextLevel()) {
+            if (_levelNavigation.nextLevel()) {
                 _view.subscribeToNodes();
                 updateLevelLabel();
                 updateButtons();
@@ -52,7 +62,7 @@ public class GameFrame extends JFrame {
 
         _restartButton = new JButton("Restart Level");
         _restartButton.addActionListener(e -> {
-            _game.restartLevel();
+            _levelNavigation.restartLevel();
             _view.subscribeToNodes();
             updateLevelLabel();
             updateButtons();
@@ -63,19 +73,13 @@ public class GameFrame extends JFrame {
         return panel;
     }
 
-    public void refresh() {
-        _gamePanel.repaint();
-        updateLevelLabel();
-        updateButtons();
-    }
-
     private void updateLevelLabel() {
-        _levelLabel.setText("Level " + (_game.getCurrentLevelIndex() + 1) + "/" + _game.getTotalLevels());
+        _levelLabel.setText("Level " + (_levelNavigation.getCurrentLevelIndex() + 1) + "/" + _gameState.getTotalLevels());
     }
 
     private void updateButtons() {
-        if (_game.isWin()) {
-            _nextLevelButton.setEnabled(_game.hasNextLevel());
+        if (_gameState.isWin()) {
+            _nextLevelButton.setEnabled(_levelNavigation.hasNextLevel());
         } else {
             _nextLevelButton.setEnabled(false);
         }
