@@ -9,15 +9,17 @@ public class Level {
 
     public Level(int maxMoves, List<NodeData> nodes, List<EdgeData> edges) {
         if (maxMoves < 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("maxMoves must be at least 1, got: " + maxMoves);
         }
         _maxMoves = maxMoves;
+        
         if (nodes == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("nodes list cannot be null");
         }
         _nodes = nodes;
+        
         if (edges == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("edges list cannot be null");
         }
         _edges = edges;
     }

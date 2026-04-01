@@ -1,9 +1,9 @@
 package e2e;
 
-import model.game.DefaultIntersectionChecker;
 import model.game.Field;
 import model.game.Game;
-import model.game.IntersectionChecker;
+import model.game.intersection.DefaultIntersectionChecker;
+import model.game.intersection.IntersectionChecker;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import model.units.Node;
