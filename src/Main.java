@@ -1,5 +1,5 @@
 import model.game.Game;
-import model.game.DefaultIntersectionChecker;
+import model.game.intersection.DefaultIntersectionChecker;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import view.View;
