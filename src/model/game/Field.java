@@ -18,16 +18,14 @@ public class Field {
         _factory = factory;
     }
 
-    public Node createNode(Point2D position, boolean movable) {
+    public void createNode(Point2D position, boolean movable) {
         Node node = _factory.createNode(position, movable);
         addNode(node);
-        return node;
     }
 
-    public Edge createEdge(Node nodeA, Node nodeB) {
+    public void createEdge(Node nodeA, Node nodeB) {
         Edge edge = _factory.createEdge(nodeA, nodeB);
         addEdge(edge);
-        return edge;
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
