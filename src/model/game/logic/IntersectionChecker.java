@@ -1,11 +1,10 @@
-package model.game.intersection;
+package model.game.logic;
 
 import model.units.Edge;
 
 import java.util.List;
 
-public class DefaultIntersectionChecker implements IntersectionChecker {
-    @Override
+public class IntersectionChecker {
     public boolean hasIntersections(List<Edge> edges) {
         int size = edges.size();
         for (int i = 0; i < size; i++) {

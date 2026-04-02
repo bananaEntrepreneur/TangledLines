@@ -1,5 +1,4 @@
 import model.game.Game;
-import model.game.intersection.DefaultIntersectionChecker;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import view.View;
@@ -21,7 +20,7 @@ public class Main {
             return;
         }
 
-        Game game = new Game(levelManager, new DefaultIntersectionChecker());
+        Game game = new Game(levelManager);
         game.start();
 
         View view = new View(game);
