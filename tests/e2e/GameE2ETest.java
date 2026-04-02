@@ -2,8 +2,7 @@ package e2e;
 
 import model.game.Field;
 import model.game.Game;
-import model.game.intersection.DefaultIntersectionChecker;
-import model.game.intersection.IntersectionChecker;
+import model.game.logic.IntersectionChecker;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import model.units.Node;
@@ -28,8 +27,8 @@ class GameE2ETest {
     @BeforeEach
     void setUp() throws LevelLoadException {
         _levelManager = new LevelManager(LEVELS_DIR);
-        _intersectionChecker = new DefaultIntersectionChecker();
-        _game = new Game(_levelManager, _intersectionChecker);
+        _intersectionChecker = new IntersectionChecker();
+        _game = new Game(_levelManager);
     }
 
     @Nested
@@ -161,7 +160,6 @@ class GameE2ETest {
                     .filter(Node::isMovable)
                     .toList();
 
-            // Make moves until win (resolve intersections)
             Point2D winPosition = new Point2D.Double(10000, 10000);
             _game.moveNode(movableNodes.get(0), winPosition);
 
