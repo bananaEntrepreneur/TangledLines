@@ -1,24 +1,29 @@
 package view;
 
 import model.game.Game;
-import model.game.state.FieldProvider;
+import model.game.state.GameState;
+import model.game.state.LevelNavigation;
+import model.listeners.GameStateChangedListener;
+import model.listeners.LevelNavigationChangeListener;
 import model.listeners.NodeChangeListener;
 import model.units.Node;
 
 import java.awt.geom.Point2D;
 
-public class View implements NodeChangeListener {
+public class View implements NodeChangeListener, GameStateChangedListener, LevelNavigationChangeListener {
     private final GameFrame _frame;
-    private final FieldProvider _fieldProvider;
+    private final Game _game;
 
     public View(Game game) {
-        _fieldProvider = game;
+        _game = game;
         _frame = new GameFrame(game, this);
+        _game.addGameStateChangedListener(this);
+        _game.addLevelNavigationChangeListener(this);
         subscribeToNodes();
     }
 
     public void subscribeToNodes() {
-        for (Node node : _fieldProvider.getField().getNodes()) {
+        for (Node node : _game.getField().getNodes()) {
             node.addListener(this);
         }
     }
@@ -29,6 +34,16 @@ public class View implements NodeChangeListener {
 
     @Override
     public void onNodeMoved(Node node, Point2D newPosition) {
+        _frame.refresh();
+    }
+
+    @Override
+    public void onGameStateChanged(GameState gameState) {
+        _frame.refresh();
+    }
+
+    @Override
+    public void onLevelChanged(LevelNavigation levelNavigation) {
         _frame.refresh();
     }
 }
