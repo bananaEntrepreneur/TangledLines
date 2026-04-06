@@ -58,7 +58,7 @@ public class Field {
     }
 
     private boolean isValidMove(Node node, Point2D newPosition) {
-        if (node == null || newPosition == null || !_nodes.contains(node)) {
+        if (node == null || newPosition == null || !_nodes.contains(node) || !node.isMovable()) {
             return false;
         }
         return hasMovedSignificantly(node.getPosition(), newPosition);
