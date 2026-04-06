@@ -18,7 +18,6 @@ public class Game implements NodeChangeListener {
     private final GameState _gameState;
     private final LevelNavigation _levelNavigation;
 
-    private boolean _started = false;
     private final List<GameStateChangedListener> _gameStateListeners = new ArrayList<>();
     private final List<LevelNavigationChangeListener> _levelNavigationListeners = new ArrayList<>();
 
@@ -26,6 +25,7 @@ public class Game implements NodeChangeListener {
         _intersectionChecker = new IntersectionChecker();
         _gameState = new GameState(levelManager.getCurrentField(), levelManager.getCurrentMaxMoves());
         _levelNavigation = new LevelNavigation(levelManager, _gameState);
+        subscribeToNodes();
     }
 
     public void addGameStateChangedListener(GameStateChangedListener listener) {
@@ -34,26 +34,6 @@ public class Game implements NodeChangeListener {
 
     public void addLevelNavigationChangeListener(LevelNavigationChangeListener listener) {
         _levelNavigationListeners.add(listener);
-    }
-
-    private void notifyGameStateChangedListeners() {
-        for (GameStateChangedListener listener : _gameStateListeners) {
-            listener.onGameStateChanged(_gameState);
-        }
-    }
-
-    private void notifyLevelNavigationChangeListeners() {
-        for (LevelNavigationChangeListener listener : _levelNavigationListeners) {
-            listener.onLevelChanged(_levelNavigation);
-        }
-    }
-
-    public void start() {
-        if (_started) {
-            return;
-        }
-        _started = true;
-        subscribeToNodes();
     }
 
     public boolean moveNode(Node node, Point2D newPosition) {
@@ -82,8 +62,6 @@ public class Game implements NodeChangeListener {
         }
     }
 
-    public Field getField() { return _gameState.getField(); }
-
     public boolean nextLevel() {
         boolean result = _levelNavigation.nextLevel();
         if (result) {
@@ -101,6 +79,8 @@ public class Game implements NodeChangeListener {
         notifyGameStateChangedListeners();
     }
 
+    public Field getField() { return _gameState.getField(); }
+
     public int getCurrentLevelIndex() { return _levelNavigation.getCurrentLevelIndex(); }
 
     public int getTotalLevels() { return _levelNavigation.getTotalLevels(); }
@@ -116,6 +96,18 @@ public class Game implements NodeChangeListener {
     public int getMoveCount() { return _gameState.getMoveCount(); }
 
     public int getMaxMoves() { return _gameState.getMaxMoves(); }
+
+    private void notifyGameStateChangedListeners() {
+        for (GameStateChangedListener listener : _gameStateListeners) {
+            listener.onGameStateChanged(_gameState);
+        }
+    }
+
+    private void notifyLevelNavigationChangeListeners() {
+        for (LevelNavigationChangeListener listener : _levelNavigationListeners) {
+            listener.onLevelChanged(_levelNavigation);
+        }
+    }
 
     private void subscribeToNodes() {
         for (Node node : _gameState.getField().getNodes()) {

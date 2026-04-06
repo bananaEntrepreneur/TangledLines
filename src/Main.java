@@ -21,7 +21,6 @@ public class Main {
         }
 
         Game game = new Game(levelManager);
-        game.start();
 
         View view = new View(game);
         view.show();

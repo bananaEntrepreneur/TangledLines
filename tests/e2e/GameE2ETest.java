@@ -38,8 +38,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should initialize with first level loaded")
         void shouldInitializeWithFirstLevel() {
-            _game.start();
-
             assertNotNull(_game.getField());
             assertEquals(0, _game.getCurrentLevelIndex());
             assertEquals(0, _game.getMoveCount());
@@ -50,8 +48,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should have correct move limit from level config")
         void shouldHaveCorrectMoveLimit() {
-            _game.start();
-
             assertTrue(_game.getMaxMoves() > 0);
             assertEquals(_levelManager.getCurrentMaxMoves(), _game.getMaxMoves());
         }
@@ -59,18 +55,14 @@ class GameE2ETest {
         @Test
         @DisplayName("Should load all nodes from level file")
         void shouldLoadAllNodes() {
-            _game.start();
             Field field = _game.getField();
-
             assertTrue(field.getNodes().size() > 0);
         }
 
         @Test
         @DisplayName("Should load all edges from level file")
         void shouldLoadAllEdges() {
-            _game.start();
             Field field = _game.getField();
-
             assertTrue(field.getEdges().size() > 0);
         }
     }
@@ -82,7 +74,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should allow moving movable node within move limit")
         void shouldAllowMovingMovableNode() {
-            _game.start();
             Field field = _game.getField();
             Node movableNode = field.getNodes().stream()
                     .filter(Node::isMovable)
@@ -104,7 +95,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should reject moving non-movable node")
         void shouldRejectMovingNonMovableNode() {
-            _game.start();
             Field field = _game.getField();
             Node nonMovableNode = field.getNodes().stream()
                     .filter(node -> !node.isMovable())
@@ -130,7 +120,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should count each valid move")
         void shouldCountEachValidMove() {
-            _game.start();
             Field field = _game.getField();
             List<Node> movableNodes = field.getNodes().stream()
                     .filter(Node::isMovable)
@@ -154,7 +143,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should reject move after game over")
         void shouldRejectMoveAfterGameOver() {
-            _game.start();
             Field field = _game.getField();
             List<Node> movableNodes = field.getNodes().stream()
                     .filter(Node::isMovable)
@@ -180,7 +168,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should win when all intersections resolved within move limit")
         void shouldWinWhenIntersectionsResolved() {
-            _game.start();
             Field field = _game.getField();
 
             boolean hasIntersectionsInitially = _intersectionChecker.hasIntersections(field.getEdges());
@@ -205,14 +192,13 @@ class GameE2ETest {
         @Test
         @DisplayName("Should lose when move limit exceeded with intersections")
         void shouldLoseWhenMoveLimitExceeded() {
-            _game.start();
             Field field = _game.getField();
             List<Node> movableNodes = field.getNodes().stream()
                     .filter(Node::isMovable)
                     .toList();
 
             int maxMoves = _game.getMaxMoves();
-            
+
             for (int i = 0; i < maxMoves + 1; i++) {
                 Point2D newPos = new Point2D.Double(
                         movableNodes.get(0).getPosition().getX() + 100 * (i + 1),
@@ -235,8 +221,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should not allow next level without winning")
         void shouldNotAllowNextLevelWithoutWinning() {
-            _game.start();
-
             boolean result = _game.nextLevel();
 
             assertFalse(result);
@@ -246,8 +230,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should allow next level after winning")
         void shouldAllowNextLevelAfterWinning() {
-            _game.start();
-
             if (_game.getTotalLevels() > 1) {
                 _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
@@ -268,8 +250,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should reset move count on next level")
         void shouldResetMoveCountOnNextLevel() {
-            _game.start();
-
             if (_game.getTotalLevels() > 1) {
                 _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
@@ -285,7 +265,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should restart level with original configuration")
         void shouldRestartLevelWithOriginalConfiguration() {
-            _game.start();
             Field initialField = _game.getField();
 
             Node movableNode = initialField.getNodes().stream()
@@ -326,7 +305,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should track current level index correctly")
         void shouldTrackCurrentLevelIndex() {
-            _game.start();
             assertEquals(0, _game.getCurrentLevelIndex());
 
             if (_game.getTotalLevels() > 1) {
@@ -342,8 +320,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should detect when all levels complete")
         void shouldDetectAllLevelsComplete() {
-            _game.start();
-
             if (_game.getTotalLevels() == 1) {
                 _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
@@ -357,7 +333,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should load different field for each level")
         void shouldLoadDifferentFieldForEachLevel() {
-            _game.start();
             Field firstField = _game.getField();
             int firstNodeCount = firstField.getNodes().size();
             int firstEdgeCount = firstField.getEdges().size();
@@ -385,8 +360,8 @@ class GameE2ETest {
     class GameStateTests {
 
         @Test
-        @DisplayName("Should allow moves before game started (Field level)")
-        void shouldAllowMovesBeforeStart() {
+        @DisplayName("Should allow moves immediately after construction")
+        void shouldAllowMovesAfterConstruction() {
             Field field = _game.getField();
             Node node = field.getNodes().get(0);
             Point2D originalPos = new Point2D.Double(
@@ -404,7 +379,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should maintain game state after multiple operations")
         void shouldMaintainGameStateAfterOperations() {
-            _game.start();
             Field field = _game.getField();
             List<Node> movableNodes = field.getNodes().stream()
                     .filter(Node::isMovable)
@@ -420,11 +394,10 @@ class GameE2ETest {
         @Test
         @DisplayName("Should handle restart after game over")
         void shouldHandleRestartAfterGameOver() {
-            _game.start();
             Field field = _game.getField();
-            
+
             boolean hasIntersectionsInitially = _intersectionChecker.hasIntersections(field.getEdges());
-            
+
             if (hasIntersectionsInitially) {
                 List<Node> movableNodes = field.getNodes().stream()
                         .filter(Node::isMovable)
@@ -451,7 +424,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should detect intersections in initial level state")
         void shouldDetectIntersectionsInInitialState() {
-            _game.start();
             Field field = _game.getField();
 
             boolean hasIntersections = _intersectionChecker.hasIntersections(field.getEdges());
@@ -462,7 +434,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should update intersection status after node movement")
         void shouldUpdateIntersectionStatusAfterMovement() {
-            _game.start();
             Field field = _game.getField();
 
             boolean initialIntersections = _intersectionChecker.hasIntersections(field.getEdges());
@@ -470,7 +441,7 @@ class GameE2ETest {
             List<Node> movableNodes = field.getNodes().stream()
                     .filter(Node::isMovable)
                     .toList();
-            
+
             Point2D winPosition = new Point2D.Double(10000, 10000);
             _game.moveNode(movableNodes.get(0), winPosition);
 
@@ -484,7 +455,6 @@ class GameE2ETest {
         @Test
         @DisplayName("Should have correct edge count from level file")
         void shouldHaveCorrectEdgeCount() {
-            _game.start();
             Field field = _game.getField();
 
             assertTrue(field.getEdges().size() > 0);
