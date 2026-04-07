@@ -48,27 +48,32 @@ public class GameFrame extends JFrame implements GameStateChangedListener {
 
         _nextLevelButton = new JButton("Next Level");
         _nextLevelButton.setEnabled(false);
-        _nextLevelButton.addActionListener(e -> {
-            if (_game.nextLevel()) {
-                _view.subscribeToNodes();
-                updateLevelLabel();
-                updateButtons();
-                _gamePanel.repaint();
-            }
-        });
+        _nextLevelButton.addActionListener(e -> handleNextLevel());
         panel.add(_nextLevelButton);
 
         _restartButton = new JButton("Restart Level");
-        _restartButton.addActionListener(e -> {
-            _game.restartLevel();
-            _view.subscribeToNodes();
-            updateLevelLabel();
-            updateButtons();
-            _gamePanel.repaint();
-        });
+        _restartButton.addActionListener(e -> handleRestartLevel());
         panel.add(_restartButton);
 
         return panel;
+    }
+
+    private void handleNextLevel() {
+        if (_game.nextLevel()) {
+            afterLevelTransition();
+        }
+    }
+
+    private void handleRestartLevel() {
+        _game.restartLevel();
+        afterLevelTransition();
+    }
+
+    private void afterLevelTransition() {
+        _view.subscribeToNodes();
+        updateLevelLabel();
+        updateButtons();
+        _gamePanel.repaint();
     }
 
     private void updateLevelLabel() {
