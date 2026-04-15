@@ -1,6 +1,5 @@
 package model.game;
 
-import model.game.logic.IntersectionChecker;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
 import model.level.LevelManager;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Game implements NodeChangeListener {
-    private final IntersectionChecker _intersectionChecker;
     private final GameState _gameState;
     private final LevelNavigation _levelNavigation;
 
@@ -22,25 +20,8 @@ public class Game implements NodeChangeListener {
     private final List<LevelNavigationChangeListener> _levelNavigationListeners = new ArrayList<>();
 
     public Game(LevelManager levelManager) {
-        _intersectionChecker = new IntersectionChecker();
         _gameState = new GameState(levelManager.getCurrentField(), levelManager.getCurrentMaxMoves());
         _levelNavigation = new LevelNavigation(levelManager, _gameState);
-        subscribeToNodes();
-    }
-
-    public void addGameStateChangedListener(GameStateChangedListener listener) {
-        _gameStateListeners.add(listener);
-    }
-
-    public void addLevelNavigationChangeListener(LevelNavigationChangeListener listener) {
-        _levelNavigationListeners.add(listener);
-    }
-
-    public boolean moveNode(Node node, Point2D newPosition) {
-        if (_gameState.isGameOver() || _gameState.isAllLevelsComplete()) {
-            return false;
-        }
-        return _gameState.getField().moveNode(node, newPosition);
     }
 
     @Override
@@ -51,21 +32,29 @@ public class Game implements NodeChangeListener {
 
         _gameState.incrementMoveCount();
 
-        if (!_intersectionChecker.hasIntersections(_gameState.getField().getEdges())) {
+        if (!_gameState.getField().hasIntersections()) {
             _gameState.setGameOver(true);
             _gameState.setWin(true);
-            notifyGameStateChangedListeners();
         } else if (_gameState.getMoveCount() >= _gameState.getMaxMoves()) {
             _gameState.setGameOver(true);
             _gameState.setWin(false);
-            notifyGameStateChangedListeners();
+        } else {
+            return;
         }
+        notifyGameStateChangedListeners();
+    }
+
+    public void addGameStateChangedListener(GameStateChangedListener listener) {
+        _gameStateListeners.add(listener);
+    }
+
+    public void addLevelNavigationChangeListener(LevelNavigationChangeListener listener) {
+        _levelNavigationListeners.add(listener);
     }
 
     public boolean nextLevel() {
         boolean result = _levelNavigation.nextLevel();
         if (result) {
-            subscribeToNodes();
             notifyLevelNavigationChangeListeners();
             notifyGameStateChangedListeners();
         }
@@ -74,7 +63,6 @@ public class Game implements NodeChangeListener {
 
     public void restartLevel() {
         _levelNavigation.restartLevel();
-        subscribeToNodes();
         notifyLevelNavigationChangeListeners();
         notifyGameStateChangedListeners();
     }
@@ -106,12 +94,6 @@ public class Game implements NodeChangeListener {
     private void notifyLevelNavigationChangeListeners() {
         for (LevelNavigationChangeListener listener : _levelNavigationListeners) {
             listener.onLevelChanged(_levelNavigation);
-        }
-    }
-
-    private void subscribeToNodes() {
-        for (Node node : _gameState.getField().getNodes()) {
-            node.addListener(this);
         }
     }
 }

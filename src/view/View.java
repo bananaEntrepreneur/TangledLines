@@ -17,13 +17,10 @@ public class View implements NodeChangeListener, GameStateChangedListener, Level
     public View(Game game) {
         _game = game;
         _frame = new GameFrame(game, this);
-        _game.addGameStateChangedListener(this);
-        _game.addLevelNavigationChangeListener(this);
-        subscribeToNodes();
     }
 
     public void subscribeToNodes() {
-        for (Node node : _game.getField().getNodes()) {
+        for (Node node : _field.getNodes()) {
             node.addListener(this);
         }
     }

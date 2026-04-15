@@ -1,3 +1,4 @@
+import model.game.Field;
 import model.game.Game;
 import model.level.LevelManager;
 import model.level.LevelLoadException;

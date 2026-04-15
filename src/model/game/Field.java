@@ -1,21 +1,27 @@
 package model.game;
 
 import model.factory.UnitFactory;
+import model.listeners.TransactionListener;
 import model.units.Edge;
 import model.units.Node;
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Field {
-    private static final double MIN_MOVE_DISTANCE_SQUARED = 1.0;
+public class Field implements TransactionListener{
     private final UnitFactory _factory;
     private final List<Node> _nodes = new ArrayList<>();
     private final List<Edge> _edges = new ArrayList<>();
 
     public Field(UnitFactory factory) {
         _factory = factory;
+    }
+
+    @Override
+    public void onCommitted(Node node, Point2D finalPosition) {
+        if (!finalPosition.equals(node.getPosition())) {
+            moveNode(node, finalPosition);
+        }
     }
 
     public void createNode(Point2D position, boolean movable) {
@@ -28,17 +34,27 @@ public class Field {
         addEdge(edge);
     }
 
-    public boolean moveNode(Node node, Point2D newPosition) {
-        if (!isValidMove(node, newPosition)) {
-            return false;
+    public boolean hasIntersections() {
+        int size = _edges.size();
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                if (_edges.get(i).crosses(_edges.get(j))) {
+                    return true;
+                }
+            }
         }
-        node.setPosition(newPosition);
-        return true;
+        return false;
     }
 
     public List<Node> getNodes() { return List.copyOf(_nodes); }
-
     public List<Edge> getEdges() { return List.copyOf(_edges); }
+
+    private boolean moveNode(Node node, Point2D newPosition) {
+        if (node == null || !_nodes.contains(node)) {
+            return false;
+        }
+        return node.move(newPosition);
+    }
 
     private void addNode(Node node) {
         if (!_nodes.contains(node)) {
@@ -47,26 +63,11 @@ public class Field {
     }
 
     private void addEdge(Edge edge) {
-        if (edge == null) {
-            return;
-        }
+        if (edge == null) return;
         addNode(edge.getNodeA());
         addNode(edge.getNodeB());
         if (!_edges.contains(edge)) {
             _edges.add(edge);
         }
-    }
-
-    private boolean isValidMove(Node node, Point2D newPosition) {
-        if (node == null || newPosition == null || !_nodes.contains(node) || !node.isMovable()) {
-            return false;
-        }
-        return hasMovedSignificantly(node.getPosition(), newPosition);
-    }
-
-    private boolean hasMovedSignificantly(Point2D oldPos, Point2D newPos) {
-        double dx = oldPos.getX() - newPos.getX();
-        double dy = oldPos.getY() - newPos.getY();
-        return dx * dx + dy * dy >= MIN_MOVE_DISTANCE_SQUARED;
     }
 }

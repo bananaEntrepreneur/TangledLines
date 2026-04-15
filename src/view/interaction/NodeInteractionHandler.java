@@ -1,6 +1,7 @@
 package view.interaction;
 
 import model.game.Game;
+import model.game.MoveTransaction;
 import model.units.Node;
 
 import java.awt.Point;
@@ -16,10 +17,11 @@ public class NodeInteractionHandler extends MouseAdapter {
 
     private Node _hoveredNode = null;
     private Node _draggedNode = null;
+    private MoveTransaction _dragTransaction = null;
     private Point _dragOffset = new Point();
     private Point2D _dragCurrentPosition = null;
 
-    public NodeInteractionHandler(Game game, NodeFinder nodeFinder, 
+    public NodeInteractionHandler(Game game, NodeFinder nodeFinder,
                                    DragListener dragListener, HoverListener hoverListener) {
         _game = game;
         _nodeFinder = nodeFinder;
@@ -33,34 +35,43 @@ public class NodeInteractionHandler extends MouseAdapter {
 
         _draggedNode = _nodeFinder.findNodeAt(e.getPoint());
         if (_draggedNode != null) {
-            Point2D pos = _draggedNode.getPosition();
-            _dragOffset = new Point(
-                e.getX() - (int) pos.getX(),
-                e.getY() - (int) pos.getY()
-            );
+            // Start a transactional drag through the movement controller
+            _dragTransaction = _game.startDrag(_draggedNode);
+            if (_dragTransaction != null) {
+                Point2D pos = _draggedNode.getPosition();
+                _dragOffset = new Point(
+                    e.getX() - (int) pos.getX(),
+                    e.getY() - (int) pos.getY()
+                );
+            } else {
+                _draggedNode = null;
+            }
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (_draggedNode != null && !_game.isGameOver()) {
-            Point2D newPosition = new Point2D.Double(
-                e.getX() - _dragOffset.x,
-                e.getY() - _dragOffset.y
-            );
-            _game.moveNode(_draggedNode, newPosition);
+        if (_draggedNode != null && _dragTransaction != null && !_game.isGameOver()) {
+            // Commit the transaction
+            _game.commitDrag(_dragTransaction);
+        } else if (_dragTransaction != null) {
+            // Cancel the transaction if game is over or no valid node
+            _game.cancelDrag(_dragTransaction);
         }
         _draggedNode = null;
+        _dragTransaction = null;
         _dragCurrentPosition = null;
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (_draggedNode != null && !_game.isGameOver()) {
+        if (_draggedNode != null && _dragTransaction != null && !_game.isGameOver()) {
             _dragCurrentPosition = new Point2D.Double(
                 e.getX() - _dragOffset.x,
                 e.getY() - _dragOffset.y
             );
+            // Queue the movement in the transaction (doesn't modify model yet)
+            _game.updateDragPosition(_dragTransaction, _dragCurrentPosition);
             _dragListener.onDraggedNodeMoved(_draggedNode, _dragCurrentPosition);
         }
     }
@@ -80,6 +91,10 @@ public class NodeInteractionHandler extends MouseAdapter {
 
     public Point2D getDragCurrentPosition() {
         return _dragCurrentPosition;
+    }
+
+    public MoveTransaction getDragTransaction() {
+        return _dragTransaction;
     }
 
     public Node getHoveredNode() {
