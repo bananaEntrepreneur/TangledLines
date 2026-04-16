@@ -2,6 +2,6 @@ package model.listeners;
 
 import model.game.state.LevelNavigation;
 
-public interface LevelNavigationChangeListener {
+public interface LevelNavigationListener {
     void onLevelChanged(LevelNavigation levelNavigation);
 }

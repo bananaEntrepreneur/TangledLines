@@ -1,6 +1,6 @@
 package unit;
 
-import model.listeners.NodeChangeListener;
+import model.listeners.NodeListener;
 import model.units.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,7 +66,7 @@ class NodeTest {
         @DisplayName("Should notify listeners when position changes")
         void shouldNotifyListenersOnPositionChange() {
             Node node = new Node(_initialPosition, true);
-            MockNodeChangeListener listener = new MockNodeChangeListener();
+            MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
             node.setPosition(_newPosition);
@@ -95,7 +95,7 @@ class NodeTest {
         @DisplayName("Should not notify listeners for non-movable node")
         void shouldNotNotifyListenersForNonMovableNode() {
             Node node = new Node(_initialPosition, false);
-            MockNodeChangeListener listener = new MockNodeChangeListener();
+            MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
             node.setPosition(_newPosition);
@@ -122,7 +122,7 @@ class NodeTest {
         @DisplayName("Should not notify listeners when newPosition is null")
         void shouldNotNotifyListenersWhenNull() {
             Node node = new Node(_initialPosition, true);
-            MockNodeChangeListener listener = new MockNodeChangeListener();
+            MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
             node.setPosition(null);
@@ -144,7 +144,7 @@ class NodeTest {
         @DisplayName("Should not notify listeners when newPosition equals current position")
         void shouldNotNotifyListenersWhenSame() {
             Node node = new Node(_initialPosition, true);
-            MockNodeChangeListener listener = new MockNodeChangeListener();
+            MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
             node.setPosition(_initialPosition);
@@ -172,8 +172,8 @@ class NodeTest {
         @DisplayName("Should support multiple listeners")
         void shouldSupportMultipleListeners() {
             Node node = new Node(_initialPosition, true);
-            MockNodeChangeListener listener1 = new MockNodeChangeListener();
-            MockNodeChangeListener listener2 = new MockNodeChangeListener();
+            MockNodeListener listener1 = new MockNodeListener();
+            MockNodeListener listener2 = new MockNodeListener();
             node.addListener(listener1);
             node.addListener(listener2);
 
@@ -187,8 +187,8 @@ class NodeTest {
         @DisplayName("Should notify all listeners with same position")
         void shouldNotifyAllListenersWithSamePosition() {
             Node node = new Node(_initialPosition, true);
-            MockNodeChangeListener listener1 = new MockNodeChangeListener();
-            MockNodeChangeListener listener2 = new MockNodeChangeListener();
+            MockNodeListener listener1 = new MockNodeListener();
+            MockNodeListener listener2 = new MockNodeListener();
             node.addListener(listener1);
             node.addListener(listener2);
 
@@ -203,7 +203,7 @@ class NodeTest {
         void shouldNotifyListenersAddedAfterCreation() {
             Node node = new Node(_initialPosition, true);
 
-            MockNodeChangeListener listener = new MockNodeChangeListener();
+            MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
             node.setPosition(_newPosition);
@@ -236,13 +236,13 @@ class NodeTest {
         }
     }
 
-    private static class MockNodeChangeListener implements NodeChangeListener {
+    private static class MockNodeListener implements NodeListener {
         private boolean _notified = false;
         private Node _notifiedNode;
         private Point2D _lastPosition;
 
         @Override
-        public void onNodeMoved(Node node, Point2D newPosition) {
+        public void onMoved(Node node, Point2D newPosition) {
             _notified = true;
             _notifiedNode = node;
             _lastPosition = newPosition;

@@ -3,21 +3,21 @@ package model.game;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
 import model.level.LevelManager;
-import model.listeners.GameStateChangedListener;
-import model.listeners.LevelNavigationChangeListener;
-import model.listeners.NodeChangeListener;
+import model.listeners.GameStateListener;
+import model.listeners.LevelNavigationListener;
+import model.listeners.NodeListener;
 import model.units.Node;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game implements NodeChangeListener {
+public class Game implements NodeListener {
     private final GameState _gameState;
     private final LevelNavigation _levelNavigation;
 
-    private final List<GameStateChangedListener> _gameStateListeners = new ArrayList<>();
-    private final List<LevelNavigationChangeListener> _levelNavigationListeners = new ArrayList<>();
+    private final List<GameStateListener> _gameStateListeners = new ArrayList<>();
+    private final List<LevelNavigationListener> _levelNavigationListeners = new ArrayList<>();
 
     public Game(LevelManager levelManager) {
         _gameState = new GameState(levelManager.getCurrentField(), levelManager.getCurrentMaxMoves());
@@ -25,7 +25,7 @@ public class Game implements NodeChangeListener {
     }
 
     @Override
-    public void onNodeMoved(Node node, Point2D newPosition) {
+    public void onMoved(Node node, Point2D newPosition) {
         if (_gameState.isGameOver() || _gameState.isAllLevelsComplete()) {
             return;
         }
@@ -44,11 +44,11 @@ public class Game implements NodeChangeListener {
         notifyGameStateChangedListeners();
     }
 
-    public void addGameStateChangedListener(GameStateChangedListener listener) {
+    public void addGameStateChangedListener(GameStateListener listener) {
         _gameStateListeners.add(listener);
     }
 
-    public void addLevelNavigationChangeListener(LevelNavigationChangeListener listener) {
+    public void addLevelNavigationChangeListener(LevelNavigationListener listener) {
         _levelNavigationListeners.add(listener);
     }
 
@@ -86,13 +86,13 @@ public class Game implements NodeChangeListener {
     public int getMaxMoves() { return _gameState.getMaxMoves(); }
 
     private void notifyGameStateChangedListeners() {
-        for (GameStateChangedListener listener : _gameStateListeners) {
+        for (GameStateListener listener : _gameStateListeners) {
             listener.onGameStateChanged(_gameState);
         }
     }
 
     private void notifyLevelNavigationChangeListeners() {
-        for (LevelNavigationChangeListener listener : _levelNavigationListeners) {
+        for (LevelNavigationListener listener : _levelNavigationListeners) {
             listener.onLevelChanged(_levelNavigation);
         }
     }

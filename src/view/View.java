@@ -3,14 +3,14 @@ package view;
 import model.game.Game;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
-import model.listeners.GameStateChangedListener;
-import model.listeners.LevelNavigationChangeListener;
-import model.listeners.NodeChangeListener;
+import model.listeners.GameStateListener;
+import model.listeners.LevelNavigationListener;
+import model.listeners.NodeListener;
 import model.units.Node;
 
 import java.awt.geom.Point2D;
 
-public class View implements NodeChangeListener, GameStateChangedListener, LevelNavigationChangeListener {
+public class View implements NodeListener, GameStateListener, LevelNavigationListener {
     private final GameFrame _frame;
     private final Game _game;
 
@@ -30,7 +30,7 @@ public class View implements NodeChangeListener, GameStateChangedListener, Level
     }
 
     @Override
-    public void onNodeMoved(Node node, Point2D newPosition) {
+    public void onMoved(Node node, Point2D newPosition) {
         _frame.refresh();
     }
 

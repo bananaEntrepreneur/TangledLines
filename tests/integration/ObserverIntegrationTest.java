@@ -6,9 +6,9 @@ import model.game.state.GameState;
 import model.game.state.LevelNavigation;
 import model.level.LevelLoadException;
 import model.level.LevelManager;
-import model.listeners.GameStateChangedListener;
-import model.listeners.LevelNavigationChangeListener;
-import model.listeners.NodeChangeListener;
+import model.listeners.GameStateListener;
+import model.listeners.LevelNavigationListener;
+import model.listeners.NodeListener;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,14 +27,14 @@ class ObserverIntegrationTest {
 
     @Nested
     @DisplayName("NodeChangeListener Integration")
-    class NodeChangeListenerTests {
+    class NodeListenerTests {
 
-        private static class MoveTracker implements NodeChangeListener {
+        private static class MoveTracker implements NodeListener {
             final List<Node> movedNodes = new ArrayList<>();
             final List<Point2D> positions = new ArrayList<>();
 
             @Override
-            public void onNodeMoved(Node node, Point2D newPosition) {
+            public void onMoved(Node node, Point2D newPosition) {
                 movedNodes.add(node);
                 positions.add(newPosition);
             }
@@ -85,9 +85,9 @@ class ObserverIntegrationTest {
 
     @Nested
     @DisplayName("GameStateChangedListener Integration")
-    class GameStateChangedListenerTests {
+    class GameStateListenerTests {
 
-        private static class GameStateTracker implements GameStateChangedListener {
+        private static class GameStateTracker implements GameStateListener {
             final AtomicInteger callCount = new AtomicInteger(0);
             final AtomicReference<GameState> lastState = new AtomicReference<>();
 
@@ -146,9 +146,9 @@ class ObserverIntegrationTest {
 
     @Nested
     @DisplayName("LevelNavigationChangeListener Integration")
-    class LevelNavigationChangeListenerTests {
+    class LevelNavigationListenerTests {
 
-        private static class LevelNavTracker implements LevelNavigationChangeListener {
+        private static class LevelNavTracker implements LevelNavigationListener {
             final AtomicInteger callCount = new AtomicInteger(0);
             final AtomicReference<LevelNavigation> lastNav = new AtomicReference<>();
 

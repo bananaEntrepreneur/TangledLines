@@ -2,12 +2,12 @@ package view;
 
 import model.game.Game;
 import model.game.state.GameState;
-import model.listeners.GameStateChangedListener;
+import model.listeners.GameStateListener;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class GameFrame extends JFrame implements GameStateChangedListener {
+public class GameFrame extends JFrame implements GameStateListener {
     private final GamePanel _gamePanel;
     private final Game _game;
     private final View _view;

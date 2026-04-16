@@ -1,6 +1,6 @@
 package model.units;
 
-import model.listeners.NodeChangeListener;
+import model.listeners.NodeListener;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class Node {
 
     private Point2D _position;
     private final boolean _movable;
-    private final List<NodeChangeListener> _listeners = new ArrayList<>();
+    private final List<NodeListener> _listeners = new ArrayList<>();
 
     public Node(Point2D position, boolean movable) {
         if (position == null) {
@@ -45,7 +45,7 @@ public class Node {
         return dx * dx + dy * dy;
     }
 
-    public void setPosition(Point2D newPosition) {
+    private void setPosition(Point2D newPosition) {
         if (!_movable || newPosition == null || newPosition.equals(_position)) {
             return;
         }
@@ -57,11 +57,11 @@ public class Node {
 
     public boolean isMovable() { return _movable; }
 
-    public void addListener(NodeChangeListener listener) { _listeners.add(listener); }
+    public void addListener(NodeListener listener) { _listeners.add(listener); }
 
-    public void removeListener(NodeChangeListener listener) { _listeners.remove(listener); }
+    public void removeListener(NodeListener listener) { _listeners.remove(listener); }
 
-    public List<NodeChangeListener> getListeners() { return Collections.unmodifiableList(_listeners); }
+    public List<NodeListener> getListeners() { return Collections.unmodifiableList(_listeners); }
 
     @Override
     public boolean equals(Object o) {
@@ -71,14 +71,9 @@ public class Node {
         return _position.equals(node._position) && _movable == node._movable;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(_position, _movable);
-    }
-
     private void notifyListeners(Point2D newPosition) {
-        for (NodeChangeListener listener : _listeners) {
-            listener.onNodeMoved(this, newPosition);
+        for (NodeListener listener : _listeners) {
+            listener.onMoved(this, newPosition);
         }
     }
 }

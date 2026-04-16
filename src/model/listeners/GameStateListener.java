@@ -2,6 +2,6 @@ package model.listeners;
 
 import model.game.state.GameState;
 
-public interface GameStateChangedListener {
+public interface GameStateListener {
     void onGameStateChanged(GameState gameState);
 }
