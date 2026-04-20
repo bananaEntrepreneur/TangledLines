@@ -35,28 +35,23 @@ public class NodeInteractionHandler extends MouseAdapter {
 
         _draggedNode = _nodeFinder.findNodeAt(e.getPoint());
         if (_draggedNode != null) {
-            // Start a transactional drag through the movement controller
-            _dragTransaction = _game.startDrag(_draggedNode);
-            if (_dragTransaction != null) {
-                Point2D pos = _draggedNode.getPosition();
-                _dragOffset = new Point(
-                    e.getX() - (int) pos.getX(),
-                    e.getY() - (int) pos.getY()
-                );
-            } else {
-                _draggedNode = null;
-            }
+            _dragTransaction = new MoveTransaction(_draggedNode, _game.getField());
+            _dragTransaction.startDragging();
+
+            Point2D pos = _draggedNode.getPosition();
+            _dragOffset = new Point(
+                e.getX() - (int) pos.getX(),
+                e.getY() - (int) pos.getY()
+            );
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (_draggedNode != null && _dragTransaction != null && !_game.isGameOver()) {
-            // Commit the transaction
-            _game.commitDrag(_dragTransaction);
+            _dragTransaction.stopDragging();
         } else if (_dragTransaction != null) {
-            // Cancel the transaction if game is over or no valid node
-            _game.cancelDrag(_dragTransaction);
+            _dragTransaction.cancelDragging();
         }
         _draggedNode = null;
         _dragTransaction = null;
@@ -70,8 +65,7 @@ public class NodeInteractionHandler extends MouseAdapter {
                 e.getX() - _dragOffset.x,
                 e.getY() - _dragOffset.y
             );
-            // Queue the movement in the transaction (doesn't modify model yet)
-            _game.updateDragPosition(_dragTransaction, _dragCurrentPosition);
+            _dragTransaction.updateDragging(_dragCurrentPosition);
             _dragListener.onDraggedNodeMoved(_draggedNode, _dragCurrentPosition);
         }
     }
@@ -91,10 +85,6 @@ public class NodeInteractionHandler extends MouseAdapter {
 
     public Point2D getDragCurrentPosition() {
         return _dragCurrentPosition;
-    }
-
-    public MoveTransaction getDragTransaction() {
-        return _dragTransaction;
     }
 
     public Node getHoveredNode() {
