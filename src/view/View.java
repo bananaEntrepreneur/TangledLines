@@ -8,8 +8,6 @@ import model.listeners.LevelNavigationListener;
 import model.listeners.NodeListener;
 import model.units.Node;
 
-import java.awt.geom.Point2D;
-
 public class View implements NodeListener, GameStateListener, LevelNavigationListener {
     private final GameFrame _frame;
     private final Game _game;
@@ -36,7 +34,7 @@ public class View implements NodeListener, GameStateListener, LevelNavigationLis
     }
 
     @Override
-    public void onMoved(Node node, Point2D newPosition) {
+    public void onMoved() {
         _frame.refresh();
     }
 

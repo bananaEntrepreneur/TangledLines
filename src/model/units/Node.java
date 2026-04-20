@@ -6,7 +6,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class Node {
     private static final double MIN_MOVE_DISTANCE_SQUARED = 1.0;
@@ -59,12 +58,12 @@ public class Node {
             return;
         }
         _position = newPosition;
-        notifyListeners(newPosition);
+        notifyListeners();
     }
 
-    private void notifyListeners(Point2D newPosition) {
+    private void notifyListeners() {
         for (NodeListener listener : _listeners) {
-            listener.onMoved(this, newPosition);
+            listener.onMoved();
         }
     }
 }

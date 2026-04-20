@@ -6,9 +6,7 @@ import model.level.LevelManager;
 import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
 import model.listeners.NodeListener;
-import model.units.Node;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public class Game implements NodeListener {
     }
 
     @Override
-    public void onMoved(Node node, Point2D newPosition) {
+    public void onMoved() {
         if (_gameState.isGameOver() || _gameState.isAllLevelsComplete()) {
             return;
         }
