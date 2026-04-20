@@ -2,7 +2,6 @@ package e2e;
 
 import model.game.Field;
 import model.game.Game;
-import model.game.logic.IntersectionChecker;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import model.units.Node;
@@ -21,13 +20,11 @@ class GameE2ETest {
 
     private static final String LEVELS_DIR = "levels";
     private LevelManager _levelManager;
-    private IntersectionChecker _intersectionChecker;
     private Game _game;
 
     @BeforeEach
     void setUp() throws LevelLoadException {
         _levelManager = new LevelManager(LEVELS_DIR);
-        _intersectionChecker = new IntersectionChecker();
         _game = new Game(_levelManager);
     }
 
@@ -85,7 +82,7 @@ class GameE2ETest {
                     movableNode.getPosition().getY() + 50
             );
 
-            boolean result = _game.moveNode(movableNode, newPosition);
+            boolean result = moveThroughGame(movableNode, newPosition);
 
             assertTrue(result);
             assertEquals(newPosition, movableNode.getPosition());
@@ -110,7 +107,7 @@ class GameE2ETest {
                     nonMovableNode.getPosition().getY() + 50
             );
 
-            _game.moveNode(nonMovableNode, newPosition);
+            moveThroughGame(nonMovableNode, newPosition);
 
             assertEquals(originalPosition.getX(), nonMovableNode.getPosition().getX(), 0.01);
             assertEquals(originalPosition.getY(), nonMovableNode.getPosition().getY(), 0.01);
@@ -129,13 +126,13 @@ class GameE2ETest {
                     movableNodes.get(0).getPosition().getX() + 50,
                     movableNodes.get(0).getPosition().getY() + 50
             );
-            _game.moveNode(movableNodes.get(0), pos1);
+            moveThroughGame(movableNodes.get(0), pos1);
 
             Point2D pos2 = new Point2D.Double(
                     movableNodes.get(1).getPosition().getX() + 50,
                     movableNodes.get(1).getPosition().getY() + 50
             );
-            _game.moveNode(movableNodes.get(1), pos2);
+            moveThroughGame(movableNodes.get(1), pos2);
 
             assertEquals(2, _game.getMoveCount());
         }
@@ -149,12 +146,12 @@ class GameE2ETest {
                     .toList();
 
             Point2D winPosition = new Point2D.Double(10000, 10000);
-            _game.moveNode(movableNodes.get(0), winPosition);
+            moveThroughGame(movableNodes.get(0), winPosition);
 
             if (_game.isGameOver() && _game.isWin()) {
                 Point2D extraMove = new Point2D.Double(500, 500);
                 int moveCountBefore = _game.getMoveCount();
-                _game.moveNode(movableNodes.get(0), extraMove);
+                moveThroughGame(movableNodes.get(0), extraMove);
 
                 assertEquals(moveCountBefore, _game.getMoveCount());
             }
@@ -170,7 +167,7 @@ class GameE2ETest {
         void shouldWinWhenIntersectionsResolved() {
             Field field = _game.getField();
 
-            boolean hasIntersectionsInitially = _intersectionChecker.hasIntersections(field.getEdges());
+            boolean hasIntersectionsInitially = field.hasIntersections();
 
             if (hasIntersectionsInitially) {
                 List<Node> movableNodes = field.getNodes().stream()
@@ -178,9 +175,9 @@ class GameE2ETest {
                         .toList();
 
                 Point2D newPos = new Point2D.Double(1000, 1000);
-                _game.moveNode(movableNodes.get(0), newPos);
+                moveThroughGame(movableNodes.get(0), newPos);
 
-                boolean stillHasIntersections = _intersectionChecker.hasIntersections(field.getEdges());
+                boolean stillHasIntersections = field.hasIntersections();
 
                 if (!stillHasIntersections && _game.getMoveCount() <= _game.getMaxMoves()) {
                     assertTrue(_game.isWin());
@@ -204,10 +201,10 @@ class GameE2ETest {
                         movableNodes.get(0).getPosition().getX() + 100 * (i + 1),
                         movableNodes.get(0).getPosition().getY()
                 );
-                _game.moveNode(movableNodes.get(0), newPos);
+                moveThroughGame(movableNodes.get(0), newPos);
             }
 
-            if (_intersectionChecker.hasIntersections(field.getEdges())) {
+            if (field.hasIntersections()) {
                 assertTrue(_game.isGameOver());
                 assertFalse(_game.isWin());
             }
@@ -231,7 +228,7 @@ class GameE2ETest {
         @DisplayName("Should allow next level after winning")
         void shouldAllowNextLevelAfterWinning() {
             if (_game.getTotalLevels() > 1) {
-                _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
+                moveThroughGame(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
                 if (_game.isWin()) {
                     boolean result = _game.nextLevel();
@@ -251,7 +248,7 @@ class GameE2ETest {
         @DisplayName("Should reset move count on next level")
         void shouldResetMoveCountOnNextLevel() {
             if (_game.getTotalLevels() > 1) {
-                _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
+                moveThroughGame(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
                 if (_game.isWin() && _game.hasNextLevel()) {
                     _game.nextLevel();
@@ -276,7 +273,7 @@ class GameE2ETest {
                     movableNode.getPosition().getY()
             );
 
-            _game.moveNode(movableNode, new Point2D.Double(500, 500));
+            moveThroughGame(movableNode, new Point2D.Double(500, 500));
             assertNotEquals(originalPos, movableNode.getPosition());
 
             _game.restartLevel();
@@ -308,7 +305,7 @@ class GameE2ETest {
             assertEquals(0, _game.getCurrentLevelIndex());
 
             if (_game.getTotalLevels() > 1) {
-                _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
+                moveThroughGame(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
                 if (_game.isWin() && _game.hasNextLevel()) {
                     _game.nextLevel();
@@ -321,7 +318,7 @@ class GameE2ETest {
         @DisplayName("Should detect when all levels complete")
         void shouldDetectAllLevelsComplete() {
             if (_game.getTotalLevels() == 1) {
-                _game.moveNode(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
+                moveThroughGame(_game.getField().getNodes().get(0), new Point2D.Double(10000, 10000));
 
                 if (_game.isWin()) {
                     assertFalse(_game.nextLevel());
@@ -339,7 +336,7 @@ class GameE2ETest {
             int firstMaxMoves = _game.getMaxMoves();
 
             if (_game.getTotalLevels() > 1) {
-                _game.moveNode(firstField.getNodes().get(0), new Point2D.Double(10000, 10000));
+                moveThroughGame(firstField.getNodes().get(0), new Point2D.Double(10000, 10000));
 
                 if (_game.isWin() && _game.hasNextLevel()) {
                     _game.nextLevel();
@@ -370,7 +367,7 @@ class GameE2ETest {
             );
             Point2D newPos = new Point2D.Double(500, 500);
 
-            boolean result = _game.moveNode(node, newPos);
+            boolean result = moveThroughGame(node, newPos);
 
             assertTrue(result);
             assertNotEquals(originalPos.getX(), node.getPosition().getX(), 0.01);
@@ -384,8 +381,8 @@ class GameE2ETest {
                     .filter(Node::isMovable)
                     .toList();
 
-            _game.moveNode(movableNodes.get(0), new Point2D.Double(300, 300));
-            _game.moveNode(movableNodes.get(1), new Point2D.Double(400, 400));
+            moveThroughGame(movableNodes.get(0), new Point2D.Double(300, 300));
+            moveThroughGame(movableNodes.get(1), new Point2D.Double(400, 400));
 
             assertEquals(2, _game.getMoveCount());
             assertEquals(0, _game.getCurrentLevelIndex());
@@ -396,7 +393,7 @@ class GameE2ETest {
         void shouldHandleRestartAfterGameOver() {
             Field field = _game.getField();
 
-            boolean hasIntersectionsInitially = _intersectionChecker.hasIntersections(field.getEdges());
+            boolean hasIntersectionsInitially = field.hasIntersections();
 
             if (hasIntersectionsInitially) {
                 List<Node> movableNodes = field.getNodes().stream()
@@ -404,7 +401,7 @@ class GameE2ETest {
                         .toList();
 
                 Point2D winPosition = new Point2D.Double(10000, 10000);
-                _game.moveNode(movableNodes.get(0), winPosition);
+                moveThroughGame(movableNodes.get(0), winPosition);
 
                 if (_game.isGameOver()) {
                     _game.restartLevel();
@@ -426,7 +423,7 @@ class GameE2ETest {
         void shouldDetectIntersectionsInInitialState() {
             Field field = _game.getField();
 
-            boolean hasIntersections = _intersectionChecker.hasIntersections(field.getEdges());
+            boolean hasIntersections = field.hasIntersections();
 
             assertTrue(hasIntersections);
         }
@@ -436,16 +433,16 @@ class GameE2ETest {
         void shouldUpdateIntersectionStatusAfterMovement() {
             Field field = _game.getField();
 
-            boolean initialIntersections = _intersectionChecker.hasIntersections(field.getEdges());
+            boolean initialIntersections = field.hasIntersections();
 
             List<Node> movableNodes = field.getNodes().stream()
                     .filter(Node::isMovable)
                     .toList();
 
             Point2D winPosition = new Point2D.Double(10000, 10000);
-            _game.moveNode(movableNodes.get(0), winPosition);
+            moveThroughGame(movableNodes.get(0), winPosition);
 
-            boolean newIntersections = _intersectionChecker.hasIntersections(field.getEdges());
+            boolean newIntersections = field.hasIntersections();
 
             if (initialIntersections) {
                 assertFalse(newIntersections);
@@ -458,6 +455,18 @@ class GameE2ETest {
             Field field = _game.getField();
 
             assertTrue(field.getEdges().size() > 0);
+        }
+    }
+
+    private boolean moveThroughGame(Node node, Point2D position) {
+        attachGameToField();
+        return node.move(position);
+    }
+
+    private void attachGameToField() {
+        for (Node node : _game.getField().getNodes()) {
+            node.removeListener(_game);
+            node.addListener(_game);
         }
     }
 }

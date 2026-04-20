@@ -2,7 +2,6 @@ package integration;
 
 import model.game.Field;
 import model.game.Game;
-import model.game.logic.IntersectionChecker;
 import model.level.LevelLoadException;
 import model.level.LevelManager;
 import model.units.Node;
@@ -50,8 +49,7 @@ class GameIntegrationTest {
         @Test
         @DisplayName("Should start with intersections in level1")
         void shouldStartWithIntersections() {
-            IntersectionChecker checker = new IntersectionChecker();
-            assertTrue(checker.hasIntersections(_game.getField().getEdges()));
+            assertTrue(_game.getField().hasIntersections());
         }
     }
 
@@ -131,7 +129,7 @@ class GameIntegrationTest {
                     .findFirst()
                     .orElseThrow();
 
-            _game.moveNode(movable, new Point2D.Double(
+            moveThroughGame(movable, new Point2D.Double(
                     movable.getPosition().getX() + 500,
                     movable.getPosition().getY() + 500
             ));
@@ -142,6 +140,7 @@ class GameIntegrationTest {
     }
 
     private void untangleAll() {
+        attachGameToField();
         Field field = _game.getField();
         List<Node> movable = field.getNodes().stream()
                 .filter(Node::isMovable)
@@ -149,7 +148,7 @@ class GameIntegrationTest {
 
         for (Node node : movable) {
             double offset = 10000 + movable.indexOf(node) * 100;
-            node.setPosition(new Point2D.Double(
+            node.move(new Point2D.Double(
                     node.getPosition().getX() + offset,
                     node.getPosition().getY() + offset
             ));
@@ -157,6 +156,7 @@ class GameIntegrationTest {
     }
 
     private void makeMovesWithoutWinning(int count) {
+        attachGameToField();
         Field field = _game.getField();
         List<Node> movable = field.getNodes().stream()
                 .filter(Node::isMovable)
@@ -164,10 +164,22 @@ class GameIntegrationTest {
 
         for (int i = 0; i < count && i < movable.size(); i++) {
             Node node = movable.get(i);
-            _game.moveNode(node, new Point2D.Double(
+            node.move(new Point2D.Double(
                     node.getPosition().getX() + 50,
                     node.getPosition().getY() + 50
             ));
+        }
+    }
+
+    private boolean moveThroughGame(Node node, Point2D position) {
+        attachGameToField();
+        return node.move(position);
+    }
+
+    private void attachGameToField() {
+        for (Node node : _game.getField().getNodes()) {
+            node.removeListener(_game);
+            node.addListener(_game);
         }
     }
 }

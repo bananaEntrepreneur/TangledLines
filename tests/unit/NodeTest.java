@@ -57,7 +57,7 @@ class NodeTest {
         void shouldUpdatePositionForMovableNode() {
             Node node = new Node(_initialPosition, true);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
             assertEquals(_newPosition, node.getPosition());
         }
@@ -69,11 +69,9 @@ class NodeTest {
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
             assertTrue(listener.wasNotified());
-            assertEquals(_newPosition, listener.getLastPosition());
-            assertEquals(node, listener.getNotifiedNode());
         }
     }
 
@@ -86,7 +84,7 @@ class NodeTest {
         void shouldNotUpdatePositionForNonMovableNode() {
             Node node = new Node(_initialPosition, false);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
             assertEquals(_initialPosition, node.getPosition());
         }
@@ -98,7 +96,7 @@ class NodeTest {
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
             assertFalse(listener.wasNotified());
         }
@@ -113,7 +111,7 @@ class NodeTest {
         void shouldNotUpdatePositionWhenNull() {
             Node node = new Node(_initialPosition, true);
 
-            node.setPosition(null);
+            node.move(null);
 
             assertEquals(_initialPosition, node.getPosition());
         }
@@ -125,7 +123,7 @@ class NodeTest {
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.setPosition(null);
+            node.move(null);
 
             assertFalse(listener.wasNotified());
         }
@@ -135,7 +133,7 @@ class NodeTest {
         void shouldNotUpdatePositionWhenSame() {
             Node node = new Node(_initialPosition, true);
 
-            node.setPosition(_initialPosition);
+            node.move(_initialPosition);
 
             assertEquals(_initialPosition, node.getPosition());
         }
@@ -147,7 +145,7 @@ class NodeTest {
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.setPosition(_initialPosition);
+            node.move(_initialPosition);
 
             assertFalse(listener.wasNotified());
         }
@@ -158,7 +156,7 @@ class NodeTest {
             Node node = new Node(_initialPosition, true);
             Point2D equalPosition = new Point2D.Double(100, 100);
 
-            node.setPosition(equalPosition);
+            node.move(equalPosition);
 
             assertEquals(_initialPosition, node.getPosition());
         }
@@ -177,7 +175,7 @@ class NodeTest {
             node.addListener(listener1);
             node.addListener(listener2);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
             assertTrue(listener1.wasNotified());
             assertTrue(listener2.wasNotified());
@@ -192,10 +190,10 @@ class NodeTest {
             node.addListener(listener1);
             node.addListener(listener2);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
-            assertEquals(_newPosition, listener1.getLastPosition());
-            assertEquals(_newPosition, listener2.getLastPosition());
+            assertTrue(listener1.wasNotified());
+            assertTrue(listener2.wasNotified());
         }
 
         @Test
@@ -206,7 +204,7 @@ class NodeTest {
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.setPosition(_newPosition);
+            node.move(_newPosition);
 
             assertTrue(listener.wasNotified());
         }
@@ -238,26 +236,15 @@ class NodeTest {
 
     private static class MockNodeListener implements NodeListener {
         private boolean _notified = false;
-        private Node _notifiedNode;
-        private Point2D _lastPosition;
 
         @Override
-        public void onMoved(Node node, Point2D newPosition) {
+        public void onMoved() {
             _notified = true;
-            _notifiedNode = node;
-            _lastPosition = newPosition;
         }
 
         public boolean wasNotified() {
             return _notified;
         }
 
-        public Node getNotifiedNode() {
-            return _notifiedNode;
-        }
-
-        public Point2D getLastPosition() {
-            return _lastPosition;
-        }
     }
 }

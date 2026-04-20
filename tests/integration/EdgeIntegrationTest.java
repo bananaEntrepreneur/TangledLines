@@ -28,11 +28,11 @@ class EdgeIntegrationTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge1.crosses(edge2));
 
-            nodeB2.setPosition(new Point2D.Double(150, 150));
+            nodeB2.move(new Point2D.Double(150, 150));
 
-            assertFalse(edge1.intersects(edge2));
+            assertFalse(edge1.crosses(edge2));
         }
 
         @Test
@@ -46,11 +46,11 @@ class EdgeIntegrationTest {
             Node nodeB2 = new Node(new Point2D.Double(50, 50), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertFalse(edge1.intersects(edge2));
+            assertFalse(edge1.crosses(edge2));
 
-            nodeB2.setPosition(new Point2D.Double(25, -25));
+            nodeB2.move(new Point2D.Double(25, -25));
 
-            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge1.crosses(edge2));
         }
 
         @Test
@@ -64,14 +64,14 @@ class EdgeIntegrationTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge1.crosses(edge2));
 
-            nodeA2.setPosition(new Point2D.Double(0, 200));
-            nodeB2.setPosition(new Point2D.Double(200, 200));
-            assertFalse(edge1.intersects(edge2));
+            nodeA2.move(new Point2D.Double(0, 200));
+            nodeB2.move(new Point2D.Double(200, 200));
+            assertFalse(edge1.crosses(edge2));
 
-            nodeA2.setPosition(new Point2D.Double(0, 0));
-            assertTrue(edge1.intersects(edge2));
+            nodeA2.move(new Point2D.Double(0, 0));
+            assertTrue(edge1.crosses(edge2));
         }
     }
 
@@ -93,10 +93,10 @@ class EdgeIntegrationTest {
             Edge separateEdge1 = new Edge(outerNode3, outerNode4);
             Edge separateEdge2 = new Edge(outerNode1, outerNode2);
 
-            assertFalse(radialEdge1.intersects(radialEdge2));
-            assertFalse(radialEdge1.intersects(separateEdge1));
-            assertFalse(radialEdge2.intersects(separateEdge1));
-            assertFalse(separateEdge1.intersects(separateEdge2));
+            assertFalse(radialEdge1.crosses(radialEdge2));
+            assertFalse(radialEdge1.crosses(separateEdge1));
+            assertFalse(radialEdge2.crosses(separateEdge1));
+            assertFalse(separateEdge1.crosses(separateEdge2));
         }
 
         @Test
@@ -114,16 +114,16 @@ class EdgeIntegrationTest {
             Node nodeD2 = new Node(new Point2D.Double(75, 25), true);
             Edge crossingEdge2 = new Edge(nodeC2, nodeD2);
 
-            assertTrue(mainEdge.intersects(crossingEdge1));
-            assertTrue(mainEdge.intersects(crossingEdge2));
+            assertTrue(mainEdge.crosses(crossingEdge1));
+            assertTrue(mainEdge.crosses(crossingEdge2));
 
-            nodeC1.setPosition(new Point2D.Double(-100, 100));
-            nodeD1.setPosition(new Point2D.Double(0, 200));
-            nodeC2.setPosition(new Point2D.Double(150, 150));
-            nodeD2.setPosition(new Point2D.Double(200, 200));
+            nodeC1.move(new Point2D.Double(-100, 100));
+            nodeD1.move(new Point2D.Double(0, 200));
+            nodeC2.move(new Point2D.Double(150, 150));
+            nodeD2.move(new Point2D.Double(200, 200));
 
-            assertFalse(mainEdge.intersects(crossingEdge1));
-            assertFalse(mainEdge.intersects(crossingEdge2));
+            assertFalse(mainEdge.crosses(crossingEdge1));
+            assertFalse(mainEdge.crosses(crossingEdge2));
         }
     }
 
@@ -142,7 +142,7 @@ class EdgeIntegrationTest {
             Node nodeB2 = new Node(new Point2D.Double(100, 100), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge1.crosses(edge2));
         }
 
         @Test
@@ -156,7 +156,7 @@ class EdgeIntegrationTest {
             Node nodeB2 = new Node(new Point2D.Double(1000, 0), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge1.crosses(edge2));
         }
 
         @Test
@@ -170,7 +170,7 @@ class EdgeIntegrationTest {
             Node nodeB2 = new Node(new Point2D.Double(1, 0), true);
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
-            assertTrue(edge1.intersects(edge2));
+            assertTrue(edge1.crosses(edge2));
         }
     }
 }

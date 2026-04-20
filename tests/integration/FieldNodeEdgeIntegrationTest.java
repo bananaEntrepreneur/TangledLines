@@ -2,7 +2,6 @@ package integration;
 
 import model.factory.DefaultUnitFactory;
 import model.game.Field;
-import model.game.logic.IntersectionChecker;
 import model.level.Level;
 import model.level.LevelLoadException;
 import model.level.LevelManager;
@@ -37,7 +36,7 @@ class FieldNodeEdgeIntegrationTest {
 
             double originalX = firstEdge.toLine().getX1();
 
-            field.moveNode(nodeA, new Point2D.Double(999, 999));
+            moveNode(field, nodeA, new Point2D.Double(999, 999));
 
             assertNotEquals(originalX, firstEdge.toLine().getX1(), 0.01,
                     "Edge line should reflect new node position");
@@ -58,7 +57,7 @@ class FieldNodeEdgeIntegrationTest {
                     nonMovable.getPosition().getY()
             );
 
-            field.moveNode(nonMovable, new Point2D.Double(999, 999));
+            moveNode(field, nonMovable, new Point2D.Double(999, 999));
 
             assertEquals(originalPos.getX(), nonMovable.getPosition().getX(), 0.01);
             assertEquals(originalPos.getY(), nonMovable.getPosition().getY(), 0.01);
@@ -66,17 +65,16 @@ class FieldNodeEdgeIntegrationTest {
     }
 
     @Nested
-    @DisplayName("IntersectionChecker + Field")
-    class IntersectionCheckerFieldTests {
+    @DisplayName("Field Intersection Checks")
+    class FieldIntersectionChecks {
 
         @Test
         @DisplayName("Should detect intersections in loaded level1")
         void shouldDetectIntersectionsInLevel1() throws LevelLoadException {
             LevelManager lm = new LevelManager("levels");
             Field field = lm.getCurrentField();
-            IntersectionChecker checker = new IntersectionChecker();
 
-            assertTrue(checker.hasIntersections(field.getEdges()),
+            assertTrue(field.hasIntersections(),
                     "Level 1 should start with intersections");
         }
 
@@ -86,9 +84,8 @@ class FieldNodeEdgeIntegrationTest {
             Level level = new JsonLevelLoader().load("levels/level2.json");
             LevelFactory factory = new LevelFactory(new DefaultUnitFactory());
             Field field = factory.createField(level);
-            IntersectionChecker checker = new IntersectionChecker();
 
-            assertTrue(checker.hasIntersections(field.getEdges()),
+            assertTrue(field.hasIntersections(),
                     "Level 2 should start with intersections");
 
             double[][] positions = {
@@ -97,10 +94,10 @@ class FieldNodeEdgeIntegrationTest {
 
             List<Node> nodes = field.getNodes();
             for (int i = 0; i < nodes.size(); i++) {
-                field.moveNode(nodes.get(i), new Point2D.Double(positions[i][0], positions[i][1]));
+                moveNode(field, nodes.get(i), new Point2D.Double(positions[i][0], positions[i][1]));
             }
 
-            assertFalse(checker.hasIntersections(field.getEdges()));
+            assertFalse(field.hasIntersections());
         }
 
         @Test
@@ -108,18 +105,17 @@ class FieldNodeEdgeIntegrationTest {
         void shouldUpdateAfterSingleNodeMove() throws LevelLoadException {
             LevelManager lm = new LevelManager("levels");
             Field field = lm.getCurrentField();
-            IntersectionChecker checker = new IntersectionChecker();
 
-            boolean before = checker.hasIntersections(field.getEdges());
+            boolean before = field.hasIntersections();
             assertTrue(before, "Level 1 should start with intersections");
 
             Node movable = field.getNodes().stream()
                     .filter(Node::isMovable)
                     .findFirst()
                     .orElseThrow();
-            field.moveNode(movable, new Point2D.Double(5000, 5000));
+            moveNode(field, movable, new Point2D.Double(5000, 5000));
 
-            boolean after = checker.hasIntersections(field.getEdges());
+            boolean after = field.hasIntersections();
 
             assertNotEquals(before, after, "Moving a node should change intersection status");
         }
@@ -171,7 +167,7 @@ class FieldNodeEdgeIntegrationTest {
 
             Node externalNode = new Node(new Point2D.Double(0, 0), true);
 
-            boolean result = field.moveNode(externalNode, new Point2D.Double(100, 100));
+            boolean result = moveNode(field, externalNode, new Point2D.Double(100, 100));
 
             assertFalse(result);
         }
@@ -182,7 +178,7 @@ class FieldNodeEdgeIntegrationTest {
             LevelManager lm = new LevelManager("levels");
             Field field = lm.getCurrentField();
 
-            boolean result = field.moveNode(null, new Point2D.Double(100, 100));
+            boolean result = moveNode(field, null, new Point2D.Double(100, 100));
 
             assertFalse(result);
         }
@@ -195,7 +191,7 @@ class FieldNodeEdgeIntegrationTest {
 
             Node node = field.getNodes().get(0);
 
-            boolean result = field.moveNode(node, null);
+            boolean result = moveNode(field, node, null);
 
             assertFalse(result);
         }
@@ -218,6 +214,16 @@ class FieldNodeEdgeIntegrationTest {
 
             assertThrows(UnsupportedOperationException.class, () ->
                     field.getEdges().add(null));
+        }
+    }
+
+    private boolean moveNode(Field field, Node node, Point2D position) {
+        try {
+            var method = Field.class.getDeclaredMethod("moveNode", Node.class, Point2D.class);
+            method.setAccessible(true);
+            return (boolean) method.invoke(field, node, position);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Unable to invoke Field.moveNode", e);
         }
     }
 }

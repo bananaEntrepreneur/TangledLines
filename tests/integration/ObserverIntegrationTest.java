@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,13 +29,11 @@ class ObserverIntegrationTest {
     class NodeListenerTests {
 
         private static class MoveTracker implements NodeListener {
-            final List<Node> movedNodes = new ArrayList<>();
-            final List<Point2D> positions = new ArrayList<>();
+            final AtomicInteger callCount = new AtomicInteger(0);
 
             @Override
-            public void onMoved(Node node, Point2D newPosition) {
-                movedNodes.add(node);
-                positions.add(newPosition);
+            public void onMoved() {
+                callCount.incrementAndGet();
             }
         }
 
@@ -52,12 +49,12 @@ class ObserverIntegrationTest {
                     .filter(Node::isMovable)
                     .findFirst()
                     .orElseThrow();
+            attachGameToField(game);
             movable.addListener(tracker);
 
-            game.moveNode(movable, new Point2D.Double(500, 500));
+            movable.move(new Point2D.Double(500, 500));
 
-            assertEquals(1, tracker.movedNodes.size());
-            assertSame(movable, tracker.movedNodes.get(0));
+            assertEquals(1, tracker.callCount.get());
         }
 
         @Test
@@ -73,13 +70,14 @@ class ObserverIntegrationTest {
                     .filter(Node::isMovable)
                     .findFirst()
                     .orElseThrow();
+            attachGameToField(game);
             movable.addListener(t1);
             movable.addListener(t2);
 
-            game.moveNode(movable, new Point2D.Double(500, 500));
+            movable.move(new Point2D.Double(500, 500));
 
-            assertEquals(1, t1.movedNodes.size());
-            assertEquals(1, t2.movedNodes.size());
+            assertEquals(1, t1.callCount.get());
+            assertEquals(1, t2.callCount.get());
         }
     }
 
@@ -208,12 +206,13 @@ class ObserverIntegrationTest {
                     .filter(Node::isMovable)
                     .findFirst()
                     .orElseThrow();
-            movable.addListener((node, pos) -> nodeMoveCount.incrementAndGet());
+            attachGameToField(game);
+            movable.addListener(() -> nodeMoveCount.incrementAndGet());
 
             game.addGameStateListener(state -> gameStateCount.incrementAndGet());
 
             while (!game.isGameOver() && nodeMoveCount.get() < game.getMaxMoves() + 1) {
-                game.moveNode(movable, new Point2D.Double(
+                movable.move(new Point2D.Double(
                         movable.getPosition().getX() + 100,
                         movable.getPosition().getY() + 100
                 ));
@@ -225,6 +224,7 @@ class ObserverIntegrationTest {
     }
 
     private void untangleAll(Game game) {
+        attachGameToField(game);
         Field field = game.getField();
         List<Node> movable = field.getNodes().stream()
                 .filter(Node::isMovable)
@@ -232,7 +232,7 @@ class ObserverIntegrationTest {
 
         for (Node node : movable) {
             double offset = 10000 + movable.indexOf(node) * 100;
-            node.setPosition(new Point2D.Double(
+            node.move(new Point2D.Double(
                     node.getPosition().getX() + offset,
                     node.getPosition().getY() + offset
             ));
@@ -240,6 +240,7 @@ class ObserverIntegrationTest {
     }
 
     private void exhaustMoves(Game game) {
+        attachGameToField(game);
         Field field = game.getField();
         List<Node> movable = field.getNodes().stream()
                 .filter(Node::isMovable)
@@ -248,10 +249,18 @@ class ObserverIntegrationTest {
         Node node = movable.get(0);
         int maxMoves = game.getMaxMoves();
         for (int i = 0; i < maxMoves; i++) {
-            game.moveNode(node, new Point2D.Double(
+            attachGameToField(game);
+            node.move(new Point2D.Double(
                     node.getPosition().getX() + 100,
                     node.getPosition().getY() + 100
             ));
+        }
+    }
+
+    private void attachGameToField(Game game) {
+        for (Node node : game.getField().getNodes()) {
+            node.removeListener(game);
+            node.addListener(game);
         }
     }
 }
