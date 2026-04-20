@@ -27,10 +27,19 @@ public class Node {
         if (!canMoveTo(newPosition)) {
             return false;
         }
-        _position = newPosition;
-        notifyListeners(newPosition);
+        setPosition(newPosition);
         return true;
     }
+
+    public Point2D getPosition() { return _position; }
+
+    public boolean isMovable() { return _movable; }
+
+    public void addListener(NodeListener listener) { _listeners.add(listener); }
+
+    public void removeListener(NodeListener listener) { _listeners.remove(listener); }
+
+    public List<NodeListener> getListeners() { return Collections.unmodifiableList(_listeners); }
 
     private boolean canMoveTo(Point2D newPosition) {
         if (!_movable || newPosition == null || newPosition.equals(_position)) {
@@ -51,24 +60,6 @@ public class Node {
         }
         _position = newPosition;
         notifyListeners(newPosition);
-    }
-
-    public Point2D getPosition() { return _position; }
-
-    public boolean isMovable() { return _movable; }
-
-    public void addListener(NodeListener listener) { _listeners.add(listener); }
-
-    public void removeListener(NodeListener listener) { _listeners.remove(listener); }
-
-    public List<NodeListener> getListeners() { return Collections.unmodifiableList(_listeners); }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Node node = (Node) o;
-        return _position.equals(node._position) && _movable == node._movable;
     }
 
     private void notifyListeners(Point2D newPosition) {
