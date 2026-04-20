@@ -41,30 +41,31 @@ public class Game implements NodeListener {
         } else {
             return;
         }
-        notifyGameStateChangedListeners();
+        notifyGameStateListeners();
     }
 
-    public void addGameStateChangedListener(GameStateListener listener) {
+    public void addGameStateListener(GameStateListener listener) {
         _gameStateListeners.add(listener);
     }
 
-    public void addLevelNavigationChangeListener(LevelNavigationListener listener) {
+    public void addLevelNavigationListener(LevelNavigationListener listener) {
         _levelNavigationListeners.add(listener);
     }
 
     public boolean nextLevel() {
+        boolean wasAllLevelsComplete = _gameState.isAllLevelsComplete();
         boolean result = _levelNavigation.nextLevel();
-        if (result) {
-            notifyLevelNavigationChangeListeners();
-            notifyGameStateChangedListeners();
+        if (result || _gameState.isAllLevelsComplete() != wasAllLevelsComplete) {
+            notifyLevelNavigationListeners();
+            notifyGameStateListeners();
         }
         return result;
     }
 
     public void restartLevel() {
         _levelNavigation.restartLevel();
-        notifyLevelNavigationChangeListeners();
-        notifyGameStateChangedListeners();
+        notifyLevelNavigationListeners();
+        notifyGameStateListeners();
     }
 
     public Field getField() { return _gameState.getField(); }
@@ -85,13 +86,13 @@ public class Game implements NodeListener {
 
     public int getMaxMoves() { return _gameState.getMaxMoves(); }
 
-    private void notifyGameStateChangedListeners() {
+    private void notifyGameStateListeners() {
         for (GameStateListener listener : _gameStateListeners) {
             listener.onGameStateChanged(_gameState);
         }
     }
 
-    private void notifyLevelNavigationChangeListeners() {
+    private void notifyLevelNavigationListeners() {
         for (LevelNavigationListener listener : _levelNavigationListeners) {
             listener.onLevelChanged(_levelNavigation);
         }

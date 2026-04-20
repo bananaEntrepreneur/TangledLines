@@ -104,7 +104,7 @@ class ObserverIntegrationTest {
             LevelManager lm = new LevelManager("levels");
             Game game = new Game(lm);
             GameStateTracker tracker = new GameStateTracker();
-            game.addGameStateChangedListener(tracker);
+            game.addGameStateListener(tracker);
 
             untangleAll(game);
 
@@ -120,7 +120,7 @@ class ObserverIntegrationTest {
             LevelManager lm = new LevelManager("levels");
             Game game = new Game(lm);
             GameStateTracker tracker = new GameStateTracker();
-            game.addGameStateChangedListener(tracker);
+            game.addGameStateListener(tracker);
 
             exhaustMoves(game);
 
@@ -134,8 +134,8 @@ class ObserverIntegrationTest {
             Game game = new Game(lm);
             GameStateTracker t1 = new GameStateTracker();
             GameStateTracker t2 = new GameStateTracker();
-            game.addGameStateChangedListener(t1);
-            game.addGameStateChangedListener(t2);
+            game.addGameStateListener(t1);
+            game.addGameStateListener(t2);
 
             untangleAll(game);
 
@@ -165,7 +165,7 @@ class ObserverIntegrationTest {
             LevelManager lm = new LevelManager("levels");
             Game game = new Game(lm);
             LevelNavTracker tracker = new LevelNavTracker();
-            game.addLevelNavigationChangeListener(tracker);
+            game.addLevelNavigationListener(tracker);
 
             untangleAll(game);
 
@@ -182,7 +182,7 @@ class ObserverIntegrationTest {
             LevelManager lm = new LevelManager("levels");
             Game game = new Game(lm);
             LevelNavTracker tracker = new LevelNavTracker();
-            game.addLevelNavigationChangeListener(tracker);
+            game.addLevelNavigationListener(tracker);
 
             game.restartLevel();
 
@@ -210,7 +210,7 @@ class ObserverIntegrationTest {
                     .orElseThrow();
             movable.addListener((node, pos) -> nodeMoveCount.incrementAndGet());
 
-            game.addGameStateChangedListener(state -> gameStateCount.incrementAndGet());
+            game.addGameStateListener(state -> gameStateCount.incrementAndGet());
 
             while (!game.isGameOver() && nodeMoveCount.get() < game.getMaxMoves() + 1) {
                 game.moveNode(movable, new Point2D.Double(
