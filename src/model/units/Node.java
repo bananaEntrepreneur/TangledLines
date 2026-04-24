@@ -38,8 +38,6 @@ public class Node {
 
     public void removeListener(NodeListener listener) { _listeners.remove(listener); }
 
-    public List<NodeListener> getListeners() { return Collections.unmodifiableList(_listeners); }
-
     private boolean canMoveTo(Point2D newPosition) {
         if (!_movable || newPosition == null || newPosition.equals(_position)) {
             return false;

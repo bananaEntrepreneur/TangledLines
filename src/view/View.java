@@ -8,14 +8,13 @@ import model.listeners.LevelNavigationListener;
 import model.listeners.NodeListener;
 import model.units.Node;
 
-public class View implements NodeListener, GameStateListener, LevelNavigationListener {
+public class View implements NodeListener, LevelNavigationListener {
     private final GameFrame _frame;
     private final Game _game;
 
     public View(Game game) {
         _game = game;
         _frame = new GameFrame(game, this);
-        _game.addGameStateListener(this);
         _game.addLevelNavigationListener(this);
         subscribeToNodes();
     }
@@ -35,11 +34,6 @@ public class View implements NodeListener, GameStateListener, LevelNavigationLis
 
     @Override
     public void onMoved() {
-        _frame.refresh();
-    }
-
-    @Override
-    public void onGameStateChanged(GameState gameState) {
         _frame.refresh();
     }
 

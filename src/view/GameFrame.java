@@ -20,6 +20,8 @@ public class GameFrame extends JFrame implements GameStateListener {
         _game = game;
         _view = view;
 
+        _game.addGameStateListener(this);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
