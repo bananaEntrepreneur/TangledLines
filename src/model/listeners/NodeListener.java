@@ -1,5 +1,7 @@
 package model.listeners;
 
+import model.units.Node;
+
 public interface NodeListener {
-    void onMoved();
+    void onMoved(Node node);
 }
