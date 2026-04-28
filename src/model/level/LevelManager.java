@@ -1,7 +1,5 @@
 package model.level;
 
-import model.factory.DefaultUnitFactory;
-import model.factory.UnitFactory;
 import model.game.Field;
 import model.level.factory.LevelFactory;
 import model.level.loader.JsonLevelLoader;
@@ -18,13 +16,13 @@ public class LevelManager {
     private final LevelLoader _levelLoader;
 
     public LevelManager(String levelsDirectory) throws LevelLoadException {
-        this(levelsDirectory, new JsonLevelLoader(), new DefaultUnitFactory());
+        this(levelsDirectory, new JsonLevelLoader());
     }
 
-    public LevelManager(String levelsDirectory, LevelLoader levelLoader, UnitFactory unitFactory)
+    public LevelManager(String levelsDirectory, LevelLoader levelLoader)
             throws LevelLoadException {
         _levelLoader = levelLoader;
-        _factory = new LevelFactory(unitFactory);
+        _factory = new LevelFactory();
         _levels = loadAllLevels(levelsDirectory);
     }
 
