@@ -9,6 +9,19 @@ import java.util.List;
 
 public class LevelFactory {
     public Field createField(Level level) {
+        Field field = getField(level);
+
+        List<Node> nodes = field.getNodes();
+        for (Level.EdgeData data : level.getEdges()) {
+            validateEdgeIndex(data.nodeAIndex(), nodes.size());
+            validateEdgeIndex(data.nodeBIndex(), nodes.size());
+            field.createEdge(nodes.get(data.nodeAIndex()), nodes.get(data.nodeBIndex()));
+        }
+
+        return field;
+    }
+
+    private static Field getField(Level level) {
         if (level == null) {
             throw new IllegalArgumentException("Level cannot be null");
         }
@@ -23,14 +36,6 @@ public class LevelFactory {
             Point2D position = new Point2D.Double(data.x(), data.y());
             field.createNode(position);
         }
-
-        List<Node> nodes = field.getNodes();
-        for (Level.EdgeData data : level.getEdges()) {
-            validateEdgeIndex(data.nodeAIndex(), nodes.size());
-            validateEdgeIndex(data.nodeBIndex(), nodes.size());
-            field.createEdge(nodes.get(data.nodeAIndex()), nodes.get(data.nodeBIndex()));
-        }
-
         return field;
     }
 
