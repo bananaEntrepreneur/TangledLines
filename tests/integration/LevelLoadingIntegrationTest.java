@@ -1,8 +1,9 @@
 package integration;
 
-import model.factory.DefaultUnitFactory;
 import model.game.Field;
 import model.level.Level;
+import model.level.LevelLoadException;
+import model.level.LevelManager;
 import model.level.factory.LevelFactory;
 import model.level.loader.JsonLevelLoader;
 import model.level.loader.LevelLoader;
@@ -26,7 +27,7 @@ class LevelLoadingIntegrationTest {
     @BeforeEach
     void setUp() {
         _loader = new JsonLevelLoader();
-        _factory = new LevelFactory(new DefaultUnitFactory());
+        _factory = new LevelFactory();
     }
 
     @Nested
@@ -62,22 +63,9 @@ class LevelLoadingIntegrationTest {
         }
 
         @Test
-        @DisplayName("Should preserve node movability from JSON through to Field")
-        void shouldPreserveNodeMovability() throws Exception {
-            Level level = _loader.load("levels/level1.json");
-            Field field = _factory.createField(level);
-            List<Node> nodes = field.getNodes();
-
-            assertTrue(nodes.get(0).isMovable());
-            assertTrue(nodes.get(1).isMovable());
-            assertFalse(nodes.get(2).isMovable());
-            assertTrue(nodes.get(3).isMovable());
-        }
-
-        @Test
         @DisplayName("Should connect edges to the same Node instances in the Field")
         void shouldShareNodeInstances() throws Exception {
-            Level level = _loader.load("levels/level2.json");
+            Level level = _loader.load("levels/level1.json");
             Field field = _factory.createField(level);
 
             List<Node> nodes = field.getNodes();

@@ -112,8 +112,12 @@ class EdgeTest {
 
             Point2D newPositionA = new Point2D.Double(50, 50);
             Point2D newPositionB = new Point2D.Double(150, 150);
-            nodeA.move(newPositionA);
-            nodeB.move(newPositionB);
+            nodeA.startDragging();
+            nodeA.updateDragging(newPositionA);
+            nodeA.stopDragging();
+            nodeB.startDragging();
+            nodeB.updateDragging(newPositionB);
+            nodeB.stopDragging();
 
             Line2D line = edge.toLine();
 
@@ -125,8 +129,8 @@ class EdgeTest {
     }
 
     @Nested
-    @DisplayName("intersects Tests - Intersecting Edges")
-    class IntersectsIntersectingTests {
+    @DisplayName("crosses Tests - Intersecting Edges")
+    class CrossesIntersectingTests {
 
         @Test
         @DisplayName("Should detect intersection between crossing edges")
@@ -173,8 +177,8 @@ class EdgeTest {
     }
 
     @Nested
-    @DisplayName("intersects Tests - Non-Intersecting Edges")
-    class IntersectsNonIntersectingTests {
+    @DisplayName("crosses Tests - Non-Intersecting Edges")
+    class CrossesNonIntersectingTests {
 
         @Test
         @DisplayName("Should return false for parallel non-overlapping edges")
@@ -219,8 +223,8 @@ class EdgeTest {
     }
 
     @Nested
-    @DisplayName("intersects Tests - Shared Nodes")
-    class IntersectsSharedNodesTests {
+    @DisplayName("crosses Tests - Shared Nodes")
+    class CrossesSharedNodesTests {
 
         @Test
         @DisplayName("Should return false when edges share node A")
@@ -275,8 +279,8 @@ class EdgeTest {
     }
 
     @Nested
-    @DisplayName("intersects Tests - Edge Cases")
-    class IntersectsEdgeCases {
+    @DisplayName("crosses Tests - Edge Cases")
+    class CrossesEdgeCases {
 
         @Test
         @DisplayName("Should return false for zero-length edge (same node reference)")

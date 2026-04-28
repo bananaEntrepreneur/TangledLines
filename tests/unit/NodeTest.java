@@ -28,135 +28,128 @@ class NodeTest {
     class ConstructorTests {
 
         @Test
-        @DisplayName("Should create movable node with given position")
-        void shouldCreateMovableNode() {
+        @DisplayName("Should create node with given position")
+        void shouldCreateNode() {
             Point2D position = new Point2D.Double(50, 50);
             Node node = new Node(position);
 
             assertEquals(position, node.getPosition());
-            assertTrue(node.isMovable());
-        }
-
-        @Test
-        @DisplayName("Should create non-movable node with given position")
-        void shouldCreateNonMovableNode() {
-            Point2D position = new Point2D.Double(150, 150);
-            Node node = new Node(position);
-
-            assertEquals(position, node.getPosition());
-            assertFalse(node.isMovable());
         }
     }
 
     @Nested
-    @DisplayName("setPosition Tests - Movable Node")
-    class SetPositionMovableTests {
+    @DisplayName("Dragging Tests")
+    class DraggingTests {
 
         @Test
-        @DisplayName("Should update position for movable node")
-        void shouldUpdatePositionForMovableNode() {
+        @DisplayName("Should start in not dragging state")
+        void shouldStartNotDragging() {
             Node node = new Node(_initialPosition);
 
-            node.move(_newPosition);
+            assertFalse(node.isDragging());
+        }
+
+        @Test
+        @DisplayName("Should update position during dragging")
+        void shouldUpdatePositionDuringDragging() {
+            Node node = new Node(_initialPosition);
+
+            node.startDragging();
+            node.updateDragging(_newPosition);
+            node.stopDragging();
 
             assertEquals(_newPosition, node.getPosition());
         }
 
         @Test
-        @DisplayName("Should notify listeners when position changes")
-        void shouldNotifyListenersOnPositionChange() {
+        @DisplayName("Should notify listeners when drag completes")
+        void shouldNotifyListenersOnDragComplete() {
             Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.move(_newPosition);
+            node.startDragging();
+            node.updateDragging(_newPosition);
+            node.stopDragging();
 
             assertTrue(listener.wasNotified());
         }
-    }
-
-    @Nested
-    @DisplayName("setPosition Tests - Non-Movable Node")
-    class SetPositionNonMovableTests {
 
         @Test
-        @DisplayName("Should not update position for non-movable node")
-        void shouldNotUpdatePositionForNonMovableNode() {
+        @DisplayName("Should not update position without startDragging")
+        void shouldNotUpdateWithoutStartDragging() {
             Node node = new Node(_initialPosition);
 
-            node.move(_newPosition);
+            node.updateDragging(_newPosition);
+            node.stopDragging();
 
             assertEquals(_initialPosition, node.getPosition());
         }
-
-        @Test
-        @DisplayName("Should not notify listeners for non-movable node")
-        void shouldNotNotifyListenersForNonMovableNode() {
-            Node node = new Node(_initialPosition);
-            MockNodeListener listener = new MockNodeListener();
-            node.addListener(listener);
-
-            node.move(_newPosition);
-
-            assertFalse(listener.wasNotified());
-        }
     }
 
     @Nested
-    @DisplayName("setPosition Tests - Edge Cases")
+    @DisplayName("Edge Cases")
     class SetPositionEdgeCases {
 
         @Test
-        @DisplayName("Should not update position when newPosition is null")
+        @DisplayName("Should not update position when null position during drag")
         void shouldNotUpdatePositionWhenNull() {
             Node node = new Node(_initialPosition);
 
-            node.move(null);
+            node.startDragging();
+            node.updateDragging(null);
+            node.stopDragging();
 
             assertEquals(_initialPosition, node.getPosition());
         }
 
         @Test
-        @DisplayName("Should not notify listeners when newPosition is null")
+        @DisplayName("Should not notify listeners when null position")
         void shouldNotNotifyListenersWhenNull() {
             Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.move(null);
+            node.startDragging();
+            node.updateDragging(null);
+            node.stopDragging();
 
             assertFalse(listener.wasNotified());
         }
 
         @Test
-        @DisplayName("Should not update position when newPosition equals current position")
+        @DisplayName("Should not update position when same position")
         void shouldNotUpdatePositionWhenSame() {
             Node node = new Node(_initialPosition);
 
-            node.move(_initialPosition);
+            node.startDragging();
+            node.updateDragging(_initialPosition);
+            node.stopDragging();
 
             assertEquals(_initialPosition, node.getPosition());
         }
 
         @Test
-        @DisplayName("Should not notify listeners when newPosition equals current position")
+        @DisplayName("Should not notify listeners when same position")
         void shouldNotNotifyListenersWhenSame() {
             Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.move(_initialPosition);
+            node.startDragging();
+            node.updateDragging(_initialPosition);
+            node.stopDragging();
 
             assertFalse(listener.wasNotified());
         }
 
         @Test
-        @DisplayName("Should not update position when newPosition equals current position (different object)")
-        void shouldNotUpdatePositionWhenEqual() {
+        @DisplayName("Should not commit without queued position")
+        void shouldNotCommitWithoutQueuedPosition() {
             Node node = new Node(_initialPosition);
-            Point2D equalPosition = new Point2D.Double(100, 100);
 
-            node.move(equalPosition);
+            node.startDragging();
+            node.stopDragging();
 
             assertEquals(_initialPosition, node.getPosition());
         }
@@ -175,7 +168,9 @@ class NodeTest {
             node.addListener(listener1);
             node.addListener(listener2);
 
-            node.move(_newPosition);
+            node.startDragging();
+            node.updateDragging(_newPosition);
+            node.stopDragging();
 
             assertTrue(listener1.wasNotified());
             assertTrue(listener2.wasNotified());
@@ -190,7 +185,9 @@ class NodeTest {
             node.addListener(listener1);
             node.addListener(listener2);
 
-            node.move(_newPosition);
+            node.startDragging();
+            node.updateDragging(_newPosition);
+            node.stopDragging();
 
             assertTrue(listener1.wasNotified());
             assertTrue(listener2.wasNotified());
@@ -204,7 +201,9 @@ class NodeTest {
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
-            node.move(_newPosition);
+            node.startDragging();
+            node.updateDragging(_newPosition);
+            node.stopDragging();
 
             assertTrue(listener.wasNotified());
         }
@@ -224,13 +223,22 @@ class NodeTest {
         }
 
         @Test
-        @DisplayName("Should return correct movability status")
-        void shouldReturnCorrectMovability() {
-            Node movableNode = new Node(_initialPosition);
-            Node nonMovableNode = new Node(_initialPosition);
+        @DisplayName("Should return drag position during dragging")
+        void shouldReturnDragPosition() {
+            Node node = new Node(_initialPosition);
 
-            assertTrue(movableNode.isMovable());
-            assertFalse(nonMovableNode.isMovable());
+            node.startDragging();
+            node.updateDragging(_newPosition);
+
+            assertEquals(_newPosition, node.getDragPosition());
+        }
+
+        @Test
+        @DisplayName("Should return current position when not dragging")
+        void shouldReturnCurrentPositionWhenNotDragging() {
+            Node node = new Node(_initialPosition);
+
+            assertEquals(_initialPosition, node.getDragPosition());
         }
     }
 

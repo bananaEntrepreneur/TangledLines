@@ -30,7 +30,9 @@ class EdgeIntegrationTest {
 
             assertTrue(edge1.crosses(edge2));
 
-            nodeB2.move(new Point2D.Double(150, 150));
+            nodeB2.startDragging();
+            nodeB2.updateDragging(new Point2D.Double(150, 150));
+            nodeB2.stopDragging();
 
             assertFalse(edge1.crosses(edge2));
         }
@@ -48,7 +50,9 @@ class EdgeIntegrationTest {
 
             assertFalse(edge1.crosses(edge2));
 
-            nodeB2.move(new Point2D.Double(25, -25));
+            nodeB2.startDragging();
+            nodeB2.updateDragging(new Point2D.Double(25, -25));
+            nodeB2.stopDragging();
 
             assertTrue(edge1.crosses(edge2));
         }
@@ -66,11 +70,17 @@ class EdgeIntegrationTest {
 
             assertTrue(edge1.crosses(edge2));
 
-            nodeA2.move(new Point2D.Double(0, 200));
-            nodeB2.move(new Point2D.Double(200, 200));
+            nodeA2.startDragging();
+            nodeA2.updateDragging(new Point2D.Double(0, 200));
+            nodeA2.stopDragging();
+            nodeB2.startDragging();
+            nodeB2.updateDragging(new Point2D.Double(200, 200));
+            nodeB2.stopDragging();
             assertFalse(edge1.crosses(edge2));
 
-            nodeA2.move(new Point2D.Double(0, 0));
+            nodeA2.startDragging();
+            nodeA2.updateDragging(new Point2D.Double(0, 0));
+            nodeA2.stopDragging();
             assertTrue(edge1.crosses(edge2));
         }
     }
@@ -117,10 +127,18 @@ class EdgeIntegrationTest {
             assertTrue(mainEdge.crosses(crossingEdge1));
             assertTrue(mainEdge.crosses(crossingEdge2));
 
-            nodeC1.move(new Point2D.Double(-100, 100));
-            nodeD1.move(new Point2D.Double(0, 200));
-            nodeC2.move(new Point2D.Double(150, 150));
-            nodeD2.move(new Point2D.Double(200, 200));
+            nodeC1.startDragging();
+            nodeC1.updateDragging(new Point2D.Double(-100, 100));
+            nodeC1.stopDragging();
+            nodeD1.startDragging();
+            nodeD1.updateDragging(new Point2D.Double(0, 200));
+            nodeD1.stopDragging();
+            nodeC2.startDragging();
+            nodeC2.updateDragging(new Point2D.Double(150, 150));
+            nodeC2.stopDragging();
+            nodeD2.startDragging();
+            nodeD2.updateDragging(new Point2D.Double(200, 200));
+            nodeD2.stopDragging();
 
             assertFalse(mainEdge.crosses(crossingEdge1));
             assertFalse(mainEdge.crosses(crossingEdge2));
