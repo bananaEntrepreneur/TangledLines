@@ -16,11 +16,11 @@ public class View implements NodeListener, LevelNavigationListener {
         _game = game;
         _frame = new GameFrame(game, this);
         _game.addLevelNavigationListener(this);
-        subscribeToNodes();
+        refreshNodeSubscriptions();
     }
 
-    public void subscribeToNodes() {
-        for (Node node : _game.getField().getNodes()) {
+    public void refreshNodeSubscriptions() {
+        for (Node node : _game.getState().getField().getNodes()) {
             node.removeListener(this);
             node.removeListener(_game);
             node.addListener(this);
@@ -33,13 +33,13 @@ public class View implements NodeListener, LevelNavigationListener {
     }
 
     @Override
-    public void onMoved() {
+    public void onMoved(Node node) {
         _frame.refresh();
     }
 
     @Override
     public void onLevelChanged(LevelNavigation levelNavigation) {
-        subscribeToNodes();
+        refreshNodeSubscriptions();
         _frame.refresh();
     }
 }

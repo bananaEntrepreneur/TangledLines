@@ -2,7 +2,9 @@ package view;
 
 import model.game.Game;
 import model.game.state.GameState;
+import model.game.state.LevelNavigation;
 import model.listeners.GameStateListener;
+import view.style.GameStyle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +18,7 @@ public class GameFrame extends JFrame implements GameStateListener {
     private JButton _restartButton;
 
     public GameFrame(Game game, View view) {
-        super("Tangled Lines");
+        super(GameStyle.WINDOW_TITLE);
         _game = game;
         _view = view;
 
@@ -45,15 +47,16 @@ public class GameFrame extends JFrame implements GameStateListener {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        _levelLabel = new JLabel("Level 1/" + _game.getTotalLevels());
+        LevelNavigation nav = _game.getNavigation();
+        _levelLabel = new JLabel(GameStyle.LABEL_LEVEL + "1/" + nav.getTotalLevels());
         panel.add(_levelLabel);
 
-        _nextLevelButton = new JButton("Next Level");
+        _nextLevelButton = new JButton(GameStyle.BUTTON_NEXT_LEVEL);
         _nextLevelButton.setEnabled(false);
         _nextLevelButton.addActionListener(e -> handleNextLevel());
         panel.add(_nextLevelButton);
 
-        _restartButton = new JButton("Restart Level");
+        _restartButton = new JButton(GameStyle.BUTTON_RESTART);
         _restartButton.addActionListener(e -> handleRestartLevel());
         panel.add(_restartButton);
 
@@ -72,19 +75,21 @@ public class GameFrame extends JFrame implements GameStateListener {
     }
 
     private void afterLevelTransition() {
-        _view.subscribeToNodes();
+        _view.refreshNodeSubscriptions();
+        _gamePanel.recreateWidgets();
         updateLevelLabel();
         updateButtons();
-        _gamePanel.repaint();
     }
 
     private void updateLevelLabel() {
-        _levelLabel.setText("Level " + (_game.getCurrentLevelIndex() + 1) + "/" + _game.getTotalLevels());
+        LevelNavigation nav = _game.getNavigation();
+        _levelLabel.setText(GameStyle.LABEL_LEVEL + (nav.getCurrentLevelIndex() + 1) + "/" + nav.getTotalLevels());
     }
 
     private void updateButtons() {
-        if (_game.isWin()) {
-            _nextLevelButton.setEnabled(_game.hasNextLevel());
+        GameState state = _game.getState();
+        if (state.isWin()) {
+            _nextLevelButton.setEnabled(_game.getNavigation().hasNextLevel());
         } else {
             _nextLevelButton.setEnabled(false);
         }
