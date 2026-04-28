@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
-    private static final double MIN_MOVE_DISTANCE_SQUARED = 1.0;
-
     private Point2D _position;
+    private Point2D _queuedPosition = null;
     private boolean _isDragging = false;
     private final List<NodeListener> _listeners = new ArrayList<>();
-    private Point2D _queuedPosition = null;
 
     public Node(Point2D position) {
         if (position == null) {
@@ -50,27 +48,6 @@ public class Node {
     public void addListener(NodeListener listener) { _listeners.add(listener); }
 
     public void removeListener(NodeListener listener) { _listeners.remove(listener); }
-
-    private boolean move(Point2D newPosition) {
-        if (!canMoveTo(newPosition)) {
-            return false;
-        }
-        setPosition(newPosition);
-        return true;
-    }
-
-    private boolean canMoveTo(Point2D newPosition) {
-        if (newPosition == null || newPosition.equals(_position)) {
-            return false;
-        }
-        return distanceSquaredTo(newPosition) >= MIN_MOVE_DISTANCE_SQUARED;
-    }
-
-    private double distanceSquaredTo(Point2D target) {
-        double dx = _position.getX() - target.getX();
-        double dy = _position.getY() - target.getY();
-        return dx * dx + dy * dy;
-    }
 
     private void setPosition(Point2D newPosition) {
         if (newPosition == null || newPosition.equals(_position)) {
