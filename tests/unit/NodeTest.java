@@ -31,7 +31,7 @@ class NodeTest {
         @DisplayName("Should create movable node with given position")
         void shouldCreateMovableNode() {
             Point2D position = new Point2D.Double(50, 50);
-            Node node = new Node(position, true);
+            Node node = new Node(position);
 
             assertEquals(position, node.getPosition());
             assertTrue(node.isMovable());
@@ -41,7 +41,7 @@ class NodeTest {
         @DisplayName("Should create non-movable node with given position")
         void shouldCreateNonMovableNode() {
             Point2D position = new Point2D.Double(150, 150);
-            Node node = new Node(position, false);
+            Node node = new Node(position);
 
             assertEquals(position, node.getPosition());
             assertFalse(node.isMovable());
@@ -55,7 +55,7 @@ class NodeTest {
         @Test
         @DisplayName("Should update position for movable node")
         void shouldUpdatePositionForMovableNode() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
 
             node.move(_newPosition);
 
@@ -65,7 +65,7 @@ class NodeTest {
         @Test
         @DisplayName("Should notify listeners when position changes")
         void shouldNotifyListenersOnPositionChange() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
@@ -82,7 +82,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not update position for non-movable node")
         void shouldNotUpdatePositionForNonMovableNode() {
-            Node node = new Node(_initialPosition, false);
+            Node node = new Node(_initialPosition);
 
             node.move(_newPosition);
 
@@ -92,7 +92,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not notify listeners for non-movable node")
         void shouldNotNotifyListenersForNonMovableNode() {
-            Node node = new Node(_initialPosition, false);
+            Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
@@ -109,7 +109,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not update position when newPosition is null")
         void shouldNotUpdatePositionWhenNull() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
 
             node.move(null);
 
@@ -119,7 +119,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not notify listeners when newPosition is null")
         void shouldNotNotifyListenersWhenNull() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
@@ -131,7 +131,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not update position when newPosition equals current position")
         void shouldNotUpdatePositionWhenSame() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
 
             node.move(_initialPosition);
 
@@ -141,7 +141,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not notify listeners when newPosition equals current position")
         void shouldNotNotifyListenersWhenSame() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
@@ -153,7 +153,7 @@ class NodeTest {
         @Test
         @DisplayName("Should not update position when newPosition equals current position (different object)")
         void shouldNotUpdatePositionWhenEqual() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
             Point2D equalPosition = new Point2D.Double(100, 100);
 
             node.move(equalPosition);
@@ -169,7 +169,7 @@ class NodeTest {
         @Test
         @DisplayName("Should support multiple listeners")
         void shouldSupportMultipleListeners() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
             MockNodeListener listener1 = new MockNodeListener();
             MockNodeListener listener2 = new MockNodeListener();
             node.addListener(listener1);
@@ -184,7 +184,7 @@ class NodeTest {
         @Test
         @DisplayName("Should notify all listeners with same position")
         void shouldNotifyAllListenersWithSamePosition() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
             MockNodeListener listener1 = new MockNodeListener();
             MockNodeListener listener2 = new MockNodeListener();
             node.addListener(listener1);
@@ -199,7 +199,7 @@ class NodeTest {
         @Test
         @DisplayName("Should notify listeners added after creation")
         void shouldNotifyListenersAddedAfterCreation() {
-            Node node = new Node(_initialPosition, true);
+            Node node = new Node(_initialPosition);
 
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
@@ -218,7 +218,7 @@ class NodeTest {
         @DisplayName("Should return correct position")
         void shouldReturnCorrectPosition() {
             Point2D position = new Point2D.Double(300, 400);
-            Node node = new Node(position, true);
+            Node node = new Node(position);
 
             assertEquals(position, node.getPosition());
         }
@@ -226,8 +226,8 @@ class NodeTest {
         @Test
         @DisplayName("Should return correct movability status")
         void shouldReturnCorrectMovability() {
-            Node movableNode = new Node(_initialPosition, true);
-            Node nonMovableNode = new Node(_initialPosition, false);
+            Node movableNode = new Node(_initialPosition);
+            Node nonMovableNode = new Node(_initialPosition);
 
             assertTrue(movableNode.isMovable());
             assertFalse(nonMovableNode.isMovable());
@@ -238,7 +238,7 @@ class NodeTest {
         private boolean _notified = false;
 
         @Override
-        public void onMoved() {
+        public void onMoved(Node node) {
             _notified = true;
         }
 

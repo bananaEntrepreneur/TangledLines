@@ -32,7 +32,7 @@ class ObserverIntegrationTest {
             final AtomicInteger callCount = new AtomicInteger(0);
 
             @Override
-            public void onMoved() {
+            public void onMoved(Node node) {
                 callCount.incrementAndGet();
             }
         }
@@ -207,7 +207,7 @@ class ObserverIntegrationTest {
                     .findFirst()
                     .orElseThrow();
             attachGameToField(game);
-            movable.addListener(() -> nodeMoveCount.incrementAndGet());
+            movable.addListener((Node node) -> nodeMoveCount.incrementAndGet());
 
             game.addGameStateListener(state -> gameStateCount.incrementAndGet());
 

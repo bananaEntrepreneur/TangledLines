@@ -1,7 +1,5 @@
 package unit;
 
-import model.game.MoveTransaction;
-import model.listeners.TransactionListener;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +16,7 @@ class TransactionListenerTest {
     @Test
     @DisplayName("Should receive committed node and final position")
     void shouldReceiveCommittedNodeAndPosition() {
-        Node node = new Node(new Point2D.Double(1, 1), true);
+        Node node = new Node(new Point2D.Double(1, 1));
         RecordingListener listener = new RecordingListener();
         MoveTransaction transaction = new MoveTransaction(node, listener);
 
@@ -34,7 +32,7 @@ class TransactionListenerTest {
     @Test
     @DisplayName("Should not be called when transaction is cancelled")
     void shouldNotBeCalledOnCancel() {
-        Node node = new Node(new Point2D.Double(1, 1), true);
+        Node node = new Node(new Point2D.Double(1, 1));
         RecordingListener listener = new RecordingListener();
         MoveTransaction transaction = new MoveTransaction(node, listener);
 

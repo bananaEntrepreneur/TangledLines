@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import view.interaction.DragListener;
 import view.interaction.HoverListener;
-import view.interaction.NodeFinder;
 import view.interaction.NodeInteractionHandler;
 
 import javax.swing.JPanel;

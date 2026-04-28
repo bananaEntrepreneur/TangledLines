@@ -1,7 +1,5 @@
 package unit;
 
-import model.game.MoveTransaction;
-import model.listeners.TransactionListener;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,7 +21,7 @@ class MoveTransactionTest {
         @Test
         @DisplayName("Should commit the final dragged position to the listener")
         void shouldCommitFinalPosition() {
-            Node node = new Node(new Point2D.Double(10, 10), true);
+            Node node = new Node(new Point2D.Double(10, 10));
             RecordingListener listener = new RecordingListener();
             MoveTransaction transaction = new MoveTransaction(node, listener);
 
@@ -40,7 +38,7 @@ class MoveTransactionTest {
         @Test
         @DisplayName("Should use the node position when no drag updates were recorded")
         void shouldCommitCurrentNodePositionWhenQueueEmpty() {
-            Node node = new Node(new Point2D.Double(10, 10), true);
+            Node node = new Node(new Point2D.Double(10, 10));
             RecordingListener listener = new RecordingListener();
             MoveTransaction transaction = new MoveTransaction(node, listener);
 
@@ -53,7 +51,7 @@ class MoveTransactionTest {
         @Test
         @DisplayName("Should ignore updates before dragging starts")
         void shouldIgnoreUpdatesBeforeStart() {
-            Node node = new Node(new Point2D.Double(10, 10), true);
+            Node node = new Node(new Point2D.Double(10, 10));
             RecordingListener listener = new RecordingListener();
             MoveTransaction transaction = new MoveTransaction(node, listener);
 
@@ -66,7 +64,7 @@ class MoveTransactionTest {
         @Test
         @DisplayName("Should cancel without notifying the listener")
         void shouldCancelWithoutCommit() {
-            Node node = new Node(new Point2D.Double(10, 10), true);
+            Node node = new Node(new Point2D.Double(10, 10));
             RecordingListener listener = new RecordingListener();
             MoveTransaction transaction = new MoveTransaction(node, listener);
 
@@ -81,7 +79,7 @@ class MoveTransactionTest {
         @Test
         @DisplayName("Should expose the wrapped node")
         void shouldReturnNode() {
-            Node node = new Node(new Point2D.Double(10, 10), true);
+            Node node = new Node(new Point2D.Double(10, 10));
             MoveTransaction transaction = new MoveTransaction(node, null);
 
             assertSame(node, transaction.getNode());

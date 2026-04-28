@@ -82,7 +82,7 @@ class FieldNodeEdgeIntegrationTest {
         @DisplayName("Should detect no intersections after moving all movable nodes far apart")
         void shouldDetectNoIntersectionsAfterMovingApart() throws Exception {
             Level level = new JsonLevelLoader().load("levels/level2.json");
-            LevelFactory factory = new LevelFactory(new DefaultUnitFactory());
+            LevelFactory factory = new LevelFactory();
             Field field = factory.createField(level);
 
             assertTrue(field.hasIntersections(),
@@ -110,7 +110,6 @@ class FieldNodeEdgeIntegrationTest {
             assertTrue(before, "Level 1 should start with intersections");
 
             Node movable = field.getNodes().stream()
-                    .filter(Node::isMovable)
                     .findFirst()
                     .orElseThrow();
             moveNode(field, movable, new Point2D.Double(5000, 5000));
@@ -165,7 +164,7 @@ class FieldNodeEdgeIntegrationTest {
             LevelManager lm = new LevelManager("levels");
             Field field = lm.getCurrentField();
 
-            Node externalNode = new Node(new Point2D.Double(0, 0), true);
+            Node externalNode = new Node(new Point2D.Double(0, 0));
 
             boolean result = moveNode(field, externalNode, new Point2D.Double(100, 100));
 
@@ -203,7 +202,7 @@ class FieldNodeEdgeIntegrationTest {
             Field field = lm.getCurrentField();
 
             assertThrows(UnsupportedOperationException.class, () ->
-                    field.getNodes().add(new Node(new Point2D.Double(0, 0), true)));
+                    field.getNodes().add(new Node(new Point2D.Double(0, 0))));
         }
 
         @Test

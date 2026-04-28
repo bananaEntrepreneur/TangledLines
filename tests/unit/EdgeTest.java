@@ -35,8 +35,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should create edge with two nodes")
         void shouldCreateEdgeWithTwoNodes() {
-            Node nodeA = new Node(_point1, true);
-            Node nodeB = new Node(_point2, true);
+            Node nodeA = new Node(_point1);
+            Node nodeB = new Node(_point2);
 
             Edge edge = new Edge(nodeA, nodeB);
 
@@ -48,8 +48,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should store node references correctly")
         void shouldStoreNodeReferences() {
-            Node nodeA = new Node(_point1, false);
-            Node nodeB = new Node(_point2, true);
+            Node nodeA = new Node(_point1);
+            Node nodeB = new Node(_point2);
 
             Edge edge = new Edge(nodeA, nodeB);
 
@@ -65,8 +65,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should return correct node A")
         void shouldReturnCorrectNodeA() {
-            Node nodeA = new Node(_point1, true);
-            Node nodeB = new Node(_point2, true);
+            Node nodeA = new Node(_point1);
+            Node nodeB = new Node(_point2);
             Edge edge = new Edge(nodeA, nodeB);
 
             assertEquals(nodeA, edge.getNodeA());
@@ -75,8 +75,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should return correct node B")
         void shouldReturnCorrectNodeB() {
-            Node nodeA = new Node(_point1, true);
-            Node nodeB = new Node(_point2, true);
+            Node nodeA = new Node(_point1);
+            Node nodeB = new Node(_point2);
             Edge edge = new Edge(nodeA, nodeB);
 
             assertEquals(nodeB, edge.getNodeB());
@@ -90,8 +90,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should create Line2D from node positions")
         void shouldCreateLineFromNodePositions() {
-            Node nodeA = new Node(_point1, true);
-            Node nodeB = new Node(_point2, true);
+            Node nodeA = new Node(_point1);
+            Node nodeB = new Node(_point2);
             Edge edge = new Edge(nodeA, nodeB);
 
             Line2D line = edge.toLine();
@@ -106,8 +106,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should reflect updated node positions")
         void shouldReflectUpdatedNodePositions() {
-            Node nodeA = new Node(_point1, true);
-            Node nodeB = new Node(_point2, true);
+            Node nodeA = new Node(_point1);
+            Node nodeB = new Node(_point2);
             Edge edge = new Edge(nodeA, nodeB);
 
             Point2D newPositionA = new Point2D.Double(50, 50);
@@ -131,12 +131,12 @@ class EdgeTest {
         @Test
         @DisplayName("Should detect intersection between crossing edges")
         void shouldDetectCrossingEdges() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(100, 100), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node nodeB1 = new Node(new Point2D.Double(100, 100));
             Edge edge1 = new Edge(nodeA1, nodeB1);
 
-            Node nodeA2 = new Node(new Point2D.Double(0, 100), true);
-            Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
+            Node nodeA2 = new Node(new Point2D.Double(0, 100));
+            Node nodeB2 = new Node(new Point2D.Double(100, 0));
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
@@ -146,12 +146,12 @@ class EdgeTest {
         @Test
         @DisplayName("Should detect intersection for perpendicular edges")
         void shouldDetectPerpendicularIntersection() {
-            Node nodeA1 = new Node(new Point2D.Double(50, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(50, 100), true);
+            Node nodeA1 = new Node(new Point2D.Double(50, 0));
+            Node nodeB1 = new Node(new Point2D.Double(50, 100));
             Edge edge1 = new Edge(nodeA1, nodeB1);
 
-            Node nodeA2 = new Node(new Point2D.Double(0, 50), true);
-            Node nodeB2 = new Node(new Point2D.Double(100, 50), true);
+            Node nodeA2 = new Node(new Point2D.Double(0, 50));
+            Node nodeB2 = new Node(new Point2D.Double(100, 50));
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
@@ -160,12 +160,12 @@ class EdgeTest {
         @Test
         @DisplayName("Should detect intersection for T-junction")
         void shouldDetectTJunction() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(100, 0), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node nodeB1 = new Node(new Point2D.Double(100, 0));
             Edge edge1 = new Edge(nodeA1, nodeB1);
 
-            Node nodeA2 = new Node(new Point2D.Double(50, 0), true);
-            Node nodeB2 = new Node(new Point2D.Double(50, 100), true);
+            Node nodeA2 = new Node(new Point2D.Double(50, 0));
+            Node nodeB2 = new Node(new Point2D.Double(50, 100));
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
@@ -179,12 +179,12 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false for parallel non-overlapping edges")
         void shouldReturnFalseForParallelEdges() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(100, 0), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node nodeB1 = new Node(new Point2D.Double(100, 0));
             Edge edge1 = new Edge(nodeA1, nodeB1);
 
-            Node nodeA2 = new Node(new Point2D.Double(0, 50), true);
-            Node nodeB2 = new Node(new Point2D.Double(100, 50), true);
+            Node nodeA2 = new Node(new Point2D.Double(0, 50));
+            Node nodeB2 = new Node(new Point2D.Double(100, 50));
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
@@ -193,12 +193,12 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false for edges far apart")
         void shouldReturnFalseForEdgesFarApart() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(10, 10), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node nodeB1 = new Node(new Point2D.Double(10, 10));
             Edge edge1 = new Edge(nodeA1, nodeB1);
 
-            Node nodeA2 = new Node(new Point2D.Double(100, 100), true);
-            Node nodeB2 = new Node(new Point2D.Double(110, 110), true);
+            Node nodeA2 = new Node(new Point2D.Double(100, 100));
+            Node nodeB2 = new Node(new Point2D.Double(110, 110));
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
@@ -207,11 +207,11 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false for adjacent edges sharing a node")
         void shouldReturnFalseForAdjacentEdges() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node sharedNode = new Node(new Point2D.Double(50, 0), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node sharedNode = new Node(new Point2D.Double(50, 0));
             Edge edge1 = new Edge(nodeA1, sharedNode);
 
-            Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
+            Node nodeB2 = new Node(new Point2D.Double(100, 0));
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
@@ -225,11 +225,11 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false when edges share node A")
         void shouldReturnFalseWhenSharingNodeA() {
-            Node sharedNode = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(100, 100), true);
+            Node sharedNode = new Node(new Point2D.Double(0, 0));
+            Node nodeB1 = new Node(new Point2D.Double(100, 100));
             Edge edge1 = new Edge(sharedNode, nodeB1);
 
-            Node nodeB2 = new Node(new Point2D.Double(0, 100), true);
+            Node nodeB2 = new Node(new Point2D.Double(0, 100));
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
@@ -238,11 +238,11 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false when edges share node B")
         void shouldReturnFalseWhenSharingNodeB() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node sharedNode = new Node(new Point2D.Double(100, 100), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node sharedNode = new Node(new Point2D.Double(100, 100));
             Edge edge1 = new Edge(nodeA1, sharedNode);
 
-            Node nodeA2 = new Node(new Point2D.Double(0, 100), true);
+            Node nodeA2 = new Node(new Point2D.Double(0, 100));
             Edge edge2 = new Edge(nodeA2, sharedNode);
 
             assertFalse(edge1.crosses(edge2));
@@ -251,8 +251,8 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false when edges share both nodes (same edge)")
         void shouldReturnFalseWhenSharingBothNodes() {
-            Node nodeA = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB = new Node(new Point2D.Double(100, 100), true);
+            Node nodeA = new Node(new Point2D.Double(0, 0));
+            Node nodeB = new Node(new Point2D.Double(100, 100));
             Edge edge1 = new Edge(nodeA, nodeB);
             Edge edge2 = new Edge(nodeA, nodeB);
 
@@ -263,11 +263,11 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false when edges cross-share a node")
         void shouldReturnFalseWhenCrossSharingNodes() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node sharedNode = new Node(new Point2D.Double(100, 100), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node sharedNode = new Node(new Point2D.Double(100, 100));
             Edge edge1 = new Edge(nodeA1, sharedNode);
 
-            Node nodeB2 = new Node(new Point2D.Double(0, 100), true);
+            Node nodeB2 = new Node(new Point2D.Double(0, 100));
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
@@ -281,9 +281,9 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false for zero-length edge (same node reference)")
         void shouldHandleZeroLengthEdge() {
-            Node nodeA = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB = new Node(new Point2D.Double(100, 100), true);
-            Node isolatedNode = new Node(new Point2D.Double(200, 200), true);
+            Node nodeA = new Node(new Point2D.Double(0, 0));
+            Node nodeB = new Node(new Point2D.Double(100, 100));
+            Node isolatedNode = new Node(new Point2D.Double(200, 200));
 
             Edge zeroLengthEdge = new Edge(isolatedNode, isolatedNode);
             Edge normalEdge = new Edge(nodeA, nodeB);
@@ -294,12 +294,12 @@ class EdgeTest {
         @Test
         @DisplayName("Should handle overlapping collinear edges")
         void shouldHandleOverlappingCollinearEdges() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node nodeB1 = new Node(new Point2D.Double(100, 0), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node nodeB1 = new Node(new Point2D.Double(100, 0));
             Edge edge1 = new Edge(nodeA1, nodeB1);
 
-            Node nodeA2 = new Node(new Point2D.Double(25, 0), true);
-            Node nodeB2 = new Node(new Point2D.Double(75, 0), true);
+            Node nodeA2 = new Node(new Point2D.Double(25, 0));
+            Node nodeB2 = new Node(new Point2D.Double(75, 0));
             Edge edge2 = new Edge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
@@ -308,11 +308,11 @@ class EdgeTest {
         @Test
         @DisplayName("Should return false for edges touching at shared endpoint")
         void shouldHandleEdgesTouchingAtEndpoints() {
-            Node nodeA1 = new Node(new Point2D.Double(0, 0), true);
-            Node sharedNode = new Node(new Point2D.Double(50, 50), true);
+            Node nodeA1 = new Node(new Point2D.Double(0, 0));
+            Node sharedNode = new Node(new Point2D.Double(50, 50));
             Edge edge1 = new Edge(nodeA1, sharedNode);
 
-            Node nodeB2 = new Node(new Point2D.Double(100, 0), true);
+            Node nodeB2 = new Node(new Point2D.Double(100, 0));
             Edge edge2 = new Edge(sharedNode, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
