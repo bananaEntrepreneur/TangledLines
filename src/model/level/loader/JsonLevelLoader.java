@@ -40,8 +40,7 @@ public class JsonLevelLoader implements LevelLoader {
         List<Level.NodeData> nodes = new ArrayList<>(schema.nodes.size());
         for (NodeSchema node : schema.nodes) {
             validateNode(node);
-            nodes.add(new Level.NodeData(node.x, node.y,
-                node.movable != null ? node.movable : true));
+            nodes.add(new Level.NodeData(node.x, node.y));
         }
 
         List<Level.EdgeData> edges = new ArrayList<>();
@@ -81,7 +80,6 @@ public class JsonLevelLoader implements LevelLoader {
 
     private static class NodeSchema {
         Double x, y;
-        Boolean movable;
     }
 
     private static class EdgeSchema {

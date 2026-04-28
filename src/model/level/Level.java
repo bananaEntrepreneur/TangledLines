@@ -28,6 +28,6 @@ public class Level {
     public List<NodeData> getNodes() { return _nodes; }
     public List<EdgeData> getEdges() { return _edges; }
 
-    public record NodeData(double x, double y, boolean movable) {}
+    public record NodeData(double x, double y) {}
     public record EdgeData(int nodeAIndex, int nodeBIndex) {}
 }

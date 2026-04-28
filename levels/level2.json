@@ -1,10 +1,10 @@
 {
   "maxMoves": 5,
   "nodes": [
-    { "x": 300, "y": 100, "movable": true },
-    { "x": 500, "y": 100, "movable": true },
-    { "x": 300, "y": 300, "movable": true },
-    { "x": 500, "y": 300, "movable": true }
+    { "x": 300, "y": 100},
+    { "x": 500, "y": 100},
+    { "x": 300, "y": 300},
+    { "x": 500, "y": 300}
   ],
   "edges": [
     { "nodeA": 0, "nodeB": 3 },
