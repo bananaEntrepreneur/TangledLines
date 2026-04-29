@@ -1,7 +1,6 @@
-package model.level.factory;
+package model.level;
 
 import model.game.Field;
-import model.level.Level;
 import model.units.Node;
 
 import java.awt.geom.Point2D;

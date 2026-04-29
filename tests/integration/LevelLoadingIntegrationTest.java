@@ -2,9 +2,7 @@ package integration;
 
 import model.game.Field;
 import model.level.Level;
-import model.level.LevelLoadException;
-import model.level.LevelManager;
-import model.level.factory.LevelFactory;
+import model.level.LevelFactory;
 import model.level.loader.JsonLevelLoader;
 import model.level.loader.LevelLoader;
 import model.units.Edge;

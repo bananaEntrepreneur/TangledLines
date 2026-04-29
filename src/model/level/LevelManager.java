@@ -1,7 +1,6 @@
 package model.level;
 
 import model.game.Field;
-import model.level.factory.LevelFactory;
 import model.level.loader.JsonLevelLoader;
 import model.level.loader.LevelLoader;
 
