@@ -11,13 +11,42 @@ public class LevelFactory {
         Field field = getField(level);
 
         List<Node> nodes = field.getNodes();
-        for (Level.EdgeData data : level.getEdges()) {
-            validateEdgeIndex(data.nodeAIndex(), nodes.size());
-            validateEdgeIndex(data.nodeBIndex(), nodes.size());
-            field.createEdge(nodes.get(data.nodeAIndex()), nodes.get(data.nodeBIndex()));
+        List<Level.EdgeSpec> edgeSpecs = level.getEdgeSpecs().isEmpty()
+            ? level.getEdges().stream()
+                .map(edge -> new Level.EdgeSpec(
+                    edge.nodeAIndex(),
+                    edge.nodeBIndex(),
+                    Level.EdgeKind.BASIC,
+                    null,
+                    null
+                ))
+                .toList()
+            : level.getEdgeSpecs();
+
+        for (Level.EdgeSpec spec : edgeSpecs) {
+            validateEdgeIndex(spec.nodeAIndex(), nodes.size());
+            validateEdgeIndex(spec.nodeBIndex(), nodes.size());
+
+            Node nodeA = nodes.get(spec.nodeAIndex());
+            Node nodeB = nodes.get(spec.nodeBIndex());
+
+            Level.EdgeKind kind = spec.kind() == null ? Level.EdgeKind.BASIC : spec.kind();
+            switch (kind) {
+                case STRETCHABLE -> field.createStretchableEdge(nodeA, nodeB, requirePercent(spec.stretchPercent(), 25.0));
+                case BREAKABLE -> field.createBreakableEdge(nodeA, nodeB, requirePercent(spec.breakPercent(), 150.0));
+                default -> field.createEdge(nodeA, nodeB);
+            }
         }
 
         return field;
+    }
+
+    private double requirePercent(Double value, double defaultValue) {
+        double resolved = value == null ? defaultValue : value;
+        if (resolved < 0) {
+            throw new IllegalArgumentException("Percent values must be non-negative");
+        }
+        return resolved;
     }
 
     private static Field getField(Level level) {

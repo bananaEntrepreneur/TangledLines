@@ -44,14 +44,58 @@ public class JsonLevelLoader implements LevelLoader {
         }
 
         List<Level.EdgeData> edges = new ArrayList<>();
+        List<Level.EdgeSpec> edgeSpecs = new ArrayList<>();
         if (schema.edges != null) {
             for (EdgeSchema edge : schema.edges) {
                 validateEdge(edge, nodes.size());
                 edges.add(new Level.EdgeData(edge.nodeA, edge.nodeB));
+                edgeSpecs.add(toEdgeSpec(edge));
             }
         }
 
-        return new Level(maxMoves, nodes, edges);
+        return new Level(maxMoves, nodes, edges, edgeSpecs);
+    }
+
+    private Level.EdgeSpec toEdgeSpec(EdgeSchema edge) throws LevelLoadException {
+        Level.EdgeKind kind = parseEdgeKind(edge.type);
+        return switch (kind) {
+            case STRETCHABLE -> new Level.EdgeSpec(
+                edge.nodeA,
+                edge.nodeB,
+                kind,
+                requirePercent(edge.stretchPercent, "stretchPercent", 25.0),
+                null
+            );
+            case BREAKABLE -> new Level.EdgeSpec(
+                edge.nodeA,
+                edge.nodeB,
+                kind,
+                null,
+                requirePercent(edge.breakPercent, "breakPercent", 150.0)
+            );
+            default -> new Level.EdgeSpec(edge.nodeA, edge.nodeB, kind, null, null);
+        };
+    }
+
+    private Level.EdgeKind parseEdgeKind(String type) throws LevelLoadException {
+        if (type == null || type.isBlank()) {
+            return Level.EdgeKind.BASIC;
+        }
+
+        return switch (type.trim().toLowerCase()) {
+            case "basic" -> Level.EdgeKind.BASIC;
+            case "stretchable" -> Level.EdgeKind.STRETCHABLE;
+            case "breakable" -> Level.EdgeKind.BREAKABLE;
+            default -> throw new LevelLoadException("Unknown edge type: " + type);
+        };
+    }
+
+    private double requirePercent(Double value, String fieldName, double defaultValue) throws LevelLoadException {
+        double resolved = value == null ? defaultValue : value;
+        if (resolved < 0) {
+            throw new LevelLoadException(fieldName + " must be non-negative");
+        }
+        return resolved;
     }
 
     private void validateNode(NodeSchema node) throws LevelLoadException {
@@ -84,5 +128,8 @@ public class JsonLevelLoader implements LevelLoader {
 
     private static class EdgeSchema {
         Integer nodeA, nodeB;
+        String type;
+        Double stretchPercent;
+        Double breakPercent;
     }
 }
