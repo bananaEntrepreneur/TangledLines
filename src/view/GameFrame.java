@@ -1,33 +1,32 @@
 package view;
 
-import model.game.Game;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
-import model.listeners.GameStateListener;
 import view.style.GameStyle;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class GameFrame extends JFrame implements GameStateListener {
+public class GameFrame extends JFrame {
     private final GamePanel _gamePanel;
-    private final Game _game;
-    private final View _view;
+    private final GameState _gameState;
+    private final LevelNavigation _navigation;
     private JLabel _levelLabel;
     private JButton _nextLevelButton;
     private JButton _restartButton;
 
-    public GameFrame(Game game, View view) {
+    public GameFrame(
+        GameState gameState,
+        LevelNavigation navigation
+    ) {
         super(GameStyle.WINDOW_TITLE);
-        _game = game;
-        _view = view;
-
-        _game.addGameStateListener(this);
+        _gameState = gameState;
+        _navigation = navigation;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
-        _gamePanel = new GamePanel(game);
+        _gamePanel = new GamePanel(gameState);
         add(_gamePanel, BorderLayout.CENTER);
 
         JPanel controlPanel = createControlPanel();
@@ -43,12 +42,15 @@ public class GameFrame extends JFrame implements GameStateListener {
         updateButtons();
     }
 
+    public void recreateWidgets() {
+        _gamePanel.recreateWidgets();
+    }
+
     private JPanel createControlPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        LevelNavigation nav = _game.getNavigation();
-        _levelLabel = new JLabel(GameStyle.LABEL_LEVEL + "1/" + nav.getTotalLevels());
+        _levelLabel = new JLabel(GameStyle.LABEL_LEVEL + "1/" + _navigation.getTotalLevels());
         panel.add(_levelLabel);
 
         _nextLevelButton = new JButton(GameStyle.BUTTON_NEXT_LEVEL);
@@ -64,39 +66,20 @@ public class GameFrame extends JFrame implements GameStateListener {
     }
 
     private void handleNextLevel() {
-        if (_game.nextLevel()) {
-            afterLevelTransition();
-        }
+        _navigation.nextLevel();
     }
 
     private void handleRestartLevel() {
-        _game.restartLevel();
-        afterLevelTransition();
-    }
-
-    private void afterLevelTransition() {
-        _view.refreshNodeSubscriptions();
-        _gamePanel.recreateWidgets();
-        updateLevelLabel();
-        updateButtons();
+        _navigation.restartLevel();
     }
 
     private void updateLevelLabel() {
-        LevelNavigation nav = _game.getNavigation();
-        _levelLabel.setText(GameStyle.LABEL_LEVEL + (nav.getCurrentLevelIndex() + 1) + "/" + nav.getTotalLevels());
+        _levelLabel.setText(
+            GameStyle.LABEL_LEVEL + (_navigation.getCurrentLevelIndex() + 1) + "/" + _navigation.getTotalLevels()
+        );
     }
 
     private void updateButtons() {
-        GameState state = _game.getState();
-        if (state.isWin()) {
-            _nextLevelButton.setEnabled(_game.getNavigation().hasNextLevel());
-        } else {
-            _nextLevelButton.setEnabled(false);
-        }
-    }
-
-    @Override
-    public void onGameStateChanged(GameState gameState) {
-        refresh();
+        _nextLevelButton.setEnabled(_gameState.isWin() && _navigation.hasNextLevel());
     }
 }

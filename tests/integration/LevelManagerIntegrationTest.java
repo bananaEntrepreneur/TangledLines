@@ -41,14 +41,13 @@ class LevelManagerIntegrationTest {
             assertNotNull(_levelManager.nextField());
             assertEquals(2, _levelManager.getCurrentLevelIndex());
 
-            assertFalse(_levelManager.hasNextLevel());
-            assertNull(_levelManager.nextField());
+            assertTrue(_levelManager.hasNextLevel());
         }
 
         @Test
         @DisplayName("Should report correct total level count")
         void shouldReportTotalLevels() {
-            assertEquals(3, _levelManager.getTotalLevels());
+            assertEquals(10, _levelManager.getTotalLevels());
         }
     }
 

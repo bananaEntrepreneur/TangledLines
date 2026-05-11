@@ -37,7 +37,7 @@ class GameIntegrationTest {
         while (_nav().getCurrentLevelIndex() < levelIndex) {
             untangleAll();
             if (_state().isWin() && _nav().hasNextLevel()) {
-                _game.nextLevel();
+                _nav().nextLevel();
             } else if (!_state().isWin()) {
                 break;
             }
@@ -51,7 +51,7 @@ class GameIntegrationTest {
         @Test
         @DisplayName("Should reflect LevelManager's total level count")
         void shouldReflectLevelCount() {
-            assertEquals(3, _nav().getTotalLevels());
+            assertEquals(10, _nav().getTotalLevels());
             assertEquals(0, _nav().getCurrentLevelIndex());
         }
 
@@ -77,7 +77,7 @@ class GameIntegrationTest {
         @Test
         @DisplayName("Should not allow nextLevel without winning")
         void shouldNotAllowNextWithoutWin() {
-            assertFalse(_game.nextLevel());
+            assertFalse(_nav().nextLevel());
             assertEquals(0, _nav().getCurrentLevelIndex());
         }
 
@@ -87,7 +87,7 @@ class GameIntegrationTest {
             untangleAll();
 
             if (_state().isWin() && _nav().hasNextLevel()) {
-                assertTrue(_game.nextLevel());
+                assertTrue(_nav().nextLevel());
                 assertEquals(1, _nav().getCurrentLevelIndex());
                 assertEquals(0, _state().getMoveCount());
                 assertEquals(5, _state().getMaxMoves());
@@ -101,7 +101,7 @@ class GameIntegrationTest {
             int movesBefore = _state().getMoveCount();
             assertTrue(movesBefore > 0, "Should have made at least one move");
 
-            _game.restartLevel();
+            _nav().restartLevel();
 
             assertEquals(0, _state().getMoveCount());
             assertEquals(3, _state().getMaxMoves());
@@ -123,10 +123,10 @@ class GameIntegrationTest {
 
                 if (_state().isWin() && _nav().hasNextLevel()) {
                     completed++;
-                    assertTrue(_game.nextLevel());
+                    assertTrue(_nav().nextLevel());
                 } else if (_state().isWin()) {
                     completed++;
-                    assertFalse(_game.nextLevel());
+                    assertFalse(_nav().nextLevel());
                 } else {
                     break;
                 }

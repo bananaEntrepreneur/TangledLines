@@ -1,6 +1,6 @@
 package view;
 
-import model.game.Game;
+import model.game.state.GameState;
 import model.listeners.NodeListener;
 import model.units.Node;
 import view.style.GameStyle;
@@ -12,17 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GamePanel extends JPanel implements NodeListener {
-    private final Game _game;
+    private final GameState _gameState;
     private final List<NodeWidget> _nodeWidgets = new ArrayList<>();
     private final EdgePanel _edgePanel;
 
-    public GamePanel(Game game) {
-        _game = game;
+    public GamePanel(GameState gameState) {
+        _gameState = gameState;
         setLayout(null);
         setBackground(GameStyle.BACKGROUND_COLOR);
         setPreferredSize(new Dimension(GameStyle.PANEL_WIDTH, GameStyle.PANEL_HEIGHT));
 
-        _edgePanel = new EdgePanel(game);
+        _edgePanel = new EdgePanel(gameState);
         _edgePanel.setBounds(0, 0, GameStyle.PANEL_WIDTH, GameStyle.PANEL_HEIGHT);
         add(_edgePanel);
 
@@ -50,7 +50,7 @@ public class GamePanel extends JPanel implements NodeListener {
     }
 
     private void createNodeWidgets() {
-        for (Node node : _game.getState().getField().getNodes()) {
+        for (Node node : _gameState.getField().getNodes()) {
             addNodeWidget(node);
         }
         reorderNodeWidgets();

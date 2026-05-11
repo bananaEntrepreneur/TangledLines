@@ -1,6 +1,10 @@
 package model.game.state;
 
 import model.game.Field;
+import model.listeners.GameStateListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameState {
     private Field _field;
@@ -9,29 +13,40 @@ public class GameState {
     private boolean _gameOver = false;
     private boolean _win = false;
     private boolean _allLevelsComplete = false;
+    private final List<GameStateListener> _listeners = new ArrayList<>();
 
     public GameState(Field field, int maxMoves) {
         _field = field;
         _maxMoves = maxMoves;
     }
 
-    public void setField(Field field) { _field = field; }
+    public void addListener(GameStateListener listener) {
+        _listeners.add(listener);
+    }
 
-    public void setMaxMoves(int maxMoves) { _maxMoves = maxMoves; }
-
-    public void incrementMoveCount() { _moveCount++; }
-
-    public void setGameOver(boolean gameOver) { _gameOver = gameOver; }
-
-    public void setWin(boolean win) { _win = win; }
-
-    public void setAllLevelsComplete(boolean allLevelsComplete) { _allLevelsComplete = allLevelsComplete; }
-
-    public void reset() {
+    public void loadLevel(Field field, int maxMoves) {
+        _field = field;
+        _maxMoves = maxMoves;
         _moveCount = 0;
         _gameOver = false;
         _win = false;
         _allLevelsComplete = false;
+    }
+
+    public void incrementMoveCount() {
+        _moveCount++;
+        notifyListeners();
+    }
+
+    public void setGameOver(boolean gameOver, boolean win) {
+        _gameOver = gameOver;
+        _win = win;
+        notifyListeners();
+    }
+
+    public void setAllLevelsComplete(boolean allLevelsComplete) {
+        _allLevelsComplete = allLevelsComplete;
+        notifyListeners();
     }
 
     public boolean isGameOver() { return _gameOver; }
@@ -45,4 +60,10 @@ public class GameState {
     public int getMaxMoves() { return _maxMoves; }
 
     public Field getField() { return _field; }
+
+    private void notifyListeners() {
+        for (GameStateListener listener : _listeners) {
+            listener.onGameStateChanged(this);
+        }
+    }
 }

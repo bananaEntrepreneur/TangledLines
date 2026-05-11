@@ -1,31 +1,20 @@
 package view;
 
-import model.game.Game;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
 import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
-import model.listeners.NodeListener;
-import model.units.Node;
 
-public class View implements NodeListener, LevelNavigationListener {
+public class View implements GameStateListener, LevelNavigationListener {
     private final GameFrame _frame;
-    private final Game _game;
 
-    public View(Game game) {
-        _game = game;
-        _frame = new GameFrame(game, this);
-        _game.addLevelNavigationListener(this);
-        refreshNodeSubscriptions();
-    }
-
-    public void refreshNodeSubscriptions() {
-        for (Node node : _game.getState().getField().getNodes()) {
-            node.removeListener(this);
-            node.removeListener(_game);
-            node.addListener(this);
-            node.addListener(_game);
-        }
+    public View(
+        GameState gameState,
+        LevelNavigation navigation
+    ) {
+        _frame = new GameFrame(gameState, navigation);
+        gameState.addListener(this);
+        navigation.addListener(this);
     }
 
     public void show() {
@@ -33,13 +22,13 @@ public class View implements NodeListener, LevelNavigationListener {
     }
 
     @Override
-    public void onMoved(Node node) {
+    public void onGameStateChanged(GameState gameState) {
         _frame.refresh();
     }
 
     @Override
     public void onLevelChanged(LevelNavigation levelNavigation) {
-        refreshNodeSubscriptions();
+        _frame.recreateWidgets();
         _frame.refresh();
     }
 }

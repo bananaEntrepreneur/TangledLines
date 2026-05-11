@@ -2,14 +2,23 @@ package model.game.state;
 
 import model.game.Field;
 import model.level.LevelManager;
+import model.listeners.LevelNavigationListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LevelNavigation {
     private final LevelManager _levelManager;
     private final GameState _gameState;
+    private final List<LevelNavigationListener> _listeners = new ArrayList<>();
 
     public LevelNavigation(LevelManager levelManager, GameState gameState) {
         _levelManager = levelManager;
         _gameState = gameState;
+    }
+
+    public void addListener(LevelNavigationListener listener) {
+        _listeners.add(listener);
     }
 
     public boolean nextLevel() {
@@ -23,17 +32,15 @@ public class LevelNavigation {
             return false;
         }
 
-        _gameState.setField(nextField);
-        _gameState.setMaxMoves(_levelManager.getCurrentMaxMoves());
-        _gameState.reset();
+        _gameState.loadLevel(nextField, _levelManager.getCurrentMaxMoves());
+        notifyLevelChanged();
         return true;
     }
 
     public void restartLevel() {
         Field currentField = _levelManager.getCurrentField();
-        _gameState.setField(currentField);
-        _gameState.setMaxMoves(_levelManager.getCurrentMaxMoves());
-        _gameState.reset();
+        _gameState.loadLevel(currentField, _levelManager.getCurrentMaxMoves());
+        notifyLevelChanged();
     }
 
     public int getCurrentLevelIndex() { return _levelManager.getCurrentLevelIndex(); }
@@ -41,4 +48,10 @@ public class LevelNavigation {
     public int getTotalLevels() { return _levelManager.getTotalLevels(); }
 
     public boolean hasNextLevel() { return _levelManager.hasNextLevel(); }
+
+    private void notifyLevelChanged() {
+        for (LevelNavigationListener listener : _listeners) {
+            listener.onLevelChanged(this);
+        }
+    }
 }

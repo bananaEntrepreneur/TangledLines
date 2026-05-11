@@ -1,4 +1,5 @@
 import model.game.Game;
+import model.game.state.LevelNavigation;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import view.View;
@@ -21,8 +22,7 @@ public class Main {
         }
 
         Game game = new Game(levelManager);
-
-        View view = new View(game);
+        View view = new View(game.getState(), game.getNavigation());
         view.show();
     }
 }

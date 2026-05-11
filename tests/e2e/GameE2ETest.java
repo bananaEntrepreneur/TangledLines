@@ -193,7 +193,7 @@ class GameE2ETest {
         @Test
         @DisplayName("Should not allow next level without winning")
         void shouldNotAllowNextLevelWithoutWinning() {
-            boolean result = _game.nextLevel();
+            boolean result = _nav().nextLevel();
 
             assertFalse(result);
             assertEquals(0, _nav().getCurrentLevelIndex());
@@ -209,7 +209,7 @@ class GameE2ETest {
                 node.stopDragging();
 
                 if (_state().isWin()) {
-                    boolean result = _game.nextLevel();
+                    boolean result = _nav().nextLevel();
 
                     if (_nav().hasNextLevel()) {
                         assertTrue(result);
@@ -232,7 +232,7 @@ class GameE2ETest {
                 node.stopDragging();
 
                 if (_state().isWin() && _nav().hasNextLevel()) {
-                    _game.nextLevel();
+                    _nav().nextLevel();
 
                     assertEquals(0, _state().getMoveCount());
                     assertTrue(_state().getMaxMoves() > 0);
@@ -253,7 +253,7 @@ class GameE2ETest {
 
             assertNotEquals(originalPos, node.getPosition());
 
-            _game.restartLevel();
+            _nav().restartLevel();
 
             Field restartedField = _field();
             Node sameNode = restartedField.getNodes().get(
@@ -288,7 +288,7 @@ class GameE2ETest {
                 node.stopDragging();
 
                 if (_state().isWin() && _nav().hasNextLevel()) {
-                    _game.nextLevel();
+                    _nav().nextLevel();
                     assertEquals(1, _nav().getCurrentLevelIndex());
                 }
             }
@@ -304,7 +304,7 @@ class GameE2ETest {
                 node.stopDragging();
 
                 if (_state().isWin()) {
-                    assertFalse(_game.nextLevel());
+                    assertFalse(_nav().nextLevel());
                     assertTrue(_state().isAllLevelsComplete());
                 }
             }
@@ -325,7 +325,7 @@ class GameE2ETest {
                 node.stopDragging();
 
                 if (_state().isWin() && _nav().hasNextLevel()) {
-                    _game.nextLevel();
+                    _nav().nextLevel();
                     Field secondField = _field();
 
                     assertTrue(
@@ -387,7 +387,7 @@ class GameE2ETest {
                 nodes.get(0).stopDragging();
 
                 if (_state().isGameOver()) {
-                    _game.restartLevel();
+                    _nav().restartLevel();
 
                     assertFalse(_state().isGameOver());
                     assertFalse(_state().isWin());

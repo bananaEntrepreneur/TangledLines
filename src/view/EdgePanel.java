@@ -1,6 +1,5 @@
 package view;
 
-import model.game.Game;
 import model.game.state.GameState;
 import model.units.Edge;
 import model.units.BreakableEdge;
@@ -13,7 +12,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 
 public class EdgePanel extends JPanel {
-    private final Game _game;
+    private final GameState _gameState;
     private static final Stroke NORMAL_STROKE = new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private static final Stroke WARNING_STROKE = new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private static final Stroke BROKEN_STROKE = new BasicStroke(
@@ -25,8 +24,8 @@ public class EdgePanel extends JPanel {
         0f
     );
 
-    public EdgePanel(Game game) {
-        _game = game;
+    public EdgePanel(GameState gameState) {
+        _gameState = gameState;
         setOpaque(false);
     }
 
@@ -36,7 +35,7 @@ public class EdgePanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        for (Edge edge : _game.getState().getField().getEdges()) {
+        for (Edge edge : _gameState.getField().getEdges()) {
             drawEdge(g2d, edge);
         }
 
@@ -83,7 +82,7 @@ public class EdgePanel extends JPanel {
     }
 
     private void drawStatus(Graphics2D g2d) {
-        GameState state = _game.getState();
+        GameState state = _gameState;
         g2d.setColor(GameStyle.DEFAULT_STATUS_COLOR);
         g2d.setFont(new Font(GameStyle.STATUS_FONT_NAME, Font.BOLD, GameStyle.STATUS_FONT_SIZE));
 
