@@ -45,8 +45,15 @@ public class JsonLevelLoader implements LevelLoader {
 
         List<Level.EdgeData> edges = new ArrayList<>();
         List<Level.EdgeSpec> edgeSpecs = new ArrayList<>();
-        if (schema.edges != null) {
+
+        if (schema.edges != null && !schema.edges.isEmpty()) {
             for (EdgeSchema edge : schema.edges) {
+                validateEdge(edge, nodes.size());
+                edges.add(new Level.EdgeData(edge.nodeA, edge.nodeB));
+                edgeSpecs.add(toEdgeSpec(edge));
+            }
+        } else if (schema.edgeSpecs != null) {
+            for (EdgeSchema edge : schema.edgeSpecs) {
                 validateEdge(edge, nodes.size());
                 edges.add(new Level.EdgeData(edge.nodeA, edge.nodeB));
                 edgeSpecs.add(toEdgeSpec(edge));
@@ -120,6 +127,7 @@ public class JsonLevelLoader implements LevelLoader {
         Integer maxMoves;
         List<NodeSchema> nodes;
         List<EdgeSchema> edges;
+        List<EdgeSchema> edgeSpecs;
     }
 
     private static class NodeSchema {

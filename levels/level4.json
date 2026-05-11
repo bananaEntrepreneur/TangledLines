@@ -1,0 +1,15 @@
+{
+  "maxMoves": 4,
+  "nodes": [
+    { "x": 200, "y": 100},
+    { "x": 600, "y": 100},
+    { "x": 200, "y": 400},
+    { "x": 600, "y": 400}
+  ],
+  "edgeSpecs": [
+    { "nodeA": 0, "nodeB": 1, "type": "stretchable", "stretchPercent": 30 },
+    { "nodeA": 2, "nodeB": 3, "type": "stretchable", "stretchPercent": 30 },
+    { "nodeA": 0, "nodeB": 3 },
+    { "nodeA": 1, "nodeB": 2 }
+  ]
+}

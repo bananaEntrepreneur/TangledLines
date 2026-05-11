@@ -70,9 +70,13 @@ public class LevelManager {
         }
 
         List<String> files = new ArrayList<>();
-        File[] levelFiles = dir.listFiles((dirPath, name) -> name.endsWith(".json"));
+        File[] levelFiles = dir.listFiles((dirPath, name) -> name.matches("level\\d+\\.json"));
         if (levelFiles != null) {
-            Arrays.sort(levelFiles);
+            Arrays.sort(levelFiles, (a, b) -> {
+                int numA = Integer.parseInt(a.getName().replaceAll("\\D", ""));
+                int numB = Integer.parseInt(b.getName().replaceAll("\\D", ""));
+                return Integer.compare(numA, numB);
+            });
             for (File file : levelFiles) {
                 files.add(file.getPath());
             }
