@@ -1,6 +1,8 @@
 package model.game;
 
 import model.units.Edge;
+import model.units.BreakableEdge;
+import model.units.StretchableEdge;
 import model.units.Node;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -15,21 +17,28 @@ public class Field {
         addNode(node);
     }
 
-    public void createEdge(Node nodeA, Node nodeB) {
-        Edge edge = new Edge(nodeA, nodeB);
+    public Edge createEdge(Node nodeA, Node nodeB) {
+        return addEdge(new Edge(nodeA, nodeB));
+    }
 
-        addNode(edge.getNodeA());
-        addNode(edge.getNodeB());
+    public StretchableEdge createStretchableEdge(Node nodeA, Node nodeB, double stretchPercent) {
+        return (StretchableEdge) addEdge(new StretchableEdge(nodeA, nodeB, stretchPercent));
+    }
 
-        if (!_edges.contains(edge)) {
-            _edges.add(edge);
-        }
+    public BreakableEdge createBreakableEdge(Node nodeA, Node nodeB, double breakPercent) {
+        return (BreakableEdge) addEdge(new BreakableEdge(nodeA, nodeB, breakPercent));
     }
 
     public boolean hasIntersections() {
         int size = _edges.size();
         for (int i = 0; i < size; i++) {
+            if (isInactiveEdge(_edges.get(i))) {
+                continue;
+            }
             for (int j = i + 1; j < size; j++) {
+                if (isInactiveEdge(_edges.get(j))) {
+                    continue;
+                }
                 if (_edges.get(i).crosses(_edges.get(j))) {
                     return true;
                 }
@@ -38,8 +47,31 @@ public class Field {
         return false;
     }
 
+    public boolean hasBrokenEdges() {
+        for (Edge edge : _edges) {
+            if (edge instanceof BreakableEdge breakableEdge && breakableEdge.isBroken()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Node> getNodes() { return List.copyOf(_nodes); }
     public List<Edge> getEdges() { return List.copyOf(_edges); }
+
+    private Edge addEdge(Edge edge) {
+        addNode(edge.getNodeA());
+        addNode(edge.getNodeB());
+
+        if (!_edges.contains(edge)) {
+            _edges.add(edge);
+        }
+        return edge;
+    }
+
+    private boolean isInactiveEdge(Edge edge) {
+        return edge instanceof BreakableEdge breakableEdge && breakableEdge.isBroken();
+    }
 
     private void addNode(Node node) {
         if (!_nodes.contains(node)) {

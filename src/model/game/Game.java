@@ -51,7 +51,10 @@ public class Game implements NodeListener {
 
         _state.incrementMoveCount();
 
-        if (!_state.getField().hasIntersections()) {
+        if (_state.getField().hasBrokenEdges()) {
+            _state.setGameOver(true);
+            _state.setWin(false);
+        } else if (!_state.getField().hasIntersections()) {
             _state.setGameOver(true);
             _state.setWin(true);
         } else if (_state.getMoveCount() >= _state.getMaxMoves()) {
