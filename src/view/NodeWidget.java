@@ -57,9 +57,10 @@ public class NodeWidget extends JComponent implements NodeListener {
                         mousePos.y - _dragOffset.y
                     );
                     _node.updateDragging(newPos);
+                    Point2D actualPos = _node.getDragPosition();
                     setLocation(
-                        (int) newPos.getX() - GameStyle.NODE_RADIUS,
-                        (int) newPos.getY() - GameStyle.NODE_RADIUS
+                        (int) actualPos.getX() - GameStyle.NODE_RADIUS,
+                        (int) actualPos.getY() - GameStyle.NODE_RADIUS
                     );
                     repaint();
                     if (getParent() != null) {

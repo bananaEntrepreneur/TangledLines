@@ -8,6 +8,10 @@ public final class GameStyle {
     public static final int PANEL_HEIGHT = 600;
 
     public static final Color EDGE_COLOR = new Color(100, 149, 237);
+    public static final Color STRETCHABLE_EDGE_COLOR = new Color(70, 130, 180);
+    public static final Color EDGE_WARNING_COLOR = new Color(255, 140, 0);
+    public static final Color BREAKABLE_EDGE_COLOR = new Color(176, 23, 31);
+    public static final Color BROKEN_EDGE_COLOR = new Color(110, 0, 0);
     public static final Color NODE_COLOR = new Color(30, 144, 255);
     public static final Color NODE_HOVER_COLOR = new Color(255, 165, 0);
     public static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
