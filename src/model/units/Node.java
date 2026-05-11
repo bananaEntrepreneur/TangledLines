@@ -11,6 +11,7 @@ public class Node {
     private Point2D _queuedPosition = null;
     private boolean _isDragging = false;
     private final List<NodeListener> _listeners = new ArrayList<>();
+    private final List<NodeMovementConstraint> _movementConstraints = new ArrayList<>();
 
     public Node(Point2D position) {
         if (position == null) {
@@ -26,12 +27,12 @@ public class Node {
 
     public void updateDragging(Point2D position) {
         if (!_isDragging || position == null) return;
-        _queuedPosition = position;
+        _queuedPosition = applyMovementConstraints(position);
     }
 
     public void stopDragging() {
         if (_isDragging && _queuedPosition != null) {
-            setPosition(_queuedPosition);
+            setPosition(applyMovementConstraints(_queuedPosition));
         }
         _isDragging = false;
         _queuedPosition = null;
@@ -49,12 +50,56 @@ public class Node {
 
     public void removeListener(NodeListener listener) { _listeners.remove(listener); }
 
+    public void addMovementConstraint(NodeMovementConstraint constraint) {
+        if (constraint != null && !_movementConstraints.contains(constraint)) {
+            _movementConstraints.add(constraint);
+        }
+    }
+
+    public void removeMovementConstraint(NodeMovementConstraint constraint) {
+        _movementConstraints.remove(constraint);
+    }
+
     private void setPosition(Point2D newPosition) {
         if (newPosition == null || newPosition.equals(_position)) {
             return;
         }
         _position = newPosition;
         notifyListeners();
+    }
+
+    private Point2D applyMovementConstraints(Point2D desiredPosition) {
+        Point2D position = desiredPosition;
+        int guard = 8;
+
+        while (guard-- > 0) {
+            boolean changed = false;
+
+            for (NodeMovementConstraint constraint : _movementConstraints) {
+                Point2D constrained = constraint.constrain(this, position);
+                if (!samePoint(position, constrained)) {
+                    position = constrained;
+                    changed = true;
+                }
+            }
+
+            if (!changed) {
+                break;
+            }
+        }
+
+        return position;
+    }
+
+    private boolean samePoint(Point2D first, Point2D second) {
+        if (first == second) {
+            return true;
+        }
+        if (first == null || second == null) {
+            return false;
+        }
+        return Double.compare(first.getX(), second.getX()) == 0
+            && Double.compare(first.getY(), second.getY()) == 0;
     }
 
     private void notifyListeners() {
