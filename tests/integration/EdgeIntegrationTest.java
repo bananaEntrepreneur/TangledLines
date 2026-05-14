@@ -1,6 +1,7 @@
 package integration;
 
 import model.units.Edge;
+import model.units.StandardEdge;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,11 +23,11 @@ class EdgeIntegrationTest {
         void shouldUpdateIntersectionWhenNodesMove() {
             Node nodeA1 = new Node(new Point2D.Double(0, 0));
             Node nodeB1 = new Node(new Point2D.Double(100, 100));
-            Edge edge1 = new Edge(nodeA1, nodeB1);
+            Edge edge1 = new StandardEdge(nodeA1, nodeB1);
 
             Node nodeA2 = new Node(new Point2D.Double(0, 100));
             Node nodeB2 = new Node(new Point2D.Double(100, 0));
-            Edge edge2 = new Edge(nodeA2, nodeB2);
+            Edge edge2 = new StandardEdge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
 
@@ -42,11 +43,11 @@ class EdgeIntegrationTest {
         void shouldDetectIntersectionAfterRepositioning() {
             Node nodeA1 = new Node(new Point2D.Double(0, 0));
             Node nodeB1 = new Node(new Point2D.Double(50, 0));
-            Edge edge1 = new Edge(nodeA1, nodeB1);
+            Edge edge1 = new StandardEdge(nodeA1, nodeB1);
 
             Node nodeA2 = new Node(new Point2D.Double(0, 50));
             Node nodeB2 = new Node(new Point2D.Double(50, 50));
-            Edge edge2 = new Edge(nodeA2, nodeB2);
+            Edge edge2 = new StandardEdge(nodeA2, nodeB2);
 
             assertFalse(edge1.crosses(edge2));
 
@@ -62,11 +63,11 @@ class EdgeIntegrationTest {
         void shouldHandleMultipleNodeMovements() {
             Node nodeA1 = new Node(new Point2D.Double(0, 0));
             Node nodeB1 = new Node(new Point2D.Double(100, 100));
-            Edge edge1 = new Edge(nodeA1, nodeB1);
+            Edge edge1 = new StandardEdge(nodeA1, nodeB1);
 
             Node nodeA2 = new Node(new Point2D.Double(0, 100));
             Node nodeB2 = new Node(new Point2D.Double(100, 0));
-            Edge edge2 = new Edge(nodeA2, nodeB2);
+            Edge edge2 = new StandardEdge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
 
@@ -98,10 +99,10 @@ class EdgeIntegrationTest {
             Node outerNode3 = new Node(new Point2D.Double(10, 90));
             Node outerNode4 = new Node(new Point2D.Double(90, 90));
 
-            Edge radialEdge1 = new Edge(centerNode, outerNode1);
-            Edge radialEdge2 = new Edge(centerNode, outerNode2);
-            Edge separateEdge1 = new Edge(outerNode3, outerNode4);
-            Edge separateEdge2 = new Edge(outerNode1, outerNode2);
+            Edge radialEdge1 = new StandardEdge(centerNode, outerNode1);
+            Edge radialEdge2 = new StandardEdge(centerNode, outerNode2);
+            Edge separateEdge1 = new StandardEdge(outerNode3, outerNode4);
+            Edge separateEdge2 = new StandardEdge(outerNode1, outerNode2);
 
             assertFalse(radialEdge1.crosses(radialEdge2));
             assertFalse(radialEdge1.crosses(separateEdge1));
@@ -114,15 +115,15 @@ class EdgeIntegrationTest {
         void shouldHandleMovementResolvingMultipleIntersections() {
             Node nodeA = new Node(new Point2D.Double(0, 0));
             Node nodeB = new Node(new Point2D.Double(100, 100));
-            Edge mainEdge = new Edge(nodeA, nodeB);
+            Edge mainEdge = new StandardEdge(nodeA, nodeB);
 
             Node nodeC1 = new Node(new Point2D.Double(0, 100));
             Node nodeD1 = new Node(new Point2D.Double(100, 0));
-            Edge crossingEdge1 = new Edge(nodeC1, nodeD1);
+            Edge crossingEdge1 = new StandardEdge(nodeC1, nodeD1);
 
             Node nodeC2 = new Node(new Point2D.Double(25, 75));
             Node nodeD2 = new Node(new Point2D.Double(75, 25));
-            Edge crossingEdge2 = new Edge(nodeC2, nodeD2);
+            Edge crossingEdge2 = new StandardEdge(nodeC2, nodeD2);
 
             assertTrue(mainEdge.crosses(crossingEdge1));
             assertTrue(mainEdge.crosses(crossingEdge2));
@@ -154,11 +155,11 @@ class EdgeIntegrationTest {
         void shouldHandleNodesAtSamePosition() {
             Node nodeA1 = new Node(new Point2D.Double(0, 0));
             Node nodeB1 = new Node(new Point2D.Double(50, 50));
-            Edge edge1 = new Edge(nodeA1, nodeB1);
+            Edge edge1 = new StandardEdge(nodeA1, nodeB1);
 
             Node nodeA2 = new Node(new Point2D.Double(50, 50));
             Node nodeB2 = new Node(new Point2D.Double(100, 100));
-            Edge edge2 = new Edge(nodeA2, nodeB2);
+            Edge edge2 = new StandardEdge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
         }
@@ -168,11 +169,11 @@ class EdgeIntegrationTest {
         void shouldHandleVeryLongEdges() {
             Node nodeA1 = new Node(new Point2D.Double(0, 0));
             Node nodeB1 = new Node(new Point2D.Double(1000, 1000));
-            Edge edge1 = new Edge(nodeA1, nodeB1);
+            Edge edge1 = new StandardEdge(nodeA1, nodeB1);
 
             Node nodeA2 = new Node(new Point2D.Double(0, 1000));
             Node nodeB2 = new Node(new Point2D.Double(1000, 0));
-            Edge edge2 = new Edge(nodeA2, nodeB2);
+            Edge edge2 = new StandardEdge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
         }
@@ -182,11 +183,11 @@ class EdgeIntegrationTest {
         void shouldHandleVeryShortEdges() {
             Node nodeA1 = new Node(new Point2D.Double(0, 0));
             Node nodeB1 = new Node(new Point2D.Double(1, 1));
-            Edge edge1 = new Edge(nodeA1, nodeB1);
+            Edge edge1 = new StandardEdge(nodeA1, nodeB1);
 
             Node nodeA2 = new Node(new Point2D.Double(0, 1));
             Node nodeB2 = new Node(new Point2D.Double(1, 0));
-            Edge edge2 = new Edge(nodeA2, nodeB2);
+            Edge edge2 = new StandardEdge(nodeA2, nodeB2);
 
             assertTrue(edge1.crosses(edge2));
         }

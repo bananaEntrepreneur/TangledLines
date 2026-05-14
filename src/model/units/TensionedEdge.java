@@ -10,15 +10,15 @@ abstract class TensionedEdge extends Edge {
         _originalLength = getPosition(nodeA).distance(getPosition(nodeB));
     }
 
-    protected double getOriginalLength() {
+    public double getOriginalLength() {
         return _originalLength;
     }
 
-    protected double getCurrentLength() {
+    public double getCurrentLength() {
         return getPosition(getNodeA()).distance(getPosition(getNodeB()));
     }
 
-    protected double getCurrentStretchFactor() {
+    public double getCurrentStretchFactor() {
         if (_originalLength <= 0) {
             return getCurrentLength() > 0 ? Double.POSITIVE_INFINITY : 1.0;
         }

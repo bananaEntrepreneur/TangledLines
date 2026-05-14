@@ -3,11 +3,11 @@ package model.units;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-public class Edge {
+public abstract class Edge {
     private final Node _nodeA;
     private final Node _nodeB;
 
-    public Edge(Node nodeA, Node nodeB) {
+    protected Edge(Node nodeA, Node nodeB) {
         if (nodeA == null || nodeB == null) {
             throw new IllegalArgumentException("Edge endpoints cannot be null");
         }

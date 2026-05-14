@@ -20,14 +20,6 @@ public class StretchableEdge extends TensionedEdge implements NodeMovementConstr
         return getOriginalLength() * (1.0 + _maxStretchPercent / 100.0);
     }
 
-    public double getOriginalLength() {
-        return super.getOriginalLength();
-    }
-
-    public double getCurrentLength() {
-        return super.getCurrentLength();
-    }
-
     public double getStretchFactor() {
         return getCurrentStretchFactor();
     }

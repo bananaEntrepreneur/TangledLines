@@ -21,14 +21,6 @@ public class BreakableEdge extends TensionedEdge implements NodeListener {
         return getOriginalLength() * (1.0 + _breakStretchPercent / 100.0);
     }
 
-    public double getOriginalLength() {
-        return super.getOriginalLength();
-    }
-
-    public double getCurrentLength() {
-        return super.getCurrentLength();
-    }
-
     public boolean isBroken() {
         return _broken;
     }

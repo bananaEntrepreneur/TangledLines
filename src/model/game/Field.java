@@ -1,6 +1,7 @@
 package model.game;
 
 import model.units.Edge;
+import model.units.StandardEdge;
 import model.units.BreakableEdge;
 import model.units.StretchableEdge;
 import model.units.Node;
@@ -18,7 +19,7 @@ public class Field {
     }
 
     public Edge createEdge(Node nodeA, Node nodeB) {
-        return addEdge(new Edge(nodeA, nodeB));
+        return addEdge(new StandardEdge(nodeA, nodeB));
     }
 
     public StretchableEdge createStretchableEdge(Node nodeA, Node nodeB, double stretchPercent) {
