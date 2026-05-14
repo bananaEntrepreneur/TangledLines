@@ -56,10 +56,6 @@ public class Node {
         }
     }
 
-    public void removeMovementConstraint(NodeMovementConstraint constraint) {
-        _movementConstraints.remove(constraint);
-    }
-
     private void setPosition(Point2D newPosition) {
         if (newPosition == null || newPosition.equals(_position)) {
             return;
