@@ -1,15 +1,15 @@
 {
-  "maxMoves": 5,
+  "maxMoves": 4,
   "nodes": [
-    { "x": 300, "y": 100},
-    { "x": 500, "y": 100},
-    { "x": 300, "y": 300},
-    { "x": 500, "y": 300}
+    { "x": 200, "y": 100},
+    { "x": 600, "y": 100},
+    { "x": 200, "y": 400},
+    { "x": 600, "y": 400}
   ],
-  "edges": [
+  "edgeSpecs": [
+    { "nodeA": 0, "nodeB": 1, "type": "stretchable", "stretchPercent": 20 },
+    { "nodeA": 2, "nodeB": 3, "type": "stretchable", "stretchPercent": 20 },
     { "nodeA": 0, "nodeB": 3 },
-    { "nodeA": 1, "nodeB": 2 },
-    { "nodeA": 0, "nodeB": 1 },
-    { "nodeA": 2, "nodeB": 3 }
+    { "nodeA": 1, "nodeB": 2 }
   ]
 }

@@ -1,20 +1,24 @@
 {
   "maxMoves": 5,
   "nodes": [
-    { "x": 150, "y": 150},
-    { "x": 650, "y": 150},
-    { "x": 150, "y": 400},
-    { "x": 650, "y": 400},
-    { "x": 400, "y": 80}
+    { "x": 100, "y": 150},
+    { "x": 400, "y": 100},
+    { "x": 700, "y": 150},
+    { "x": 100, "y": 400},
+    { "x": 400, "y": 350},
+    { "x": 700, "y": 400}
   ],
   "edgeSpecs": [
-    { "nodeA": 0, "nodeB": 4, "type": "stretchable", "stretchPercent": 40 },
-    { "nodeA": 1, "nodeB": 4, "type": "stretchable", "stretchPercent": 40 },
+    { "nodeA": 0, "nodeB": 3, "type": "stretchable", "stretchPercent": 50 },
+    { "nodeA": 1, "nodeB": 4, "type": "stretchable", "stretchPercent": 50 },
+    { "nodeA": 2, "nodeB": 5, "type": "stretchable", "stretchPercent": 50 },
     { "nodeA": 0, "nodeB": 1 },
-    { "nodeA": 0, "nodeB": 2 },
+    { "nodeA": 1, "nodeB": 2 },
+    { "nodeA": 3, "nodeB": 4 },
+    { "nodeA": 4, "nodeB": 5 },
+    { "nodeA": 0, "nodeB": 4 },
     { "nodeA": 1, "nodeB": 3 },
-    { "nodeA": 2, "nodeB": 3 },
-    { "nodeA": 2, "nodeB": 4 },
-    { "nodeA": 3, "nodeB": 4 }
+    { "nodeA": 1, "nodeB": 5 },
+    { "nodeA": 2, "nodeB": 4 }
   ]
 }
