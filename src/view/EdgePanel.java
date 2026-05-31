@@ -2,10 +2,9 @@ package view;
 
 import model.game.state.GameState;
 import model.units.Edge;
-import model.units.BreakableEdge;
 import model.units.Node;
-import model.units.StretchableEdge;
 import view.style.GameStyle;
+import view.edge.EdgeRendererRegistry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,19 +12,18 @@ import java.awt.geom.Point2D;
 
 public class EdgePanel extends JPanel {
     private final GameState _gameState;
-    private static final Stroke NORMAL_STROKE = new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final Stroke WARNING_STROKE = new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final Stroke BROKEN_STROKE = new BasicStroke(
-        3f,
-        BasicStroke.CAP_ROUND,
-        BasicStroke.JOIN_ROUND,
-        10f,
-        new float[] { 12f, 10f },
-        0f
-    );
+    private final EdgeRendererRegistry _edgeRenderers;
 
     public EdgePanel(GameState gameState) {
+        this(gameState, EdgeRendererRegistry.withDefaults());
+    }
+
+    public EdgePanel(GameState gameState, EdgeRendererRegistry edgeRenderers) {
         _gameState = gameState;
+        if (edgeRenderers == null) {
+            throw new IllegalArgumentException("Edge renderer registry cannot be null");
+        }
+        _edgeRenderers = edgeRenderers;
         setOpaque(false);
     }
 
@@ -46,35 +44,7 @@ public class EdgePanel extends JPanel {
     private void drawEdge(Graphics2D g2d, Edge edge) {
         Point2D a = drawPosition(edge.getNodeA());
         Point2D b = drawPosition(edge.getNodeB());
-
-        if (edge instanceof BreakableEdge breakableEdge) {
-            if (breakableEdge.isBroken()) {
-                g2d.setColor(GameStyle.BROKEN_EDGE_COLOR);
-                g2d.setStroke(BROKEN_STROKE);
-            } else if (breakableEdge.isReadyToBreak()) {
-                g2d.setColor(GameStyle.EDGE_WARNING_COLOR);
-                g2d.setStroke(WARNING_STROKE);
-            } else {
-                g2d.setColor(GameStyle.BREAKABLE_EDGE_COLOR);
-                g2d.setStroke(NORMAL_STROKE);
-            }
-        } else if (edge instanceof StretchableEdge stretchableEdge) {
-            if (stretchableEdge.isNearLimit()) {
-                g2d.setColor(GameStyle.EDGE_WARNING_COLOR);
-                g2d.setStroke(WARNING_STROKE);
-            } else {
-                g2d.setColor(GameStyle.STRETCHABLE_EDGE_COLOR);
-                g2d.setStroke(NORMAL_STROKE);
-            }
-        } else {
-            g2d.setColor(GameStyle.EDGE_COLOR);
-            g2d.setStroke(NORMAL_STROKE);
-        }
-
-        g2d.drawLine(
-            (int) a.getX(), (int) a.getY(),
-            (int) b.getX(), (int) b.getY()
-        );
+        _edgeRenderers.draw(g2d, edge, a, b);
     }
 
     private Point2D drawPosition(Node node) {
