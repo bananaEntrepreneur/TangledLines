@@ -12,7 +12,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,7 +42,7 @@ class LevelLoadingIntegrationTest {
 
             assertEquals(3, level.getMaxMoves());
             assertEquals(4, level.getNodes().size());
-            assertEquals(6, level.getEdges().size());
+            assertEquals(6, level.getEdgeSpecs().size());
 
             Field field = _factory.createField(level);
 
@@ -71,6 +74,53 @@ class LevelLoadingIntegrationTest {
                 assertTrue(nodes.contains(edge.getNodeA()), "Edge nodeA should be in the field");
                 assertTrue(nodes.contains(edge.getNodeB()), "Edge nodeB should be in the field");
             }
+        }
+
+        @Test
+        @DisplayName("Should load custom numeric edge parameters from JSON")
+        void shouldLoadCustomNumericEdgeParameters() throws Exception {
+            Path levelFile = Files.createTempFile("custom-edge-params", ".json");
+            Files.writeString(levelFile, """
+                {
+                  "maxMoves": 3,
+                  "nodes": [
+                    { "x": 0, "y": 0 },
+                    { "x": 100, "y": 0 }
+                  ],
+                  "edgeSpecs": [
+                    {
+                      "nodeA": 0,
+                      "nodeB": 1,
+                      "type": "elastic",
+                      "elasticity": 2.5,
+                      "warningPercent": 80
+                    }
+                  ]
+                }
+                """);
+
+            Level level = _loader.load(levelFile.toString());
+            Level.EdgeSpec edgeSpec = level.getEdgeSpecs().get(0);
+
+            assertEquals("elastic", edgeSpec.type());
+            assertEquals(2.5, edgeSpec.parameters().getCustom("elasticity"), 0.01);
+            assertEquals(80.0, edgeSpec.parameters().getCustom("warningPercent"), 0.01);
+        }
+
+        @Test
+        @DisplayName("Should keep edge specs as the single edge representation")
+        void shouldKeepEdgeSpecsAsSingleEdgeRepresentation() {
+            Level.EdgeSpec edgeSpec = new Level.EdgeSpec(0, 1, "elastic", Map.of("elasticity", 2.0));
+            Level level = new Level(
+                3,
+                List.of(
+                    new Level.NodeData(0, 0),
+                    new Level.NodeData(100, 0)
+                ),
+                List.of(edgeSpec)
+            );
+
+            assertEquals(List.of(edgeSpec), level.getEdgeSpecs());
         }
     }
 

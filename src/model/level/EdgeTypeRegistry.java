@@ -48,11 +48,10 @@ public final class EdgeTypeRegistry {
         return type == null ? "" : type.trim().toLowerCase();
     }
 
-    private static double percent(Level.EdgeSpec spec, String parameterName, double defaultValue) {
-        Double value = spec.parameters().get(parameterName);
-        double resolved = value == null ? defaultValue : value;
+    private static double percent(Level.EdgeSpec spec, Level.EdgeParameter parameter, double defaultValue) {
+        double resolved = spec.parameters().getOrDefault(parameter, defaultValue);
         if (resolved < 0) {
-            throw new IllegalArgumentException(parameterName + " must be non-negative");
+            throw new IllegalArgumentException(parameter.jsonName() + " must be non-negative");
         }
         return resolved;
     }
@@ -77,7 +76,11 @@ public final class EdgeTypeRegistry {
 
         @Override
         public Edge createEdge(Field field, Node nodeA, Node nodeB, Level.EdgeSpec spec) {
-            return field.createStretchableEdge(nodeA, nodeB, percent(spec, "stretchPercent", 25.0));
+            return field.createStretchableEdge(
+                nodeA,
+                nodeB,
+                percent(spec, Level.EdgeParameter.STRETCH_PERCENT, 25.0)
+            );
         }
     }
 
@@ -89,7 +92,11 @@ public final class EdgeTypeRegistry {
 
         @Override
         public Edge createEdge(Field field, Node nodeA, Node nodeB, Level.EdgeSpec spec) {
-            return field.createBreakableEdge(nodeA, nodeB, percent(spec, "breakPercent", 150.0));
+            return field.createBreakableEdge(
+                nodeA,
+                nodeB,
+                percent(spec, Level.EdgeParameter.BREAK_PERCENT, 150.0)
+            );
         }
     }
 }

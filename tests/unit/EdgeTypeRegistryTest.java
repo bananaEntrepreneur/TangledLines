@@ -32,7 +32,6 @@ class EdgeTypeRegistryTest {
                 new Level.NodeData(0, 0),
                 new Level.NodeData(100, 0)
             ),
-            List.of(),
             List.of(new Level.EdgeSpec(
                 0,
                 1,
@@ -56,7 +55,7 @@ class EdgeTypeRegistryTest {
 
         @Override
         public Edge createEdge(Field field, Node nodeA, Node nodeB, Level.EdgeSpec spec) {
-            double elasticity = spec.parameters().getOrDefault("elasticity", 1.0);
+            double elasticity = spec.parameters().getCustomOrDefault("elasticity", 1.0);
             return field.addEdge(new ElasticEdge(nodeA, nodeB, elasticity));
         }
     }

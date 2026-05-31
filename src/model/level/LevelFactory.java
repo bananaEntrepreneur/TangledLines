@@ -24,19 +24,7 @@ public class LevelFactory {
         Field field = getField(level);
 
         List<Node> nodes = field.getNodes();
-        List<Level.EdgeSpec> edgeSpecs = level.getEdgeSpecs().isEmpty()
-            ? level.getEdges().stream()
-                .map(edge -> new Level.EdgeSpec(
-                    edge.nodeAIndex(),
-                    edge.nodeBIndex(),
-                    Level.EdgeKind.BASIC,
-                    null,
-                    null
-                ))
-                .toList()
-            : level.getEdgeSpecs();
-
-        for (Level.EdgeSpec spec : edgeSpecs) {
+        for (Level.EdgeSpec spec : level.getEdgeSpecs()) {
             validateEdgeIndex(spec.nodeAIndex(), nodes.size());
             validateEdgeIndex(spec.nodeBIndex(), nodes.size());
 
