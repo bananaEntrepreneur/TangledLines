@@ -17,7 +17,7 @@ public class Node {
         if (position == null) {
             throw new IllegalArgumentException("Node position cannot be null");
         }
-        _position = position;
+        _position = copyOf(position);
     }
 
     public void startDragging() {
@@ -39,14 +39,18 @@ public class Node {
     }
 
     public Point2D getDragPosition() {
-        return _queuedPosition != null ? _queuedPosition : _position;
+        return copyOf(_queuedPosition != null ? _queuedPosition : _position);
     }
 
     public boolean isDragging() { return _isDragging; }
 
-    public Point2D getPosition() { return _position; }
+    public Point2D getPosition() { return copyOf(_position); }
 
-    public void addListener(NodeListener listener) { _listeners.add(listener); }
+    public void addListener(NodeListener listener) {
+        if (listener != null && !_listeners.contains(listener)) {
+            _listeners.add(listener);
+        }
+    }
 
     public void removeListener(NodeListener listener) { _listeners.remove(listener); }
 
@@ -60,21 +64,24 @@ public class Node {
         if (newPosition == null || newPosition.equals(_position)) {
             return;
         }
-        _position = newPosition;
+        _position = copyOf(newPosition);
         notifyListeners();
     }
 
     private Point2D applyMovementConstraints(Point2D desiredPosition) {
-        Point2D position = desiredPosition;
+        Point2D position = copyOf(desiredPosition);
         int guard = 8;
 
         while (guard-- > 0) {
             boolean changed = false;
 
             for (NodeMovementConstraint constraint : _movementConstraints) {
-                Point2D constrained = constraint.constrain(this, position);
+                Point2D constrained = constraint.constrain(this, copyOf(position));
+                if (constrained == null) {
+                    continue;
+                }
                 if (!samePoint(position, constrained)) {
-                    position = constrained;
+                    position = copyOf(constrained);
                     changed = true;
                 }
             }
@@ -96,6 +103,10 @@ public class Node {
         }
         return Double.compare(first.getX(), second.getX()) == 0
             && Double.compare(first.getY(), second.getY()) == 0;
+    }
+
+    private Point2D copyOf(Point2D point) {
+        return new Point2D.Double(point.getX(), point.getY());
     }
 
     private void notifyListeners() {

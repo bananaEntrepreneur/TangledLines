@@ -35,6 +35,17 @@ class NodeTest {
 
             assertEquals(position, node.getPosition());
         }
+
+        @Test
+        @DisplayName("Should copy constructor position")
+        void shouldCopyConstructorPosition() {
+            Point2D position = new Point2D.Double(50, 50);
+            Node node = new Node(position);
+
+            position.setLocation(500, 500);
+
+            assertEquals(new Point2D.Double(50, 50), node.getPosition());
+        }
     }
 
     @Nested
@@ -223,12 +234,38 @@ class NodeTest {
         }
 
         @Test
+        @DisplayName("Should protect stored position from getter mutation")
+        void shouldProtectStoredPositionFromGetterMutation() {
+            Point2D position = new Point2D.Double(300, 400);
+            Node node = new Node(position);
+
+            Point2D exposedPosition = node.getPosition();
+            exposedPosition.setLocation(10, 20);
+
+            assertEquals(position, node.getPosition());
+        }
+
+        @Test
         @DisplayName("Should return drag position during dragging")
         void shouldReturnDragPosition() {
             Node node = new Node(_initialPosition);
 
             node.startDragging();
             node.updateDragging(_newPosition);
+
+            assertEquals(_newPosition, node.getDragPosition());
+        }
+
+        @Test
+        @DisplayName("Should protect drag position from getter mutation")
+        void shouldProtectDragPositionFromGetterMutation() {
+            Node node = new Node(_initialPosition);
+
+            node.startDragging();
+            node.updateDragging(_newPosition);
+
+            Point2D exposedPosition = node.getDragPosition();
+            exposedPosition.setLocation(10, 20);
 
             assertEquals(_newPosition, node.getDragPosition());
         }
