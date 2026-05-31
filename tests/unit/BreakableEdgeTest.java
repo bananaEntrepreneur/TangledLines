@@ -25,7 +25,7 @@ class BreakableEdgeTest {
         nodeB.startDragging();
         nodeB.updateDragging(new Point2D.Double(140, 0));
 
-        assertFalse(edge.isBroken());
+        assertTrue(edge.isActive());
         assertTrue(edge.isReadyToBreak());
         assertEquals(140.0, edge.getCurrentLength(), 0.01);
     }
@@ -42,7 +42,7 @@ class BreakableEdgeTest {
         nodeB.updateDragging(new Point2D.Double(140, 0));
         nodeB.stopDragging();
 
-        assertTrue(edge.isBroken());
+        assertFalse(edge.isActive());
         assertEquals(140.0, nodeB.getPosition().getX(), 0.01);
     }
 }

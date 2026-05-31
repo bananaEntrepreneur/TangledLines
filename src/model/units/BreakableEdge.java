@@ -30,11 +30,6 @@ public class BreakableEdge extends TensionedEdge implements NodeListener {
         return !_broken;
     }
 
-    @Override
-    public boolean causesGameLoss() {
-        return _broken;
-    }
-
     public boolean isReadyToBreak() {
         if (_broken) {
             return false;

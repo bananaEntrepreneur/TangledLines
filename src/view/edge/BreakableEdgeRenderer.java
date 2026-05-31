@@ -27,7 +27,7 @@ public class BreakableEdgeRenderer extends BasicEdgeRenderer {
     @Override
     public void draw(Graphics2D g2d, Edge edge, Point2D start, Point2D end) {
         BreakableEdge breakableEdge = (BreakableEdge) edge;
-        if (breakableEdge.isBroken()) {
+        if (!breakableEdge.isActive()) {
             g2d.setColor(GameStyle.BROKEN_EDGE_COLOR);
             g2d.setStroke(BROKEN_STROKE);
         } else if (breakableEdge.isReadyToBreak()) {

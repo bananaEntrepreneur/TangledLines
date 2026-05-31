@@ -48,9 +48,9 @@ public class Field {
         return false;
     }
 
-    public boolean hasFailedEdges() {
+    public boolean hasInactiveEdges() {
         for (Edge edge : _edges) {
-            if (edge.causesGameLoss()) {
+            if (!edge.isActive()) {
                 return true;
             }
         }

@@ -3,6 +3,7 @@ package integration;
 import model.game.Field;
 import model.level.LevelLoadException;
 import model.level.LevelManager;
+import model.units.BreakableEdge;
 import model.units.Edge;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
@@ -79,18 +80,22 @@ class FieldNodeEdgeIntegrationTest {
         }
 
         @Test
-        @DisplayName("Should use Edge polymorphism for failed inactive edges")
-        void shouldUseEdgePolymorphismForFailedInactiveEdges() {
+        @DisplayName("Should detect inactive breakable edges")
+        void shouldDetectInactiveBreakableEdges() {
             Field field = new Field();
             Node nodeA = new Node(new Point2D.Double(0, 0));
             Node nodeB = new Node(new Point2D.Double(100, 100));
             Node nodeC = new Node(new Point2D.Double(0, 100));
             Node nodeD = new Node(new Point2D.Double(100, 0));
 
-            field.addEdge(new FailedInactiveEdge(nodeA, nodeB));
+            BreakableEdge breakableEdge = field.createBreakableEdge(nodeA, nodeB, 10);
             field.createEdge(nodeC, nodeD);
+            nodeB.startDragging();
+            nodeB.updateDragging(new Point2D.Double(200, 200));
+            nodeB.stopDragging();
 
-            assertTrue(field.hasFailedEdges());
+            assertFalse(breakableEdge.isActive());
+            assertTrue(field.hasInactiveEdges());
             assertFalse(field.hasIntersections());
         }
     }
@@ -117,22 +122,6 @@ class FieldNodeEdgeIntegrationTest {
 
             assertThrows(UnsupportedOperationException.class, () ->
                     field.getEdges().add(null));
-        }
-    }
-
-    private static class FailedInactiveEdge extends Edge {
-        FailedInactiveEdge(Node nodeA, Node nodeB) {
-            super(nodeA, nodeB);
-        }
-
-        @Override
-        public boolean isActive() {
-            return false;
-        }
-
-        @Override
-        public boolean causesGameLoss() {
-            return true;
         }
     }
 }

@@ -28,7 +28,7 @@ public class Game implements NodeListener, LevelNavigationListener {
 
         _state.incrementMoveCount();
 
-        if (_state.getField().hasFailedEdges()) {
+        if (_state.getField().hasInactiveEdges()) {
             _state.lose();
         } else if (!_state.getField().hasIntersections()) {
             _state.win();

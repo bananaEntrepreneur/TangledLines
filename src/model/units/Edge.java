@@ -33,10 +33,6 @@ public abstract class Edge {
         return true;
     }
 
-    public boolean causesGameLoss() {
-        return false;
-    }
-
     public Node getNodeA() { return _nodeA; }
 
     public Node getNodeB() { return _nodeB; }
