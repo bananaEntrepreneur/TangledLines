@@ -18,7 +18,9 @@ public class LevelNavigation {
     }
 
     public void addListener(LevelNavigationListener listener) {
-        _listeners.add(listener);
+        if (listener != null && !_listeners.contains(listener)) {
+            _listeners.add(listener);
+        }
     }
 
     public boolean nextLevel() {
@@ -28,7 +30,7 @@ public class LevelNavigation {
 
         Field nextField = _levelManager.nextField();
         if (nextField == null) {
-            _gameState.setAllLevelsComplete(true);
+            _gameState.completeAllLevels();
             return false;
         }
 

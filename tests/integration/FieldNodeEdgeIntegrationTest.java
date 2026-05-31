@@ -77,6 +77,22 @@ class FieldNodeEdgeIntegrationTest {
 
             assertNotEquals(before, after, "Moving a node should change intersection status");
         }
+
+        @Test
+        @DisplayName("Should use Edge polymorphism for failed inactive edges")
+        void shouldUseEdgePolymorphismForFailedInactiveEdges() {
+            Field field = new Field();
+            Node nodeA = new Node(new Point2D.Double(0, 0));
+            Node nodeB = new Node(new Point2D.Double(100, 100));
+            Node nodeC = new Node(new Point2D.Double(0, 100));
+            Node nodeD = new Node(new Point2D.Double(100, 0));
+
+            field.addEdge(new FailedInactiveEdge(nodeA, nodeB));
+            field.createEdge(nodeC, nodeD);
+
+            assertTrue(field.hasFailedEdges());
+            assertFalse(field.hasIntersections());
+        }
     }
 
     @Nested
@@ -101,6 +117,22 @@ class FieldNodeEdgeIntegrationTest {
 
             assertThrows(UnsupportedOperationException.class, () ->
                     field.getEdges().add(null));
+        }
+    }
+
+    private static class FailedInactiveEdge extends Edge {
+        FailedInactiveEdge(Node nodeA, Node nodeB) {
+            super(nodeA, nodeB);
+        }
+
+        @Override
+        public boolean isActive() {
+            return false;
+        }
+
+        @Override
+        public boolean causesGameLoss() {
+            return true;
         }
     }
 }

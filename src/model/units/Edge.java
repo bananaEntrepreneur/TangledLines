@@ -29,6 +29,14 @@ public abstract class Edge {
         return new Line2D.Double(a.getX(), a.getY(), b.getX(), b.getY());
     }
 
+    public boolean isActive() {
+        return true;
+    }
+
+    public boolean causesGameLoss() {
+        return false;
+    }
+
     public Node getNodeA() { return _nodeA; }
 
     public Node getNodeB() { return _nodeB; }

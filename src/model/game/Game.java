@@ -29,12 +29,12 @@ public class Game implements NodeListener, LevelNavigationListener {
 
         _state.incrementMoveCount();
 
-        if (_state.getField().hasBrokenEdges()) {
-            _state.setGameOver(true, false);
+        if (_state.getField().hasFailedEdges()) {
+            _state.lose();
         } else if (!_state.getField().hasIntersections()) {
-            _state.setGameOver(true, true);
+            _state.win();
         } else if (_state.getMoveCount() >= _state.getMaxMoves()) {
-            _state.setGameOver(true, false);
+            _state.lose();
         }
     }
 

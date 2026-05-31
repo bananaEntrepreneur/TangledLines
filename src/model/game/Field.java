@@ -33,11 +33,11 @@ public class Field {
     public boolean hasIntersections() {
         int size = _edges.size();
         for (int i = 0; i < size; i++) {
-            if (isInactiveEdge(_edges.get(i))) {
+            if (!_edges.get(i).isActive()) {
                 continue;
             }
             for (int j = i + 1; j < size; j++) {
-                if (isInactiveEdge(_edges.get(j))) {
+                if (!_edges.get(j).isActive()) {
                     continue;
                 }
                 if (_edges.get(i).crosses(_edges.get(j))) {
@@ -48,9 +48,9 @@ public class Field {
         return false;
     }
 
-    public boolean hasBrokenEdges() {
+    public boolean hasFailedEdges() {
         for (Edge edge : _edges) {
-            if (edge instanceof BreakableEdge breakableEdge && breakableEdge.isBroken()) {
+            if (edge.causesGameLoss()) {
                 return true;
             }
         }
@@ -72,10 +72,6 @@ public class Field {
             _edges.add(edge);
         }
         return edge;
-    }
-
-    private boolean isInactiveEdge(Edge edge) {
-        return edge instanceof BreakableEdge breakableEdge && breakableEdge.isBroken();
     }
 
     private void addNode(Node node) {

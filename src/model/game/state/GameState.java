@@ -7,12 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameState {
+    public enum Status {
+        PLAYING,
+        WON,
+        LOST,
+        ALL_LEVELS_COMPLETE
+    }
+
     private Field _field;
     private int _maxMoves;
     private int _moveCount = 0;
-    private boolean _gameOver = false;
-    private boolean _win = false;
-    private boolean _allLevelsComplete = false;
+    private Status _status = Status.PLAYING;
     private final List<GameStateListener> _listeners = new ArrayList<>();
 
     public GameState(Field field, int maxMoves) {
@@ -21,16 +26,16 @@ public class GameState {
     }
 
     public void addListener(GameStateListener listener) {
-        _listeners.add(listener);
+        if (listener != null && !_listeners.contains(listener)) {
+            _listeners.add(listener);
+        }
     }
 
     public void loadLevel(Field field, int maxMoves) {
         _field = field;
         _maxMoves = maxMoves;
         _moveCount = 0;
-        _gameOver = false;
-        _win = false;
-        _allLevelsComplete = false;
+        _status = Status.PLAYING;
     }
 
     public void incrementMoveCount() {
@@ -38,22 +43,26 @@ public class GameState {
         notifyListeners();
     }
 
-    public void setGameOver(boolean gameOver, boolean win) {
-        _gameOver = gameOver;
-        _win = win;
+    public void win() {
+        _status = Status.WON;
         notifyListeners();
     }
 
-    public void setAllLevelsComplete(boolean allLevelsComplete) {
-        _allLevelsComplete = allLevelsComplete;
+    public void lose() {
+        _status = Status.LOST;
         notifyListeners();
     }
 
-    public boolean isGameOver() { return _gameOver; }
+    public void completeAllLevels() {
+        _status = Status.ALL_LEVELS_COMPLETE;
+        notifyListeners();
+    }
 
-    public boolean isWin() { return _win; }
+    public boolean isGameOver() { return _status == Status.WON || _status == Status.LOST; }
 
-    public boolean isAllLevelsComplete() { return _allLevelsComplete; }
+    public boolean isWin() { return _status == Status.WON; }
+
+    public boolean isAllLevelsComplete() { return _status == Status.ALL_LEVELS_COMPLETE; }
 
     public int getMoveCount() { return _moveCount; }
 
