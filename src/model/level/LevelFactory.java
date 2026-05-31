@@ -7,6 +7,19 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 public class LevelFactory {
+    private final EdgeTypeRegistry _edgeTypes;
+
+    public LevelFactory() {
+        this(EdgeTypeRegistry.withDefaults());
+    }
+
+    public LevelFactory(EdgeTypeRegistry edgeTypes) {
+        if (edgeTypes == null) {
+            throw new IllegalArgumentException("Edge type registry cannot be null");
+        }
+        _edgeTypes = edgeTypes;
+    }
+
     public Field createField(Level level) {
         Field field = getField(level);
 
@@ -30,23 +43,10 @@ public class LevelFactory {
             Node nodeA = nodes.get(spec.nodeAIndex());
             Node nodeB = nodes.get(spec.nodeBIndex());
 
-            Level.EdgeKind kind = spec.kind() == null ? Level.EdgeKind.BASIC : spec.kind();
-            switch (kind) {
-                case STRETCHABLE -> field.createStretchableEdge(nodeA, nodeB, requirePercent(spec.stretchPercent(), 25.0));
-                case BREAKABLE -> field.createBreakableEdge(nodeA, nodeB, requirePercent(spec.breakPercent(), 150.0));
-                default -> field.createEdge(nodeA, nodeB);
-            }
+            _edgeTypes.createEdge(field, nodeA, nodeB, spec);
         }
 
         return field;
-    }
-
-    private double requirePercent(Double value, double defaultValue) {
-        double resolved = value == null ? defaultValue : value;
-        if (resolved < 0) {
-            throw new IllegalArgumentException("Percent values must be non-negative");
-        }
-        return resolved;
     }
 
     private static Field getField(Level level) {

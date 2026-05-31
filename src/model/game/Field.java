@@ -60,7 +60,11 @@ public class Field {
     public List<Node> getNodes() { return List.copyOf(_nodes); }
     public List<Edge> getEdges() { return List.copyOf(_edges); }
 
-    private Edge addEdge(Edge edge) {
+    public Edge addEdge(Edge edge) {
+        if (edge == null) {
+            throw new IllegalArgumentException("Edge cannot be null");
+        }
+
         addNode(edge.getNodeA());
         addNode(edge.getNodeB());
 

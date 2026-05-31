@@ -1,6 +1,8 @@
 package model.level;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Level {
     private final int _maxMoves;
@@ -49,6 +51,54 @@ public class Level {
 
     public record NodeData(double x, double y) {}
     public record EdgeData(int nodeAIndex, int nodeBIndex) {}
-    public record EdgeSpec(int nodeAIndex, int nodeBIndex, EdgeKind kind, Double stretchPercent, Double breakPercent) {}
+    public record EdgeSpec(int nodeAIndex, int nodeBIndex, String type, Map<String, Double> parameters) {
+        public EdgeSpec {
+            type = normalizeType(type);
+            parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
+        }
+
+        public EdgeSpec(int nodeAIndex, int nodeBIndex, EdgeKind kind, Double stretchPercent, Double breakPercent) {
+            this(
+                nodeAIndex,
+                nodeBIndex,
+                kind == null ? EdgeKind.BASIC.name().toLowerCase() : kind.name().toLowerCase(),
+                legacyParameters(stretchPercent, breakPercent)
+            );
+        }
+
+        public EdgeKind kind() {
+            try {
+                return EdgeKind.valueOf(type.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
+        public Double stretchPercent() {
+            return parameters.get("stretchPercent");
+        }
+
+        public Double breakPercent() {
+            return parameters.get("breakPercent");
+        }
+
+        private static String normalizeType(String type) {
+            if (type == null || type.isBlank()) {
+                return EdgeKind.BASIC.name().toLowerCase();
+            }
+            return type.trim().toLowerCase();
+        }
+
+        private static Map<String, Double> legacyParameters(Double stretchPercent, Double breakPercent) {
+            Map<String, Double> parameters = new HashMap<>();
+            if (stretchPercent != null) {
+                parameters.put("stretchPercent", stretchPercent);
+            }
+            if (breakPercent != null) {
+                parameters.put("breakPercent", breakPercent);
+            }
+            return parameters;
+        }
+    }
     public enum EdgeKind { BASIC, STRETCHABLE, BREAKABLE }
 }

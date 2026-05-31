@@ -9,7 +9,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JsonLevelLoader implements LevelLoader {
     private static final int DEFAULT_MAX_MOVES = 50;
@@ -64,45 +66,20 @@ public class JsonLevelLoader implements LevelLoader {
     }
 
     private Level.EdgeSpec toEdgeSpec(EdgeSchema edge) throws LevelLoadException {
-        Level.EdgeKind kind = parseEdgeKind(edge.type);
-        return switch (kind) {
-            case STRETCHABLE -> new Level.EdgeSpec(
-                edge.nodeA,
-                edge.nodeB,
-                kind,
-                requirePercent(edge.stretchPercent, "stretchPercent", 25.0),
-                null
-            );
-            case BREAKABLE -> new Level.EdgeSpec(
-                edge.nodeA,
-                edge.nodeB,
-                kind,
-                null,
-                requirePercent(edge.breakPercent, "breakPercent", 150.0)
-            );
-            default -> new Level.EdgeSpec(edge.nodeA, edge.nodeB, kind, null, null);
-        };
+        Map<String, Double> parameters = new HashMap<>();
+        putPercent(parameters, "stretchPercent", edge.stretchPercent);
+        putPercent(parameters, "breakPercent", edge.breakPercent);
+        return new Level.EdgeSpec(edge.nodeA, edge.nodeB, edge.type, parameters);
     }
 
-    private Level.EdgeKind parseEdgeKind(String type) throws LevelLoadException {
-        if (type == null || type.isBlank()) {
-            return Level.EdgeKind.BASIC;
+    private void putPercent(Map<String, Double> parameters, String fieldName, Double value) throws LevelLoadException {
+        if (value == null) {
+            return;
         }
-
-        return switch (type.trim().toLowerCase()) {
-            case "basic" -> Level.EdgeKind.BASIC;
-            case "stretchable" -> Level.EdgeKind.STRETCHABLE;
-            case "breakable" -> Level.EdgeKind.BREAKABLE;
-            default -> throw new LevelLoadException("Unknown edge type: " + type);
-        };
-    }
-
-    private double requirePercent(Double value, String fieldName, double defaultValue) throws LevelLoadException {
-        double resolved = value == null ? defaultValue : value;
-        if (resolved < 0) {
+        if (value < 0) {
             throw new LevelLoadException(fieldName + " must be non-negative");
         }
-        return resolved;
+        parameters.put(fieldName, value);
     }
 
     private void validateNode(NodeSchema node) throws LevelLoadException {

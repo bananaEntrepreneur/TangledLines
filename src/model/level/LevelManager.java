@@ -20,8 +20,19 @@ public class LevelManager {
 
     public LevelManager(String levelsDirectory, LevelLoader levelLoader)
             throws LevelLoadException {
+        this(levelsDirectory, levelLoader, new LevelFactory());
+    }
+
+    public LevelManager(String levelsDirectory, LevelLoader levelLoader, LevelFactory factory)
+            throws LevelLoadException {
+        if (levelLoader == null) {
+            throw new IllegalArgumentException("Level loader cannot be null");
+        }
+        if (factory == null) {
+            throw new IllegalArgumentException("Level factory cannot be null");
+        }
         _levelLoader = levelLoader;
-        _factory = new LevelFactory();
+        _factory = factory;
         _levels = loadAllLevels(levelsDirectory);
     }
 
