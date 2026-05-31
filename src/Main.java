@@ -1,5 +1,4 @@
 import model.game.Game;
-import model.game.state.LevelNavigation;
 import model.level.LevelManager;
 import model.level.LevelLoadException;
 import view.View;
