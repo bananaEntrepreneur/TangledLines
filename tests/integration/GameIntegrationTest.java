@@ -107,6 +107,23 @@ class GameIntegrationTest {
             assertEquals(3, _state().getMaxMoves());
             assertFalse(_state().isGameOver());
         }
+
+        @Test
+        @DisplayName("Should detach from old field nodes after restart")
+        void shouldDetachFromOldFieldNodesAfterRestart() {
+            Field oldField = _field();
+
+            _nav().restartLevel();
+
+            Node oldNode = oldField.getNodes().get(0);
+            oldNode.startDragging();
+            oldNode.updateDragging(new Point2D.Double(500, 500));
+            oldNode.stopDragging();
+
+            assertEquals(0, _state().getMoveCount());
+            assertSame(_state().getField(), _field());
+            assertNotSame(oldField, _field());
+        }
     }
 
     @Nested
