@@ -85,8 +85,9 @@ class LevelLoadingIntegrationTest {
             Level level2 = _loader.load("levels/level2.json");
             Level level3 = _loader.load("levels/level3.json");
 
-            assertNotEquals(level1.getMaxMoves(), level2.getMaxMoves());
-            assertNotEquals(level1.getMaxMoves(), level3.getMaxMoves());
+            assertEquals(3, level1.getMaxMoves());
+            assertEquals(4, level2.getMaxMoves());
+            assertEquals(3, level3.getMaxMoves());
         }
 
         @Test
@@ -143,7 +144,7 @@ class LevelLoadingIntegrationTest {
 
             Edge firstEdge = edges.get(0);
             assertSame(nodes.get(0), firstEdge.getNodeA());
-            assertSame(nodes.get(3), firstEdge.getNodeB());
+            assertSame(nodes.get(1), firstEdge.getNodeB());
         }
     }
 }

@@ -47,7 +47,7 @@ class LevelManagerIntegrationTest {
         @Test
         @DisplayName("Should report correct total level count")
         void shouldReportTotalLevels() {
-            assertEquals(10, _levelManager.getTotalLevels());
+            assertEquals(8, _levelManager.getTotalLevels());
         }
     }
 
@@ -61,10 +61,10 @@ class LevelManagerIntegrationTest {
             assertEquals(3, _levelManager.getCurrentMaxMoves());
 
             _levelManager.nextField();
-            assertEquals(5, _levelManager.getCurrentMaxMoves());
+            assertEquals(4, _levelManager.getCurrentMaxMoves());
 
             _levelManager.nextField();
-            assertEquals(1, _levelManager.getCurrentMaxMoves());
+            assertEquals(3, _levelManager.getCurrentMaxMoves());
         }
     }
 

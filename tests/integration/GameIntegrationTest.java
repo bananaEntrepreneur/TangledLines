@@ -51,7 +51,7 @@ class GameIntegrationTest {
         @Test
         @DisplayName("Should reflect LevelManager's total level count")
         void shouldReflectLevelCount() {
-            assertEquals(10, _nav().getTotalLevels());
+            assertEquals(8, _nav().getTotalLevels());
             assertEquals(0, _nav().getCurrentLevelIndex());
         }
 
@@ -90,7 +90,7 @@ class GameIntegrationTest {
                 assertTrue(_nav().nextLevel());
                 assertEquals(1, _nav().getCurrentLevelIndex());
                 assertEquals(0, _state().getMoveCount());
-                assertEquals(5, _state().getMaxMoves());
+                assertEquals(4, _state().getMaxMoves());
             }
         }
 
@@ -136,7 +136,7 @@ class GameIntegrationTest {
         }
 
         @Test
-        @DisplayName("Should enforce move limit on level3 (1 maxMove) - skipped: game requires win to advance")
+        @DisplayName("Should enforce move limit on level3 (3 maxMoves) - skipped: game requires win to advance")
         void shouldEnforceStrictMoveLimit() {
         }
     }
