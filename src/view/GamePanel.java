@@ -79,7 +79,7 @@ public class GamePanel extends JPanel implements NodeListener {
     private void updateWidgetPosition(Node node) {
         for (NodeWidget widget : _nodeWidgets) {
             if (widget.getNode() == node) {
-                Point2D pos = node.getPosition();
+                Point2D pos = node.isDragging() ? node.getDragPosition() : node.getPosition();
                 widget.setBounds(
                     (int) pos.getX() - GameStyle.NODE_RADIUS,
                     (int) pos.getY() - GameStyle.NODE_RADIUS,

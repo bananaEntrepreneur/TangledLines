@@ -12,6 +12,9 @@ public final class GameStyle {
     public static final Color EDGE_WARNING_COLOR = new Color(255, 165, 0); // orange
     public static final Color BREAKABLE_EDGE_COLOR = new Color(128, 0, 128); // purple
     public static final Color BROKEN_EDGE_COLOR = new Color(255, 0, 0); // red
+    public static final Color OVERHEATING_EDGE_COLOR = new Color(80, 160, 180);
+    public static final Color WARM_EDGE_COLOR = new Color(255, 190, 80);
+    public static final Color HOT_EDGE_COLOR = new Color(255, 80, 40);
     public static final Color NODE_COLOR = new Color(30, 144, 255);
     public static final Color NODE_HOVER_COLOR = new Color(255, 165, 0);
     public static final Color BACKGROUND_COLOR = new Color(250, 250, 250);

@@ -1,22 +1,24 @@
 {
   "maxMoves": 6,
   "nodes": [
-    { "x": 100, "y": 100},
-    { "x": 700, "y": 100},
-    { "x": 100, "y": 500},
-    { "x": 700, "y": 500},
-    { "x": 400, "y": 300}
+    { "x": 120, "y": 120 },
+    { "x": 420, "y": 420 },
+    { "x": 120, "y": 420 },
+    { "x": 420, "y": 120 }
   ],
-  "edgeSpecs": [
-    { "nodeA": 0, "nodeB": 1 },
-    { "nodeA": 2, "nodeB": 3 },
-    { "nodeA": 0, "nodeB": 2 },
-    { "nodeA": 1, "nodeB": 3 },
-    { "nodeA": 0, "nodeB": 3 },
-    { "nodeA": 1, "nodeB": 2 },
-    { "nodeA": 0, "nodeB": 4, "type": "stretchable", "stretchPercent": 40 },
-    { "nodeA": 1, "nodeB": 4, "type": "stretchable", "stretchPercent": 40 },
-    { "nodeA": 2, "nodeB": 4, "type": "breakable", "breakPercent": 15 },
-    { "nodeA": 3, "nodeB": 4, "type": "breakable", "breakPercent": 15 }
+  "edges": [
+    {
+      "nodeA": 0,
+      "nodeB": 1,
+      "type": "overheating",
+      "heatPerIntersection": 30,
+      "coolPerMove": 15,
+      "criticalHeat": 100
+    },
+    {
+      "nodeA": 2,
+      "nodeB": 3,
+      "type": "basic"
+    }
   ]
 }

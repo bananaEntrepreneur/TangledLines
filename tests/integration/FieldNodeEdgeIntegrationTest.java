@@ -6,6 +6,7 @@ import model.level.LevelManager;
 import model.units.BreakableEdge;
 import model.units.Edge;
 import model.units.Node;
+import model.units.OverheatingEdge;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,30 @@ class FieldNodeEdgeIntegrationTest {
             assertFalse(breakableEdge.isActive());
             assertTrue(field.hasInactiveEdges());
             assertFalse(field.hasIntersections());
+        }
+
+        @Test
+        @DisplayName("Should update overheating edges from node movement")
+        void shouldUpdateOverheatingEdgesFromNodeMovement() {
+            Field field = new Field();
+            Node nodeA = new Node(new Point2D.Double(0, 0));
+            Node nodeB = new Node(new Point2D.Double(100, 100));
+            Node nodeC = new Node(new Point2D.Double(0, 100));
+            Node nodeD = new Node(new Point2D.Double(100, 0));
+
+            OverheatingEdge overheatingEdge = field.createOverheatingEdge(nodeA, nodeB, 60, 10, 100);
+            field.createEdge(nodeC, nodeD);
+
+            nodeC.startDragging();
+            nodeC.updateDragging(new Point2D.Double(-100, 200));
+
+            assertTrue(overheatingEdge.isActive());
+            assertEquals(0.6, overheatingEdge.getHeatRatio(), 0.01);
+
+            nodeC.updateDragging(new Point2D.Double(-200, 300));
+
+            assertFalse(overheatingEdge.isActive());
+            assertTrue(field.hasInactiveEdges());
         }
     }
 

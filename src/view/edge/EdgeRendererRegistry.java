@@ -14,7 +14,8 @@ public final class EdgeRendererRegistry {
         return new EdgeRendererRegistry()
             .register(new BasicEdgeRenderer())
             .register(new StretchableEdgeRenderer())
-            .register(new BreakableEdgeRenderer());
+            .register(new BreakableEdgeRenderer())
+            .register(new OverheatingEdgeRenderer());
     }
 
     public EdgeRendererRegistry register(EdgeRenderer renderer) {

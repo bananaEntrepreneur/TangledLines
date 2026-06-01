@@ -47,7 +47,7 @@ class LevelManagerIntegrationTest {
         @Test
         @DisplayName("Should report correct total level count")
         void shouldReportTotalLevels() {
-            assertEquals(8, _levelManager.getTotalLevels());
+            assertEquals(9, _levelManager.getTotalLevels());
         }
     }
 

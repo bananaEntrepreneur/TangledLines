@@ -51,7 +51,7 @@ class GameIntegrationTest {
         @Test
         @DisplayName("Should reflect LevelManager's total level count")
         void shouldReflectLevelCount() {
-            assertEquals(8, _nav().getTotalLevels());
+            assertEquals(9, _nav().getTotalLevels());
             assertEquals(0, _nav().getCurrentLevelIndex());
         }
 

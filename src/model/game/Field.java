@@ -4,6 +4,7 @@ import model.units.Edge;
 import model.units.StandardEdge;
 import model.units.BreakableEdge;
 import model.units.StretchableEdge;
+import model.units.OverheatingEdge;
 import model.units.Node;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -30,6 +31,17 @@ public class Field {
         return (BreakableEdge) addEdge(new BreakableEdge(nodeA, nodeB, breakPercent));
     }
 
+    public OverheatingEdge createOverheatingEdge(
+            Node nodeA,
+            Node nodeB,
+            double heatPerIntersection,
+            double coolPerMove,
+            double criticalHeat) {
+        return (OverheatingEdge) addEdge(
+            new OverheatingEdge(nodeA, nodeB, heatPerIntersection, coolPerMove, criticalHeat, this)
+        );
+    }
+
     public boolean hasIntersections() {
         int size = _edges.size();
         for (int i = 0; i < size; i++) {
@@ -43,6 +55,19 @@ public class Field {
                 if (_edges.get(i).crosses(_edges.get(j))) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasIntersections(Edge target) {
+        if (target == null || !target.isActive()) {
+            return false;
+        }
+
+        for (Edge edge : _edges) {
+            if (edge != target && edge.isActive() && target.crosses(edge)) {
+                return true;
             }
         }
         return false;
@@ -71,12 +96,30 @@ public class Field {
         if (!_edges.contains(edge)) {
             _edges.add(edge);
         }
+        if (edge instanceof OverheatingEdge) {
+            addListenerToAllNodes((OverheatingEdge) edge);
+        }
         return edge;
     }
 
     private void addNode(Node node) {
         if (!_nodes.contains(node)) {
             _nodes.add(node);
+            addExistingOverheatingEdgesTo(node);
+        }
+    }
+
+    private void addExistingOverheatingEdgesTo(Node node) {
+        for (Edge edge : _edges) {
+            if (edge instanceof OverheatingEdge) {
+                node.addListener((OverheatingEdge) edge);
+            }
+        }
+    }
+
+    private void addListenerToAllNodes(OverheatingEdge edge) {
+        for (Node node : _nodes) {
+            node.addListener(edge);
         }
     }
 }

@@ -26,11 +26,20 @@ public class Game implements NodeListener, LevelNavigationListener {
     public void onMoved(Node node) {
         if (_state.isGameOver() || _state.isAllLevelsComplete()) return;
 
+        boolean hasIntersections = _observedField.hasIntersections();
+
+        if (_observedField.hasInactiveEdges()) {
+            _state.lose();
+            return;
+        }
+
+        if (node.isDragging()) {
+            return;
+        }
+
         _state.incrementMoveCount();
 
-        if (_state.getField().hasInactiveEdges()) {
-            _state.lose();
-        } else if (!_state.getField().hasIntersections()) {
+        if (!hasIntersections) {
             _state.win();
         } else if (_state.getMoveCount() >= _state.getMaxMoves()) {
             _state.lose();

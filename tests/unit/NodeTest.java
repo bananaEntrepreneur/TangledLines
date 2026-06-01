@@ -87,6 +87,21 @@ class NodeTest {
         }
 
         @Test
+        @DisplayName("Should notify listeners while dragging without committing move")
+        void shouldNotifyListenersWhileDragging() {
+            Node node = new Node(_initialPosition);
+            MockNodeListener listener = new MockNodeListener();
+            node.addListener(listener);
+
+            node.startDragging();
+            node.updateDragging(_newPosition);
+
+            assertTrue(listener.wasNotified());
+            assertEquals(_initialPosition, node.getPosition());
+            assertEquals(_newPosition, node.getDragPosition());
+        }
+
+        @Test
         @DisplayName("Should not update position without startDragging")
         void shouldNotUpdateWithoutStartDragging() {
             Node node = new Node(_initialPosition);
@@ -141,17 +156,16 @@ class NodeTest {
         }
 
         @Test
-        @DisplayName("Should not notify listeners when same position")
-        void shouldNotNotifyListenersWhenSame() {
+        @DisplayName("Should notify listeners during drag even when position is same")
+        void shouldNotifyListenersDuringDragWhenSamePosition() {
             Node node = new Node(_initialPosition);
             MockNodeListener listener = new MockNodeListener();
             node.addListener(listener);
 
             node.startDragging();
             node.updateDragging(_initialPosition);
-            node.stopDragging();
 
-            assertFalse(listener.wasNotified());
+            assertTrue(listener.wasNotified());
         }
 
         @Test

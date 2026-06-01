@@ -36,7 +36,7 @@ class ListenerRegistrationTest {
         node.updateDragging(new Point2D.Double(10, 10));
         node.stopDragging();
 
-        assertEquals(1, listener.count);
+        assertEquals(2, listener.count);
     }
 
     @Test

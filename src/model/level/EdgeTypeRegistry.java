@@ -14,7 +14,8 @@ public final class EdgeTypeRegistry {
         return new EdgeTypeRegistry()
             .register(new BasicEdgeFactory())
             .register(new StretchableEdgeFactory())
-            .register(new BreakableEdgeFactory());
+            .register(new BreakableEdgeFactory())
+            .register(new OverheatingEdgeFactory());
     }
 
     public EdgeTypeRegistry register(EdgeTypeFactory factory) {
@@ -52,6 +53,14 @@ public final class EdgeTypeRegistry {
         double resolved = spec.parameters().getOrDefault(parameter, defaultValue);
         if (resolved < 0) {
             throw new IllegalArgumentException(parameter.jsonName() + " must be non-negative");
+        }
+        return resolved;
+    }
+
+    private static double positiveParameter(Level.EdgeSpec spec, String parameterName, double defaultValue) {
+        double resolved = spec.parameters().getCustomOrDefault(parameterName, defaultValue);
+        if (resolved <= 0) {
+            throw new IllegalArgumentException(parameterName + " must be positive");
         }
         return resolved;
     }
@@ -96,6 +105,24 @@ public final class EdgeTypeRegistry {
                 nodeA,
                 nodeB,
                 percent(spec, Level.EdgeParameter.BREAK_PERCENT, 150.0)
+            );
+        }
+    }
+
+    private static class OverheatingEdgeFactory implements EdgeTypeFactory {
+        @Override
+        public String getType() {
+            return "overheating";
+        }
+
+        @Override
+        public Edge createEdge(Field field, Node nodeA, Node nodeB, Level.EdgeSpec spec) {
+            return field.createOverheatingEdge(
+                nodeA,
+                nodeB,
+                positiveParameter(spec, "heatPerIntersection", 25.0),
+                positiveParameter(spec, "coolPerMove", 10.0),
+                positiveParameter(spec, "criticalHeat", 100.0)
             );
         }
     }

@@ -24,8 +24,8 @@ public abstract class Edge {
     }
 
     public Line2D toLine() {
-        Point2D a = _nodeA.getPosition();
-        Point2D b = _nodeB.getPosition();
+        Point2D a = positionOf(_nodeA);
+        Point2D b = positionOf(_nodeB);
         return new Line2D.Double(a.getX(), a.getY(), b.getX(), b.getY());
     }
 
@@ -36,6 +36,10 @@ public abstract class Edge {
     public Node getNodeA() { return _nodeA; }
 
     public Node getNodeB() { return _nodeB; }
+
+    private Point2D positionOf(Node node) {
+        return node.isDragging() ? node.getDragPosition() : node.getPosition();
+    }
 
     private boolean sharesEndpointWith(Edge other) {
         return _nodeA == other._nodeA || _nodeA == other._nodeB

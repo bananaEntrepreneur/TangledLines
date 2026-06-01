@@ -28,14 +28,19 @@ public class Node {
     public void updateDragging(Point2D position) {
         if (!_isDragging || position == null) return;
         _queuedPosition = applyMovementConstraints(position);
+        notifyListeners();
     }
 
     public void stopDragging() {
+        Point2D positionToCommit = null;
         if (_isDragging && _queuedPosition != null) {
-            setPosition(applyMovementConstraints(_queuedPosition));
+            positionToCommit = applyMovementConstraints(_queuedPosition);
         }
         _isDragging = false;
         _queuedPosition = null;
+        if (positionToCommit != null) {
+            setPosition(positionToCommit);
+        }
     }
 
     public Point2D getDragPosition() {
