@@ -24,12 +24,24 @@ public class OverheatingEdge extends Edge implements NodeListener {
             double criticalHeat,
             Field field) {
         super(nodeA, nodeB);
+        if (heatPerIntersection < 0) {
+            throw new IllegalArgumentException("Heat per intersection cannot be negative");
+        }
+        if (coolPerMove < 0) {
+            throw new IllegalArgumentException("Cool per move cannot be negative");
+        }
+        if (criticalHeat <= 0) {
+            throw new IllegalArgumentException("Critical heat must be positive");
+        }
+        if (field == null) {
+            throw new IllegalArgumentException("Field cannot be null");
+        }
 
         _heatPerIntersection = heatPerIntersection;
         _coolPerMove = coolPerMove;
         _criticalHeat = criticalHeat;
         _field = field;
-        _referenceLength = nodeA.getPosition().distance(nodeB.getPosition());
+        _referenceLength = Math.max(1.0, nodeA.getPosition().distance(nodeB.getPosition()));
 
         nodeA.addListener(this);
         nodeB.addListener(this);
@@ -67,7 +79,7 @@ public class OverheatingEdge extends Edge implements NodeListener {
         return _heat;
     }
 
-    public double getHeatRatio() { return _heat / _criticalHeat; }
+    public double getHeatRatio() { return Math.min(1.0, _heat / _criticalHeat); }
 
     private double getMoveRatio(Node node) {
         Point2D currentPosition = currentPosition(node);
