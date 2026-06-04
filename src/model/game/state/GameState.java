@@ -36,6 +36,7 @@ public class GameState {
         _maxMoves = maxMoves;
         _moveCount = 0;
         _status = Status.PLAYING;
+        notifyListeners();
     }
 
     public void incrementMoveCount() {
