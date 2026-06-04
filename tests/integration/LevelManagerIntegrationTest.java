@@ -7,17 +7,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Integration — LevelManager")
 class LevelManagerIntegrationTest {
 
+    @TempDir
+    private Path _levelsDirectory;
     private LevelManager _levelManager;
 
     @BeforeEach
-    void setUp() throws LevelLoadException {
-        _levelManager = new LevelManager("levels");
+    void setUp() throws IOException, LevelLoadException {
+        writeLevel(1, 3, 4, 2);
+        writeLevel(2, 4, 3, 1);
+        writeLevel(3, 5, 2, 0);
+        _levelManager = new LevelManager(_levelsDirectory.toString());
     }
 
     @Nested
@@ -35,19 +45,22 @@ class LevelManagerIntegrationTest {
         @DisplayName("Should progress through all levels sequentially")
         void shouldProgressAllLevels() {
             assertEquals(0, _levelManager.getCurrentLevelIndex());
+
             assertNotNull(_levelManager.nextField());
             assertEquals(1, _levelManager.getCurrentLevelIndex());
 
             assertNotNull(_levelManager.nextField());
             assertEquals(2, _levelManager.getCurrentLevelIndex());
 
-            assertTrue(_levelManager.hasNextLevel());
+            assertFalse(_levelManager.hasNextLevel());
+            assertNull(_levelManager.nextField());
+            assertEquals(2, _levelManager.getCurrentLevelIndex());
         }
 
         @Test
-        @DisplayName("Should report correct total level count")
+        @DisplayName("Should report level count from available level files")
         void shouldReportTotalLevels() {
-            assertEquals(9, _levelManager.getTotalLevels());
+            assertEquals(3, _levelManager.getTotalLevels());
         }
     }
 
@@ -64,7 +77,7 @@ class LevelManagerIntegrationTest {
             assertEquals(4, _levelManager.getCurrentMaxMoves());
 
             _levelManager.nextField();
-            assertEquals(3, _levelManager.getCurrentMaxMoves());
+            assertEquals(5, _levelManager.getCurrentMaxMoves());
         }
     }
 
@@ -91,22 +104,62 @@ class LevelManagerIntegrationTest {
 
             _levelManager.nextField();
             Field level2 = _levelManager.getCurrentField();
-            assertEquals(4, level2.getNodes().size());
+            assertEquals(3, level2.getNodes().size());
 
             _levelManager.nextField();
             Field level3 = _levelManager.getCurrentField();
-            assertEquals(4, level3.getNodes().size());
+            assertEquals(2, level3.getNodes().size());
         }
 
         @Test
         @DisplayName("Should produce Fields with correct edge counts per level")
         void shouldProduceCorrectEdgeCounts() {
             Field level1 = _levelManager.getCurrentField();
-            assertEquals(6, level1.getEdges().size());
+            assertEquals(2, level1.getEdges().size());
 
             _levelManager.nextField();
             Field level2 = _levelManager.getCurrentField();
-            assertEquals(4, level2.getEdges().size());
+            assertEquals(1, level2.getEdges().size());
+
+            _levelManager.nextField();
+            Field level3 = _levelManager.getCurrentField();
+            assertEquals(0, level3.getEdges().size());
         }
+    }
+
+    private void writeLevel(int number, int maxMoves, int nodeCount, int edgeCount) throws IOException {
+        Files.writeString(_levelsDirectory.resolve("level" + number + ".json"), levelJson(maxMoves, nodeCount, edgeCount));
+    }
+
+    private String levelJson(int maxMoves, int nodeCount, int edgeCount) {
+        StringBuilder nodes = new StringBuilder();
+        for (int i = 0; i < nodeCount; i++) {
+            if (i > 0) {
+                nodes.append(",");
+            }
+            nodes.append("""
+                
+                    { "x": %d, "y": %d }""".formatted(i * 100, i * 50));
+        }
+
+        StringBuilder edges = new StringBuilder();
+        for (int i = 0; i < edgeCount; i++) {
+            if (i > 0) {
+                edges.append(",");
+            }
+            edges.append("""
+                
+                    { "nodeA": %d, "nodeB": %d }""".formatted(i, i + 1));
+        }
+
+        return """
+            {
+              "maxMoves": %d,
+              "nodes": [%s
+              ],
+              "edges": [%s
+              ]
+            }
+            """.formatted(maxMoves, nodes, edges);
     }
 }

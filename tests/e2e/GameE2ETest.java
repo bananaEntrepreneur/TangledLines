@@ -4,30 +4,34 @@ import model.game.Field;
 import model.game.Game;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
-import model.level.LevelManager;
 import model.level.LevelLoadException;
+import model.level.LevelManager;
 import model.units.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.awt.geom.Point2D;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("End-to-End Game Tests")
 class GameE2ETest {
 
-    private static final String LEVELS_DIR = "levels";
-    private LevelManager _levelManager;
+    @TempDir
+    private Path _levelsDirectory;
     private Game _game;
 
     @BeforeEach
-    void setUp() throws LevelLoadException {
-        _levelManager = new LevelManager(LEVELS_DIR);
-        _game = new Game(_levelManager);
+    void setUp() throws IOException, LevelLoadException {
+        Files.writeString(_levelsDirectory.resolve("level1.json"), crossingLevel(3));
+        Files.writeString(_levelsDirectory.resolve("level2.json"), clearLevel(4));
+        _game = new Game(new LevelManager(_levelsDirectory.toString()));
     }
 
     private GameState _state() { return _game.getState(); }
@@ -44,29 +48,17 @@ class GameE2ETest {
             assertNotNull(_field());
             assertEquals(0, _nav().getCurrentLevelIndex());
             assertEquals(0, _state().getMoveCount());
+            assertEquals(3, _state().getMaxMoves());
             assertFalse(_state().isGameOver());
             assertFalse(_state().isWin());
         }
 
         @Test
-        @DisplayName("Should have correct move limit from level config")
-        void shouldHaveCorrectMoveLimit() {
-            assertTrue(_state().getMaxMoves() > 0);
-            assertEquals(_levelManager.getCurrentMaxMoves(), _state().getMaxMoves());
-        }
-
-        @Test
-        @DisplayName("Should load all nodes from level file")
-        void shouldLoadAllNodes() {
-            Field field = _field();
-            assertTrue(field.getNodes().size() > 0);
-        }
-
-        @Test
-        @DisplayName("Should load all edges from level file")
-        void shouldLoadAllEdges() {
-            Field field = _field();
-            assertTrue(field.getEdges().size() > 0);
+        @DisplayName("Should load nodes and edges from JSON level file")
+        void shouldLoadNodesAndEdgesFromLevelFile() {
+            assertEquals(4, _field().getNodes().size());
+            assertEquals(2, _field().getEdges().size());
+            assertTrue(_field().hasIntersections());
         }
     }
 
@@ -75,114 +67,52 @@ class GameE2ETest {
     class NodeMovementTests {
 
         @Test
-        @DisplayName("Should allow moving node within move limit")
-        void shouldAllowMovingNode() {
-            Node node = _field().getNodes().get(0);
-            Point2D originalPos = node.getPosition();
-
-            node.startDragging();
-            node.updateDragging(new Point2D.Double(
-                    originalPos.getX() + 50,
-                    originalPos.getY() + 50
-            ));
-            node.stopDragging();
-
-            assertEquals(1, _state().getMoveCount());
-        }
-
-        @Test
-        @DisplayName("Should count each valid move")
-        void shouldCountEachValidMove() {
-            List<Node> nodes = _field().getNodes();
-
-            Node node1 = nodes.get(0);
-            Point2D pos1 = new Point2D.Double(
-                    node1.getPosition().getX() + 50,
-                    node1.getPosition().getY() + 50
-            );
-            node1.startDragging();
-            node1.updateDragging(pos1);
-            node1.stopDragging();
-
-            Node node2 = nodes.get(1);
-            Point2D pos2 = new Point2D.Double(
-                    node2.getPosition().getX() + 50,
-                    node2.getPosition().getY() + 50
-            );
-            node2.startDragging();
-            node2.updateDragging(pos2);
-            node2.stopDragging();
+        @DisplayName("Should count committed moves")
+        void shouldCountCommittedMoves() {
+            moveKeepingIntersection(10);
+            moveKeepingIntersection(20);
 
             assertEquals(2, _state().getMoveCount());
+            assertFalse(_state().isGameOver());
         }
 
         @Test
-        @DisplayName("Should reject move after game over")
-        void shouldRejectMoveAfterGameOver() {
-            List<Node> nodes = _field().getNodes();
-            Node node = nodes.get(0);
+        @DisplayName("Should ignore moves after game over")
+        void shouldIgnoreMovesAfterGameOver() {
+            winCrossingLevel();
+            int moveCountBefore = _state().getMoveCount();
 
-            Point2D winPosition = new Point2D.Double(10000, 10000);
-            node.startDragging();
-            node.updateDragging(winPosition);
-            node.stopDragging();
+            drag(_field().getNodes().get(0), new Point2D.Double(50, 0));
 
-            if (_state().isGameOver() && _state().isWin()) {
-                int moveCountBefore = _state().getMoveCount();
-                node.startDragging();
-                node.updateDragging(new Point2D.Double(500, 500));
-                node.stopDragging();
-
-                assertEquals(moveCountBefore, _state().getMoveCount());
-            }
+            assertEquals(moveCountBefore, _state().getMoveCount());
+            assertTrue(_state().isGameOver());
         }
     }
 
     @Nested
-    @DisplayName("Win Condition Tests")
-    class WinConditionTests {
+    @DisplayName("Win And Loss Tests")
+    class WinAndLossTests {
 
         @Test
-        @DisplayName("Should win when all intersections resolved within move limit")
+        @DisplayName("Should win when all intersections are resolved within move limit")
         void shouldWinWhenIntersectionsResolved() {
-            boolean hasIntersectionsInitially = _field().hasIntersections();
+            winCrossingLevel();
 
-            if (hasIntersectionsInitially) {
-                List<Node> nodes = _field().getNodes();
-                Point2D newPos = new Point2D.Double(1000, 1000);
-                nodes.get(0).startDragging();
-                nodes.get(0).updateDragging(newPos);
-                nodes.get(0).stopDragging();
-
-                boolean stillHasIntersections = _field().hasIntersections();
-
-                if (!stillHasIntersections && _state().getMoveCount() <= _state().getMaxMoves()) {
-                    assertTrue(_state().isWin());
-                    assertTrue(_state().isGameOver());
-                }
-            }
+            assertTrue(_state().isWin());
+            assertTrue(_state().isGameOver());
         }
 
         @Test
-        @DisplayName("Should lose when move limit exceeded with intersections")
-        void shouldLoseWhenMoveLimitExceeded() {
-            List<Node> nodes = _field().getNodes();
-            int maxMoves = _state().getMaxMoves();
+        @DisplayName("Should lose when move limit is reached with intersections")
+        void shouldLoseWhenMoveLimitReached() {
+            moveKeepingIntersection(10);
+            moveKeepingIntersection(20);
+            moveKeepingIntersection(30);
 
-            for (int i = 0; i < maxMoves + 1; i++) {
-                Point2D newPos = new Point2D.Double(
-                        nodes.get(0).getPosition().getX() + 100 * (i + 1),
-                        nodes.get(0).getPosition().getY()
-                );
-                nodes.get(0).startDragging();
-                nodes.get(0).updateDragging(newPos);
-                nodes.get(0).stopDragging();
-            }
-
-            if (_field().hasIntersections()) {
-                assertTrue(_state().isGameOver());
-                assertFalse(_state().isWin());
-            }
+            assertTrue(_field().hasIntersections());
+            assertEquals(3, _state().getMoveCount());
+            assertTrue(_state().isGameOver());
+            assertFalse(_state().isWin());
         }
     }
 
@@ -193,207 +123,59 @@ class GameE2ETest {
         @Test
         @DisplayName("Should not allow next level without winning")
         void shouldNotAllowNextLevelWithoutWinning() {
-            boolean result = _nav().nextLevel();
-
-            assertFalse(result);
+            assertFalse(_nav().nextLevel());
             assertEquals(0, _nav().getCurrentLevelIndex());
         }
 
         @Test
-        @DisplayName("Should allow next level after winning")
-        void shouldAllowNextLevelAfterWinning() {
-            if (_nav().getTotalLevels() > 1) {
-                Node node = _field().getNodes().get(0);
-                node.startDragging();
-                node.updateDragging(new Point2D.Double(10000, 10000));
-                node.stopDragging();
+        @DisplayName("Should load next level after winning")
+        void shouldLoadNextLevelAfterWinning() {
+            winCrossingLevel();
 
-                if (_state().isWin()) {
-                    boolean result = _nav().nextLevel();
+            assertTrue(_nav().nextLevel());
 
-                    if (_nav().hasNextLevel()) {
-                        assertTrue(result);
-                        assertEquals(1, _nav().getCurrentLevelIndex());
-                    } else {
-                        assertFalse(result);
-                        assertTrue(_state().isAllLevelsComplete());
-                    }
-                }
-            }
+            assertEquals(1, _nav().getCurrentLevelIndex());
+            assertEquals(0, _state().getMoveCount());
+            assertEquals(4, _state().getMaxMoves());
+            assertFalse(_field().hasIntersections());
         }
 
         @Test
-        @DisplayName("Should reset move count on next level")
-        void shouldResetMoveCountOnNextLevel() {
-            if (_nav().getTotalLevels() > 1) {
-                Node node = _field().getNodes().get(0);
-                node.startDragging();
-                node.updateDragging(new Point2D.Double(10000, 10000));
-                node.stopDragging();
+        @DisplayName("Should complete all levels after winning final level")
+        void shouldCompleteAllLevels() {
+            winCrossingLevel();
+            assertTrue(_nav().nextLevel());
 
-                if (_state().isWin() && _nav().hasNextLevel()) {
-                    _nav().nextLevel();
+            drag(_field().getNodes().get(0), new Point2D.Double(50, 0));
+            assertTrue(_state().isWin());
 
-                    assertEquals(0, _state().getMoveCount());
-                    assertTrue(_state().getMaxMoves() > 0);
-                }
-            }
+            assertFalse(_nav().nextLevel());
+            assertTrue(_state().isAllLevelsComplete());
         }
+    }
+
+    @Nested
+    @DisplayName("Restart Tests")
+    class RestartTests {
 
         @Test
         @DisplayName("Should restart level with original configuration")
         void shouldRestartLevelWithOriginalConfiguration() {
             Field initialField = _field();
             Node node = initialField.getNodes().get(0);
-            Point2D originalPos = node.getPosition();
+            Point2D originalPosition = node.getPosition();
 
-            node.startDragging();
-            node.updateDragging(new Point2D.Double(500, 500));
-            node.stopDragging();
-
-            assertNotEquals(originalPos, node.getPosition());
+            moveKeepingIntersection(10);
+            assertNotEquals(originalPosition, node.getPosition());
 
             _nav().restartLevel();
 
             Field restartedField = _field();
-            Node sameNode = restartedField.getNodes().get(
-                    initialField.getNodes().indexOf(node)
-            );
-            assertEquals(originalPos.getX(), sameNode.getPosition().getX(), 0.01);
-            assertEquals(originalPos.getY(), sameNode.getPosition().getY(), 0.01);
+            Node restartedNode = restartedField.getNodes().get(0);
+            assertEquals(originalPosition.getX(), restartedNode.getPosition().getX(), 0.01);
+            assertEquals(originalPosition.getY(), restartedNode.getPosition().getY(), 0.01);
             assertEquals(0, _state().getMoveCount());
             assertFalse(_state().isGameOver());
-        }
-    }
-
-    @Nested
-    @DisplayName("Multiple Levels Tests")
-    class MultipleLevelsTests {
-
-        @Test
-        @DisplayName("Should have multiple levels available")
-        void shouldHaveMultipleLevels() {
-            assertTrue(_nav().getTotalLevels() >= 1);
-        }
-
-        @Test
-        @DisplayName("Should track current level index correctly")
-        void shouldTrackCurrentLevelIndex() {
-            assertEquals(0, _nav().getCurrentLevelIndex());
-
-            if (_nav().getTotalLevels() > 1) {
-                Node node = _field().getNodes().get(0);
-                node.startDragging();
-                node.updateDragging(new Point2D.Double(10000, 10000));
-                node.stopDragging();
-
-                if (_state().isWin() && _nav().hasNextLevel()) {
-                    _nav().nextLevel();
-                    assertEquals(1, _nav().getCurrentLevelIndex());
-                }
-            }
-        }
-
-        @Test
-        @DisplayName("Should detect when all levels complete")
-        void shouldDetectAllLevelsComplete() {
-            if (_nav().getTotalLevels() == 1) {
-                Node node = _field().getNodes().get(0);
-                node.startDragging();
-                node.updateDragging(new Point2D.Double(10000, 10000));
-                node.stopDragging();
-
-                if (_state().isWin()) {
-                    assertFalse(_nav().nextLevel());
-                    assertTrue(_state().isAllLevelsComplete());
-                }
-            }
-        }
-
-        @Test
-        @DisplayName("Should load different field for each level")
-        void shouldLoadDifferentFieldForEachLevel() {
-            Field firstField = _field();
-            int firstNodeCount = firstField.getNodes().size();
-            int firstEdgeCount = firstField.getEdges().size();
-            int firstMaxMoves = _state().getMaxMoves();
-
-            if (_nav().getTotalLevels() > 1) {
-                Node node = firstField.getNodes().get(0);
-                node.startDragging();
-                node.updateDragging(new Point2D.Double(10000, 10000));
-                node.stopDragging();
-
-                if (_state().isWin() && _nav().hasNextLevel()) {
-                    _nav().nextLevel();
-                    Field secondField = _field();
-
-                    assertTrue(
-                            secondField.getNodes().size() != firstNodeCount ||
-                            secondField.getEdges().size() != firstEdgeCount ||
-                            _state().getMaxMoves() != firstMaxMoves
-                    );
-                }
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("Game State Tests")
-    class GameStateTests {
-
-        @Test
-        @DisplayName("Should allow moves immediately after construction")
-        void shouldAllowMovesAfterConstruction() {
-            Node node = _field().getNodes().get(0);
-            Point2D originalPos = node.getPosition();
-            Point2D newPos = new Point2D.Double(500, 500);
-
-            node.startDragging();
-            node.updateDragging(newPos);
-            node.stopDragging();
-
-            assertTrue(node.getPosition().getX() != originalPos.getX() ||
-                    node.getPosition().getY() != originalPos.getY());
-        }
-
-        @Test
-        @DisplayName("Should maintain game state after multiple operations")
-        void shouldMaintainGameStateAfterOperations() {
-            List<Node> nodes = _field().getNodes();
-
-            nodes.get(0).startDragging();
-            nodes.get(0).updateDragging(new Point2D.Double(300, 300));
-            nodes.get(0).stopDragging();
-
-            nodes.get(1).startDragging();
-            nodes.get(1).updateDragging(new Point2D.Double(400, 400));
-            nodes.get(1).stopDragging();
-
-            assertEquals(2, _state().getMoveCount());
-            assertEquals(0, _nav().getCurrentLevelIndex());
-        }
-
-        @Test
-        @DisplayName("Should handle restart after game over")
-        void shouldHandleRestartAfterGameOver() {
-            boolean hasIntersectionsInitially = _field().hasIntersections();
-
-            if (hasIntersectionsInitially) {
-                List<Node> nodes = _field().getNodes();
-                Point2D winPosition = new Point2D.Double(10000, 10000);
-                nodes.get(0).startDragging();
-                nodes.get(0).updateDragging(winPosition);
-                nodes.get(0).stopDragging();
-
-                if (_state().isGameOver()) {
-                    _nav().restartLevel();
-
-                    assertFalse(_state().isGameOver());
-                    assertFalse(_state().isWin());
-                    assertEquals(0, _state().getMoveCount());
-                }
-            }
         }
     }
 
@@ -402,35 +184,66 @@ class GameE2ETest {
     class EdgeIntersectionTests {
 
         @Test
-        @DisplayName("Should detect intersections in initial level state")
-        void shouldDetectIntersectionsInInitialState() {
-            boolean hasIntersections = _field().hasIntersections();
-
-            assertTrue(hasIntersections);
-        }
-
-        @Test
         @DisplayName("Should update intersection status after node movement")
         void shouldUpdateIntersectionStatusAfterMovement() {
-            boolean initialIntersections = _field().hasIntersections();
+            assertTrue(_field().hasIntersections());
 
-            List<Node> nodes = _field().getNodes();
-            Point2D winPosition = new Point2D.Double(10000, 10000);
-            nodes.get(0).startDragging();
-            nodes.get(0).updateDragging(winPosition);
-            nodes.get(0).stopDragging();
+            Node node = _field().getNodes().get(2);
+            drag(node, new Point2D.Double(0, -100));
 
-            boolean newIntersections = _field().hasIntersections();
+            assertFalse(_field().hasIntersections());
+        }
+    }
 
-            if (initialIntersections) {
-                assertFalse(newIntersections);
+    private void winCrossingLevel() {
+        Node node = _field().getNodes().get(2);
+        drag(node, new Point2D.Double(0, -100));
+
+        assertFalse(_field().hasIntersections());
+        assertTrue(_state().isWin());
+    }
+
+    private void moveKeepingIntersection(double x) {
+        Node node = _field().getNodes().get(0);
+        drag(node, new Point2D.Double(x, 0));
+    }
+
+    private void drag(Node node, Point2D position) {
+        node.startDragging();
+        node.updateDragging(position);
+        node.stopDragging();
+    }
+
+    private String crossingLevel(int maxMoves) {
+        return """
+            {
+              "maxMoves": %d,
+              "nodes": [
+                { "x": 0, "y": 0 },
+                { "x": 100, "y": 100 },
+                { "x": 0, "y": 100 },
+                { "x": 100, "y": 0 }
+              ],
+              "edges": [
+                { "nodeA": 0, "nodeB": 1 },
+                { "nodeA": 2, "nodeB": 3 }
+              ]
             }
-        }
+            """.formatted(maxMoves);
+    }
 
-        @Test
-        @DisplayName("Should have correct edge count from level file")
-        void shouldHaveCorrectEdgeCount() {
-            assertTrue(_field().getEdges().size() > 0);
-        }
+    private String clearLevel(int maxMoves) {
+        return """
+            {
+              "maxMoves": %d,
+              "nodes": [
+                { "x": 0, "y": 0 },
+                { "x": 100, "y": 0 }
+              ],
+              "edges": [
+                { "nodeA": 0, "nodeB": 1 }
+              ]
+            }
+            """.formatted(maxMoves);
     }
 }

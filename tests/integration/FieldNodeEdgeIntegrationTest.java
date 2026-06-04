@@ -1,8 +1,6 @@
 package integration;
 
 import model.game.Field;
-import model.level.LevelLoadException;
-import model.level.LevelManager;
 import model.units.BreakableEdge;
 import model.units.Edge;
 import model.units.Node;
@@ -24,20 +22,19 @@ class FieldNodeEdgeIntegrationTest {
 
         @Test
         @DisplayName("Should update Edge geometry when Field moves a Node")
-        void shouldUpdateEdgeGeometryWhenNodeMoves() throws LevelLoadException {
-            LevelManager lm = new LevelManager("levels");
-            Field field = lm.getCurrentField();
+        void shouldUpdateEdgeGeometryWhenNodeMoves() {
+            Field field = new Field();
+            Node nodeA = new Node(new Point2D.Double(0, 0));
+            Node nodeB = new Node(new Point2D.Double(100, 100));
+            Edge edge = field.createEdge(nodeA, nodeB);
 
-            Edge firstEdge = field.getEdges().get(0);
-            Node nodeA = firstEdge.getNodeA();
-
-            double originalX = firstEdge.toLine().getX1();
+            double originalX = edge.toLine().getX1();
 
             nodeA.startDragging();
-            nodeA.updateDragging(new Point2D.Double(999, 999));
+            nodeA.updateDragging(new Point2D.Double(200, 0));
             nodeA.stopDragging();
 
-            assertNotEquals(originalX, firstEdge.toLine().getX1(), 0.01,
+            assertNotEquals(originalX, edge.toLine().getX1(), 0.01,
                     "Edge line should reflect new node position");
         }
     }
@@ -47,37 +44,40 @@ class FieldNodeEdgeIntegrationTest {
     class FieldIntersectionChecks {
 
         @Test
-        @DisplayName("Should detect intersections in loaded level1")
-        void shouldDetectIntersectionsInLevel1() throws LevelLoadException {
-            LevelManager lm = new LevelManager("levels");
-            Field field = lm.getCurrentField();
+        @DisplayName("Should detect intersections between crossing field edges")
+        void shouldDetectIntersectionsBetweenCrossingEdges() {
+            Field field = crossingField();
 
             assertTrue(field.hasIntersections(),
-                    "Level 1 should start with intersections");
+                    "Crossing field should start with intersections");
         }
 
         @Test
-        @DisplayName("Should detect no intersections after moving all nodes far apart (skip: level1 diagonal edges always cross)")
-        void shouldDetectNoIntersectionsAfterMovingApart() throws LevelLoadException {
+        @DisplayName("Should detect no intersections after moving crossing edge away")
+        void shouldDetectNoIntersectionsAfterMovingApart() {
+            Field field = crossingField();
+            Node node = field.getNodes().get(2);
+
+            node.startDragging();
+            node.updateDragging(new Point2D.Double(0, -100));
+            node.stopDragging();
+
+            assertFalse(field.hasIntersections());
         }
 
         @Test
         @DisplayName("Should update intersection status after single node move")
-        void shouldUpdateAfterSingleNodeMove() throws LevelLoadException {
-            LevelManager lm = new LevelManager("levels");
-            Field field = lm.getCurrentField();
+        void shouldUpdateAfterSingleNodeMove() {
+            Field field = crossingField();
 
-            boolean before = field.hasIntersections();
-            assertTrue(before, "Level 1 should start with intersections");
+            assertTrue(field.hasIntersections(), "Crossing field should start with intersections");
 
-            Node node = field.getNodes().get(0);
+            Node node = field.getNodes().get(2);
             node.startDragging();
-            node.updateDragging(new Point2D.Double(5000, 5000));
+            node.updateDragging(new Point2D.Double(0, -100));
             node.stopDragging();
 
-            boolean after = field.hasIntersections();
-
-            assertNotEquals(before, after, "Moving a node should change intersection status");
+            assertFalse(field.hasIntersections(), "Moving a crossing edge away should remove intersections");
         }
 
         @Test
@@ -131,9 +131,8 @@ class FieldNodeEdgeIntegrationTest {
 
         @Test
         @DisplayName("Should return unmodifiable node list")
-        void shouldReturnUnmodifiableNodeList() throws LevelLoadException {
-            LevelManager lm = new LevelManager("levels");
-            Field field = lm.getCurrentField();
+        void shouldReturnUnmodifiableNodeList() {
+            Field field = fieldWithOneEdge();
 
             assertThrows(UnsupportedOperationException.class, () ->
                     field.getNodes().add(new Node(new Point2D.Double(0, 0))));
@@ -141,12 +140,33 @@ class FieldNodeEdgeIntegrationTest {
 
         @Test
         @DisplayName("Should return unmodifiable edge list")
-        void shouldReturnUnmodifiableEdgeList() throws LevelLoadException {
-            LevelManager lm = new LevelManager("levels");
-            Field field = lm.getCurrentField();
+        void shouldReturnUnmodifiableEdgeList() {
+            Field field = fieldWithOneEdge();
 
             assertThrows(UnsupportedOperationException.class, () ->
                     field.getEdges().add(null));
         }
+    }
+
+    private Field crossingField() {
+        Field field = new Field();
+        field.createEdge(
+            new Node(new Point2D.Double(0, 0)),
+            new Node(new Point2D.Double(100, 100))
+        );
+        field.createEdge(
+            new Node(new Point2D.Double(0, 100)),
+            new Node(new Point2D.Double(100, 0))
+        );
+        return field;
+    }
+
+    private Field fieldWithOneEdge() {
+        Field field = new Field();
+        field.createEdge(
+            new Node(new Point2D.Double(0, 0)),
+            new Node(new Point2D.Double(100, 100))
+        );
+        return field;
     }
 }
