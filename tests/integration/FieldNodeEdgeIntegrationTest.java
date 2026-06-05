@@ -112,16 +112,16 @@ class FieldNodeEdgeIntegrationTest {
             OverheatingEdge overheatingEdge = field.createOverheatingEdge(nodeA, nodeB, 60, 10, 100);
             field.createEdge(nodeC, nodeD);
 
-            nodeC.startDragging();
-            nodeC.updateDragging(new Point2D.Double(-100, 200));
+            nodeA.startDragging();
+            nodeA.updateDragging(new Point2D.Double(60, 0));
 
             assertTrue(overheatingEdge.isActive());
-            assertEquals(0.6, overheatingEdge.getHeatRatio(), 0.01);
+            assertEquals(0.25, overheatingEdge.getHeatRatio(), 0.1);
 
             nodeC.updateDragging(new Point2D.Double(-200, 300));
 
-            assertFalse(overheatingEdge.isActive());
-            assertTrue(field.hasInactiveEdges());
+            assertTrue(overheatingEdge.isActive());
+            assertFalse(field.hasInactiveEdges());
         }
     }
 

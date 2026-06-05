@@ -24,7 +24,14 @@ public class Field {
     }
 
     public StretchableEdge createStretchableEdge(Node nodeA, Node nodeB, double stretchPercent) {
-        return (StretchableEdge) addEdge(new StretchableEdge(nodeA, nodeB, stretchPercent));
+        StretchableEdge newEdge = new StretchableEdge(nodeA, nodeB, stretchPercent);
+
+        addEdge(newEdge);
+
+        nodeA.addMovementConstraint(newEdge);
+        nodeB.addMovementConstraint(newEdge);
+
+        return newEdge;
     }
 
     public BreakableEdge createBreakableEdge(Node nodeA, Node nodeB, double breakPercent) {
@@ -37,9 +44,14 @@ public class Field {
             double heatPerIntersection,
             double coolPerMove,
             double criticalHeat) {
-        return (OverheatingEdge) addEdge(
-            new OverheatingEdge(nodeA, nodeB, heatPerIntersection, coolPerMove, criticalHeat, this)
-        );
+        OverheatingEdge newEdge = new OverheatingEdge(nodeA, nodeB, heatPerIntersection, coolPerMove, criticalHeat, this);
+
+        addEdge(newEdge);
+
+        nodeA.addListener(newEdge);
+        nodeB.addListener(newEdge);
+
+        return newEdge;
     }
 
     public boolean hasIntersections() {
@@ -96,30 +108,12 @@ public class Field {
         if (!_edges.contains(edge)) {
             _edges.add(edge);
         }
-        if (edge instanceof OverheatingEdge) {
-            addListenerToAllNodes((OverheatingEdge) edge);
-        }
         return edge;
     }
 
     private void addNode(Node node) {
         if (!_nodes.contains(node)) {
             _nodes.add(node);
-            addExistingOverheatingEdgesTo(node);
-        }
-    }
-
-    private void addExistingOverheatingEdgesTo(Node node) {
-        for (Edge edge : _edges) {
-            if (edge instanceof OverheatingEdge) {
-                node.addListener((OverheatingEdge) edge);
-            }
-        }
-    }
-
-    private void addListenerToAllNodes(OverheatingEdge edge) {
-        for (Node node : _nodes) {
-            node.addListener(edge);
         }
     }
 }
