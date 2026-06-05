@@ -34,7 +34,9 @@ public class Node {
     public void stopDragging() {
         Point2D positionToCommit = null;
         if (_isDragging && _queuedPosition != null) {
-            positionToCommit = applyMovementConstraints(_queuedPosition);
+            positionToCommit = _movementConstraints.isEmpty()
+                    ? _queuedPosition
+                    : applyMovementConstraints(_queuedPosition);
         }
         _isDragging = false;
         _queuedPosition = null;
@@ -75,39 +77,15 @@ public class Node {
 
     private Point2D applyMovementConstraints(Point2D desiredPosition) {
         Point2D position = copyOf(desiredPosition);
-        int guard = 8;
 
-        while (guard-- > 0) {
-            boolean changed = false;
-
-            for (NodeMovementConstraint constraint : _movementConstraints) {
-                Point2D constrained = constraint.constrain(this, copyOf(position));
-                if (constrained == null) {
-                    continue;
-                }
-                if (!samePoint(position, constrained)) {
-                    position = copyOf(constrained);
-                    changed = true;
-                }
-            }
-
-            if (!changed) {
-                break;
+        for (NodeMovementConstraint constraint : _movementConstraints) {
+            Point2D constrained = constraint.constrain(this, copyOf(position));
+            if (constrained != null) {
+                position = copyOf(constrained);
             }
         }
 
         return position;
-    }
-
-    private boolean samePoint(Point2D first, Point2D second) {
-        if (first == second) {
-            return true;
-        }
-        if (first == null || second == null) {
-            return false;
-        }
-        return Double.compare(first.getX(), second.getX()) == 0
-            && Double.compare(first.getY(), second.getY()) == 0;
     }
 
     private Point2D copyOf(Point2D point) {
