@@ -1,6 +1,5 @@
 package view;
 
-import model.listeners.NodeListener;
 import model.units.Node;
 import view.style.GameStyle;
 
@@ -10,14 +9,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-public class NodeWidget extends JComponent implements NodeListener {
+public class NodeWidget extends JComponent {
     private final Node _node;
     private boolean _isDragging = false;
     private Point _dragOffset = new Point();
 
     public NodeWidget(Node node) {
         _node = node;
-        _node.addListener(this);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setOpaque(true);
         setVisible(true);
@@ -89,11 +87,6 @@ public class NodeWidget extends JComponent implements NodeListener {
         g2d.fillOval(2, 2, size / 3, size / 3);
 
         g2d.dispose();
-    }
-
-    @Override
-    public void onMoved(Node node) {
-        repaint();
     }
 
     public Node getNode() {
