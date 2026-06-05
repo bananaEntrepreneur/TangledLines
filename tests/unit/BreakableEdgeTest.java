@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Breakable Edge Tests")
-class BreakableEdgeTest {
+class BreakableEdgeTest extends EdgeBehaviorContract {
 
     @Test
     @DisplayName("Should become ready to break before failing")
@@ -44,5 +44,10 @@ class BreakableEdgeTest {
 
         assertFalse(edge.isActive());
         assertEquals(140.0, nodeB.getPosition().getX(), 0.01);
+    }
+
+    @Override
+    protected BreakableEdge createEdge(Node nodeA, Node nodeB) {
+        return new BreakableEdge(nodeA, nodeB, 50);
     }
 }

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Overheating Edge Tests")
-class OverheatingEdgeTest {
+class OverheatingEdgeTest extends EdgeBehaviorContract {
 
     @Test
     @DisplayName("Should heat while intersecting and cool when clear")
@@ -85,5 +85,13 @@ class OverheatingEdgeTest {
         node.startDragging();
         node.updateDragging(new Point2D.Double(x, y));
         node.stopDragging();
+    }
+
+    @Override
+    protected OverheatingEdge createEdge(Node nodeA, Node nodeB) {
+        Field field = new Field();
+        OverheatingEdge edge = new OverheatingEdge(nodeA, nodeB, 30, 10, 100, field);
+        field.addEdge(edge);
+        return edge;
     }
 }

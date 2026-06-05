@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Stretchable Edge Tests")
-class StretchableEdgeTest {
+class StretchableEdgeTest extends EdgeBehaviorContract {
 
     @Test
     @DisplayName("Should clamp dragged node to max stretch")
@@ -53,5 +53,10 @@ class StretchableEdgeTest {
 
         assertEquals(123.0, nodeB.getDragPosition().getX(), 0.01);
         assertTrue(edge.isNearLimit());
+    }
+
+    @Override
+    protected StretchableEdge createEdge(Node nodeA, Node nodeB) {
+        return new StretchableEdge(nodeA, nodeB, 50);
     }
 }

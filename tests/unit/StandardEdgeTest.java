@@ -14,7 +14,7 @@ import java.awt.geom.Point2D;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Edge Unit Tests")
-class StandardEdgeTest {
+class StandardEdgeTest extends EdgeBehaviorContract {
 
     private Point2D _point1;
     private Point2D _point2;
@@ -27,6 +27,11 @@ class StandardEdgeTest {
         _point2 = new Point2D.Double(100, 100);
         _point3 = new Point2D.Double(0, 100);
         _point4 = new Point2D.Double(100, 0);
+    }
+
+    @Override
+    protected Edge createEdge(Node nodeA, Node nodeB) {
+        return new StandardEdge(nodeA, nodeB);
     }
 
     @Nested
