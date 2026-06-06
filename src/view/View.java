@@ -6,6 +6,9 @@ import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
 import model.listeners.Priority;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 public class View {
     private final GameFrame _frame;
     private final GameStateListener _gameStateListener = new GameStateListener() {
@@ -37,6 +40,14 @@ public class View {
         LevelNavigation navigation
     ) {
         _frame = new GameFrame(gameState, navigation);
+        _frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                gameState.removeListener(_gameStateListener);
+                navigation.removeListener(_levelNavigationListener);
+            }
+        });
+
         gameState.addListener(_gameStateListener);
         navigation.addListener(_levelNavigationListener);
     }

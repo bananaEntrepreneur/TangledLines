@@ -30,6 +30,8 @@ public class GameState {
         }
     }
 
+    public void removeListener(GameStateListener listener) { _listeners.remove(listener); }
+
     void startLevel(Field field, int maxMoveCount) {
         setCurrentLevel(field, maxMoveCount);
         notifyListeners();

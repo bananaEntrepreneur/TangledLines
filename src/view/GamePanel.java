@@ -8,7 +8,6 @@ import view.style.GameStyle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,22 +42,38 @@ public class GamePanel extends JPanel {
     }
 
     public void recreateWidgets() {
+        unsubscribeFromNodes();
         for (NodeWidget widget : _nodeWidgets) {
-            widget.getNode().removeListener(_nodeListener);
             remove(widget);
         }
         _nodeWidgets.clear();
         createNodeWidgets();
-        reorderNodeWidgets();
+        subscribeToNodes();
         revalidate();
         repaint();
     }
 
-    private void reorderNodeWidgets() {
-        for (Component c : getComponents()) {
-            if (c instanceof NodeWidget) {
-                setComponentZOrder(c, 0);
-            }
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        subscribeToNodes();
+    }
+
+    @Override
+    public void removeNotify() {
+        unsubscribeFromNodes();
+        super.removeNotify();
+    }
+
+    private void subscribeToNodes() {
+        for (NodeWidget widget : _nodeWidgets) {
+            widget.getNode().addListener(_nodeListener);
+        }
+    }
+
+    private void unsubscribeFromNodes() {
+        for (NodeWidget widget : _nodeWidgets) {
+            widget.getNode().removeListener(_nodeListener);
         }
     }
 
@@ -66,33 +81,19 @@ public class GamePanel extends JPanel {
         for (Node node : _gameState.getField().getNodes()) {
             addNodeWidget(node);
         }
-        reorderNodeWidgets();
     }
 
     private void addNodeWidget(Node node) {
         NodeWidget widget = new NodeWidget(node);
-        Point2D pos = node.getPosition();
-        widget.setBounds(
-            (int) pos.getX() - GameStyle.NODE_RADIUS,
-            (int) pos.getY() - GameStyle.NODE_RADIUS,
-            GameStyle.NODE_RADIUS * 2,
-            GameStyle.NODE_RADIUS * 2
-        );
-        add(widget);
+        widget.syncWithNode();
+        add(widget, 0);
         _nodeWidgets.add(widget);
-        node.addListener(_nodeListener);
     }
 
     private void updateWidgetPosition(Node node) {
         for (NodeWidget widget : _nodeWidgets) {
             if (widget.getNode() == node) {
-                Point2D pos = node.isDragging() ? node.getDragPosition() : node.getPosition();
-                widget.setBounds(
-                    (int) pos.getX() - GameStyle.NODE_RADIUS,
-                    (int) pos.getY() - GameStyle.NODE_RADIUS,
-                    GameStyle.NODE_RADIUS * 2,
-                    GameStyle.NODE_RADIUS * 2
-                );
+                widget.syncWithNode();
             }
         }
     }

@@ -55,18 +55,19 @@ public class NodeWidget extends JComponent {
                         mousePos.y - _dragOffset.y
                     );
                     _node.updateDragging(newPos);
-                    Point2D actualPos = _node.getDragPosition();
-                    setLocation(
-                        (int) actualPos.getX() - GameStyle.NODE_RADIUS,
-                        (int) actualPos.getY() - GameStyle.NODE_RADIUS
-                    );
-                    repaint();
-                    if (getParent() != null) {
-                        getParent().repaint();
-                    }
                 }
             }
         });
+    }
+
+    public void syncWithNode() {
+        Point2D pos = _node.isDragging() ? _node.getDragPosition() : _node.getPosition();
+        setBounds(
+            (int) pos.getX() - GameStyle.NODE_RADIUS,
+            (int) pos.getY() - GameStyle.NODE_RADIUS,
+            GameStyle.NODE_RADIUS * 2,
+            GameStyle.NODE_RADIUS * 2
+        );
     }
 
     @Override

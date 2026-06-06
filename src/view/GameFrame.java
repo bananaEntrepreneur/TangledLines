@@ -23,7 +23,7 @@ public class GameFrame extends JFrame {
         _gameState = gameState;
         _navigation = navigation;
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
 
         _gamePanel = new GamePanel(gameState);

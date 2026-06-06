@@ -1,33 +1,21 @@
 # Tangled Lines
 
-Tangled Lines is a Java desktop game where the player moves nodes to untangle lines.
+Java game about moving nodes to untangle intersecting lines.
 
 ## Requirements
 
-- JDK 17 or newer
-- IntelliJ IDEA
+- JDK 17+
 
-The application creates levels in code through `SimpleSeeder`.
-
-## Run in IntelliJ IDEA
-
-1. Open the project in IntelliJ IDEA.
-2. Open `src/Main.java`.
-3. Run the `Main` class.
-
-## Run from Terminal
-
-On macOS/Linux:
+## Run
 
 ```bash
 javac -d out $(find src -name "*.java")
 java -cp out Main
 ```
 
-On Windows PowerShell:
+## Test
 
-```powershell
-$files = Get-ChildItem -Recurse src -Filter *.java | ForEach-Object { $_.FullName }
-javac -d out $files
-java -cp out Main
+```bash
+javac -cp "lib/*" -d out $(find src tests -name "*.java")
+java -jar lib/junit-platform-console-standalone.jar -cp out --scan-classpath
 ```

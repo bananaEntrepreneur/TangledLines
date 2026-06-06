@@ -29,6 +29,8 @@ public class LevelNavigation {
         }
     }
 
+    public void removeListener(LevelNavigationListener listener) { _listeners.remove(listener); }
+
     public boolean nextLevel() {
         if (!_gameState.isCurrentLevelFinished() || !_gameState.isCurrentLevelWon()) {
             return false;
