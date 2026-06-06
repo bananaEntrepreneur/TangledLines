@@ -19,13 +19,12 @@ class OverheatingEdgeTest extends EdgeBehaviorContract {
     @DisplayName("Should heat while intersecting and cool when clear")
     void shouldHeatAndCool() {
         Field field = new Field();
-        Node nodeA = node(0, 0);
-        Node nodeB = node(100, 0);
-        Node nodeC = node(50, -50);
-        Node nodeD = node(50, 50);
+        Node nodeA = createNode(0, 0);
+        Node nodeB = createNode(100, 0);
+        Node nodeC = createNode(50, -50);
+        Node nodeD = createNode(50, 50);
 
-        OverheatingEdge edge = new OverheatingEdge(nodeA, nodeB, 30, 10, 100, field);
-        field.addEdge(edge);
+        OverheatingEdge edge = field.createOverheatingEdge(nodeA, nodeB, 30, 10, 100);
         field.createEdge(nodeC, nodeD);
 
         drag(nodeA, 10, 0);
@@ -45,12 +44,11 @@ class OverheatingEdgeTest extends EdgeBehaviorContract {
     @DisplayName("Should heat slowly for small drag updates")
     void shouldHeatSlowlyForSmallDragUpdates() {
         Field field = new Field();
-        Node nodeA = node(0, 0);
-        Node nodeB = node(100, 0);
+        Node nodeA = createNode(0, 0);
+        Node nodeB = createNode(100, 0);
 
-        OverheatingEdge edge = new OverheatingEdge(nodeA, nodeB, 30, 10, 100, field);
-        field.addEdge(edge);
-        field.createEdge(node(50, -50), node(50, 50));
+        OverheatingEdge edge = field.createOverheatingEdge(nodeA, nodeB, 30, 10, 100);
+        field.createEdge(createNode(50, -50), createNode(50, 50));
 
         drag(nodeA, 1, 0);
         drag(nodeA, 2, 0);
@@ -65,10 +63,9 @@ class OverheatingEdgeTest extends EdgeBehaviorContract {
     @DisplayName("Should become inactive when overheated")
     void shouldBecomeInactiveWhenOverheated() {
         Field field = new Field();
-        Node nodeA = node(0, 0);
-        OverheatingEdge edge = new OverheatingEdge(nodeA, node(100, 0), 60, 10, 100, field);
-        field.addEdge(edge);
-        field.createEdge(node(50, -50), node(50, 50));
+        Node nodeA = createNode(0, 0);
+        OverheatingEdge edge = field.createOverheatingEdge(nodeA, createNode(100, 0), 60, 10, 100);
+        field.createEdge(createNode(50, -50), createNode(50, 50));
 
         drag(nodeA, -100, 0);
         drag(nodeA, -200, 0);
@@ -77,7 +74,7 @@ class OverheatingEdgeTest extends EdgeBehaviorContract {
         assertEquals(1.0, edge.getHeatRatio(), 0.01);
     }
 
-    private Node node(double x, double y) {
+    private Node createNode(double x, double y) {
         return new Node(new Point2D.Double(x, y));
     }
 
@@ -90,8 +87,6 @@ class OverheatingEdgeTest extends EdgeBehaviorContract {
     @Override
     protected OverheatingEdge createEdge(Node nodeA, Node nodeB) {
         Field field = new Field();
-        OverheatingEdge edge = new OverheatingEdge(nodeA, nodeB, 30, 10, 100, field);
-        field.addEdge(edge);
-        return edge;
+        return field.createOverheatingEdge(nodeA, nodeB, 30, 10, 100);
     }
 }

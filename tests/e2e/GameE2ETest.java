@@ -2,8 +2,8 @@ package e2e;
 
 import model.game.Field;
 import model.game.Game;
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
+import model.game.GameState;
+import model.game.LevelNavigation;
 import model.level.Level;
 import model.level.LevelManager;
 import model.level.seeder.Seeder;
@@ -29,7 +29,7 @@ class GameE2ETest {
     }
 
     private GameState _state() { return _game.getState(); }
-    private LevelNavigation _nav() { return _game.getNavigation(); }
+    private LevelNavigation _nav() { return _game.getLevelNavigation(); }
     private Field _field() { return _state().getField(); }
 
     @Nested
@@ -42,9 +42,9 @@ class GameE2ETest {
             assertNotNull(_field());
             assertEquals(0, _nav().getCurrentLevelIndex());
             assertEquals(0, _state().getMoveCount());
-            assertEquals(3, _state().getMaxMoves());
-            assertFalse(_state().isGameOver());
-            assertFalse(_state().isWin());
+            assertEquals(3, _state().getMaxMoveCount());
+            assertFalse(_state().isCurrentLevelFinished());
+            assertFalse(_state().isCurrentLevelWon());
         }
 
         @Test
@@ -67,7 +67,7 @@ class GameE2ETest {
             moveKeepingIntersection(20);
 
             assertEquals(2, _state().getMoveCount());
-            assertFalse(_state().isGameOver());
+            assertFalse(_state().isCurrentLevelFinished());
         }
 
         @Test
@@ -79,7 +79,7 @@ class GameE2ETest {
             drag(_field().getNodes().get(0), new Point2D.Double(50, 0));
 
             assertEquals(moveCountBefore, _state().getMoveCount());
-            assertTrue(_state().isGameOver());
+            assertTrue(_state().isCurrentLevelFinished());
         }
     }
 
@@ -92,8 +92,8 @@ class GameE2ETest {
         void shouldWinWhenIntersectionsResolved() {
             winCrossingLevel();
 
-            assertTrue(_state().isWin());
-            assertTrue(_state().isGameOver());
+            assertTrue(_state().isCurrentLevelWon());
+            assertTrue(_state().isCurrentLevelFinished());
         }
 
         @Test
@@ -105,8 +105,8 @@ class GameE2ETest {
 
             assertTrue(_field().hasIntersections());
             assertEquals(3, _state().getMoveCount());
-            assertTrue(_state().isGameOver());
-            assertFalse(_state().isWin());
+            assertTrue(_state().isCurrentLevelFinished());
+            assertFalse(_state().isCurrentLevelWon());
         }
     }
 
@@ -130,7 +130,7 @@ class GameE2ETest {
 
             assertEquals(1, _nav().getCurrentLevelIndex());
             assertEquals(0, _state().getMoveCount());
-            assertEquals(4, _state().getMaxMoves());
+            assertEquals(4, _state().getMaxMoveCount());
             assertFalse(_field().hasIntersections());
         }
 
@@ -141,7 +141,7 @@ class GameE2ETest {
             assertTrue(_nav().nextLevel());
 
             drag(_field().getNodes().get(0), new Point2D.Double(50, 0));
-            assertTrue(_state().isWin());
+            assertTrue(_state().isCurrentLevelWon());
 
             assertFalse(_nav().nextLevel());
             assertTrue(_state().isAllLevelsComplete());
@@ -169,7 +169,7 @@ class GameE2ETest {
             assertEquals(originalPosition.getX(), restartedNode.getPosition().getX(), 0.01);
             assertEquals(originalPosition.getY(), restartedNode.getPosition().getY(), 0.01);
             assertEquals(0, _state().getMoveCount());
-            assertFalse(_state().isGameOver());
+            assertFalse(_state().isCurrentLevelFinished());
         }
     }
 
@@ -194,7 +194,7 @@ class GameE2ETest {
         drag(node, new Point2D.Double(0, -100));
 
         assertFalse(_field().hasIntersections());
-        assertTrue(_state().isWin());
+        assertTrue(_state().isCurrentLevelWon());
     }
 
     private void moveKeepingIntersection(double x) {
@@ -215,24 +215,24 @@ class GameE2ETest {
         }
 
         private Level crossingLevel(int maxMoves) {
-            return level(maxMoves, () -> {
-                Field field = field();
-                Node a = node(field, 0, 0);
-                Node b = node(field, 100, 100);
-                Node c = node(field, 0, 100);
-                Node d = node(field, 100, 0);
-                edge(field, a, b);
-                edge(field, c, d);
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 100);
+                Node c = createNode(field, 0, 100);
+                Node d = createNode(field, 100, 0);
+                createEdge(field, a, b);
+                createEdge(field, c, d);
                 return field;
             });
         }
 
         private Level clearLevel(int maxMoves) {
-            return level(maxMoves, () -> {
-                Field field = field();
-                Node a = node(field, 0, 0);
-                Node b = node(field, 100, 0);
-                edge(field, a, b);
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 0);
+                createEdge(field, a, b);
                 return field;
             });
         }

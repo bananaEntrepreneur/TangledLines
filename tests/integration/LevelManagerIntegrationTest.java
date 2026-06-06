@@ -55,7 +55,7 @@ class LevelManagerIntegrationTest {
         @Test
         @DisplayName("Should report level count from seeded levels")
         void shouldReportTotalLevels() {
-            assertEquals(3, _levelManager.getTotalLevels());
+            assertEquals(3, _levelManager.getTotalLevelCount());
         }
     }
 
@@ -66,13 +66,13 @@ class LevelManagerIntegrationTest {
         @Test
         @DisplayName("Should return correct maxMoves for each level")
         void shouldReturnCorrectMaxMoves() {
-            assertEquals(3, _levelManager.getCurrentMaxMoves());
+            assertEquals(3, _levelManager.getCurrentMaxMoveCount());
 
             _levelManager.nextField();
-            assertEquals(4, _levelManager.getCurrentMaxMoves());
+            assertEquals(4, _levelManager.getCurrentMaxMoveCount());
 
             _levelManager.nextField();
-            assertEquals(5, _levelManager.getCurrentMaxMoves());
+            assertEquals(5, _levelManager.getCurrentMaxMoveCount());
         }
     }
 
@@ -81,10 +81,10 @@ class LevelManagerIntegrationTest {
     class FieldCreationTests {
 
         @Test
-        @DisplayName("Should create a fresh Field on each getCurrentField call")
+        @DisplayName("Should create a fresh Field on each createCurrentField call")
         void shouldCreateFreshField() {
-            Field field1 = _levelManager.getCurrentField();
-            Field field2 = _levelManager.getCurrentField();
+            Field field1 = _levelManager.createCurrentField();
+            Field field2 = _levelManager.createCurrentField();
 
             assertNotSame(field1, field2, "Each call should produce a new Field");
             assertEquals(field1.getNodes().size(), field2.getNodes().size());
@@ -94,30 +94,30 @@ class LevelManagerIntegrationTest {
         @Test
         @DisplayName("Should produce Fields with correct node counts per level")
         void shouldProduceCorrectNodeCounts() {
-            Field level1 = _levelManager.getCurrentField();
+            Field level1 = _levelManager.createCurrentField();
             assertEquals(4, level1.getNodes().size());
 
             _levelManager.nextField();
-            Field level2 = _levelManager.getCurrentField();
+            Field level2 = _levelManager.createCurrentField();
             assertEquals(3, level2.getNodes().size());
 
             _levelManager.nextField();
-            Field level3 = _levelManager.getCurrentField();
+            Field level3 = _levelManager.createCurrentField();
             assertEquals(2, level3.getNodes().size());
         }
 
         @Test
         @DisplayName("Should produce Fields with correct edge counts per level")
         void shouldProduceCorrectEdgeCounts() {
-            Field level1 = _levelManager.getCurrentField();
+            Field level1 = _levelManager.createCurrentField();
             assertEquals(2, level1.getEdges().size());
 
             _levelManager.nextField();
-            Field level2 = _levelManager.getCurrentField();
+            Field level2 = _levelManager.createCurrentField();
             assertEquals(1, level2.getEdges().size());
 
             _levelManager.nextField();
-            Field level3 = _levelManager.getCurrentField();
+            Field level3 = _levelManager.createCurrentField();
             assertEquals(0, level3.getEdges().size());
         }
     }
@@ -133,14 +133,14 @@ class LevelManagerIntegrationTest {
         }
 
         private Level testLevel(int maxMoves, int nodeCount, int edgeCount) {
-            return level(maxMoves, () -> {
-                Field field = field();
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
                 List<Node> nodes = new ArrayList<>();
                 for (int i = 0; i < nodeCount; i++) {
-                    nodes.add(node(field, i * 100, i * 50));
+                    nodes.add(createNode(field, i * 100, i * 50));
                 }
                 for (int i = 0; i < edgeCount; i++) {
-                    edge(field, nodes.get(i), nodes.get(i + 1));
+                    createEdge(field, nodes.get(i), nodes.get(i + 1));
                 }
                 return field;
             });

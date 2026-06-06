@@ -2,8 +2,8 @@ package integration;
 
 import model.game.Field;
 import model.game.Game;
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
+import model.game.GameState;
+import model.game.LevelNavigation;
 import model.level.Level;
 import model.level.LevelManager;
 import model.level.seeder.Seeder;
@@ -29,7 +29,7 @@ class GameIntegrationTest {
     }
 
     private GameState _state() { return _game.getState(); }
-    private LevelNavigation _nav() { return _game.getNavigation(); }
+    private LevelNavigation _nav() { return _game.getLevelNavigation(); }
     private Field _field() { return _state().getField(); }
 
     @Nested
@@ -39,7 +39,7 @@ class GameIntegrationTest {
         @Test
         @DisplayName("Should reflect LevelManager's total level count")
         void shouldReflectLevelCount() {
-            assertEquals(2, _nav().getTotalLevels());
+            assertEquals(2, _nav().getTotalLevelCount());
             assertEquals(0, _nav().getCurrentLevelIndex());
         }
 
@@ -48,7 +48,7 @@ class GameIntegrationTest {
         void shouldInitializeWithLevel1() {
             assertEquals(4, _field().getNodes().size());
             assertEquals(2, _field().getEdges().size());
-            assertEquals(3, _state().getMaxMoves());
+            assertEquals(3, _state().getMaxMoveCount());
         }
 
         @Test
@@ -63,7 +63,7 @@ class GameIntegrationTest {
     class LevelTransitionTests {
 
         @Test
-        @DisplayName("Should not allow nextLevel without winning")
+        @DisplayName("Should not allow advanceToNextLevel without winning")
         void shouldNotAllowNextWithoutWin() {
             assertFalse(_nav().nextLevel());
             assertEquals(0, _nav().getCurrentLevelIndex());
@@ -77,7 +77,7 @@ class GameIntegrationTest {
             assertTrue(_nav().nextLevel());
             assertEquals(1, _nav().getCurrentLevelIndex());
             assertEquals(0, _state().getMoveCount());
-            assertEquals(4, _state().getMaxMoves());
+            assertEquals(4, _state().getMaxMoveCount());
         }
 
         @Test
@@ -85,13 +85,13 @@ class GameIntegrationTest {
         void shouldRestartWithReset() {
             moveKeepingIntersection(10);
             assertEquals(1, _state().getMoveCount());
-            assertFalse(_state().isGameOver());
+            assertFalse(_state().isCurrentLevelFinished());
 
             _nav().restartLevel();
 
             assertEquals(0, _state().getMoveCount());
-            assertEquals(3, _state().getMaxMoves());
-            assertFalse(_state().isGameOver());
+            assertEquals(3, _state().getMaxMoveCount());
+            assertFalse(_state().isCurrentLevelFinished());
         }
 
         @Test
@@ -138,7 +138,7 @@ class GameIntegrationTest {
             assertTrue(_nav().nextLevel());
 
             moveInClearLevel();
-            assertTrue(_state().isWin());
+            assertTrue(_state().isCurrentLevelWon());
             assertFalse(_nav().nextLevel());
 
             assertTrue(_state().isAllLevelsComplete());
@@ -153,8 +153,8 @@ class GameIntegrationTest {
 
             assertTrue(_field().hasIntersections());
             assertEquals(3, _state().getMoveCount());
-            assertTrue(_state().isGameOver());
-            assertFalse(_state().isWin());
+            assertTrue(_state().isCurrentLevelFinished());
+            assertFalse(_state().isCurrentLevelWon());
         }
 
     }
@@ -164,7 +164,7 @@ class GameIntegrationTest {
         drag(node, new Point2D.Double(0, -100));
 
         assertFalse(_field().hasIntersections());
-        assertTrue(_state().isWin());
+        assertTrue(_state().isCurrentLevelWon());
     }
 
     private void moveKeepingIntersection(double x) {
@@ -190,24 +190,24 @@ class GameIntegrationTest {
         }
 
         private Level crossingLevel(int maxMoves) {
-            return level(maxMoves, () -> {
-                Field field = field();
-                Node a = node(field, 0, 0);
-                Node b = node(field, 100, 100);
-                Node c = node(field, 0, 100);
-                Node d = node(field, 100, 0);
-                edge(field, a, b);
-                edge(field, c, d);
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 100);
+                Node c = createNode(field, 0, 100);
+                Node d = createNode(field, 100, 0);
+                createEdge(field, a, b);
+                createEdge(field, c, d);
                 return field;
             });
         }
 
         private Level clearLevel(int maxMoves) {
-            return level(maxMoves, () -> {
-                Field field = field();
-                Node a = node(field, 0, 0);
-                Node b = node(field, 100, 0);
-                edge(field, a, b);
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 0);
+                createEdge(field, a, b);
                 return field;
             });
         }

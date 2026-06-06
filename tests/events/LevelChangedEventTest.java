@@ -1,19 +1,22 @@
 package events;
 
 import model.game.Field;
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
+import model.game.Game;
+import model.game.GameState;
+import model.game.LevelNavigation;
 import model.level.Level;
 import model.level.LevelManager;
 import model.level.seeder.Seeder;
 import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
 import model.listeners.ListenerPriority;
+import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.geom.Point2D;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -28,16 +31,17 @@ class LevelChangedEventTest {
     @Test
     @DisplayName("Should call level navigation listeners in order after state changes")
     void shouldCallLevelNavigationListenersInOrderAfterStateChanges() throws Exception {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(singleLevelManager(), state);
+        Game game = new Game(singleLevelManager());
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
-        state.addListener(gameStateListener(gameState -> events.add("state:maxMoves=" + gameState.getMaxMoves())));
+        state.addListener(gameStateListener(gameState -> events.add("state:maxMoves=" + gameState.getMaxMoveCount())));
         navigation.addListener(levelNavigationListener(levelNavigation -> events.add(
-            "first:index=" + levelNavigation.getCurrentLevelIndex() + " maxMoves=" + state.getMaxMoves()
+            "first:index=" + levelNavigation.getCurrentLevelIndex() + " maxMoves=" + state.getMaxMoveCount()
         )));
         navigation.addListener(levelNavigationListener(levelNavigation -> events.add(
-            "second:index=" + levelNavigation.getCurrentLevelIndex() + " maxMoves=" + state.getMaxMoves()
+            "second:index=" + levelNavigation.getCurrentLevelIndex() + " maxMoves=" + state.getMaxMoveCount()
         )));
 
         navigation.restartLevel();
@@ -52,8 +56,9 @@ class LevelChangedEventTest {
     @Test
     @DisplayName("Should notify each unique level navigation listener once per level change")
     void shouldNotifyEachUniqueLevelNavigationListenerOncePerLevelChange() throws Exception {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(singleLevelManager(), state);
+        Game game = new Game(singleLevelManager());
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         AtomicInteger notificationCount = new AtomicInteger();
         LevelNavigationListener listener = levelNavigationListener(
             changedNavigation -> notificationCount.incrementAndGet()
@@ -71,8 +76,9 @@ class LevelChangedEventTest {
     @Test
     @DisplayName("Should pass the changed level navigation instance to listeners")
     void shouldPassChangedLevelNavigationInstanceToListeners() throws Exception {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(singleLevelManager(), state);
+        Game game = new Game(singleLevelManager());
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<LevelNavigation> notifiedNavigations = new ArrayList<>();
 
         navigation.addListener(levelNavigationListener(notifiedNavigations::add));
@@ -86,18 +92,19 @@ class LevelChangedEventTest {
     @Test
     @DisplayName("Should notify state listeners before level listeners when moving to next level")
     void shouldNotifyStateListenersBeforeLevelListenersWhenMovingToNextLevel() throws Exception {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(twoLevelManager(), state);
+        Game game = new Game(twoLevelManager());
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(gameState -> events.add(
-            "state:maxMoves=" + gameState.getMaxMoves() + " index=" + navigation.getCurrentLevelIndex()
+            "state:maxMoves=" + gameState.getMaxMoveCount() + " index=" + navigation.getCurrentLevelIndex()
         )));
         navigation.addListener(levelNavigationListener(levelNavigation -> events.add(
-            "level:index=" + levelNavigation.getCurrentLevelIndex() + " maxMoves=" + state.getMaxMoves()
+            "level:index=" + levelNavigation.getCurrentLevelIndex() + " maxMoves=" + state.getMaxMoveCount()
         )));
 
-        state.win();
+        winCrossingLevel(state);
         events.clear();
 
         assertTrue(navigation.nextLevel());
@@ -111,8 +118,9 @@ class LevelChangedEventTest {
     @Test
     @DisplayName("Should not notify level listeners when next level is blocked")
     void shouldNotNotifyLevelListenersWhenNextLevelIsBlocked() throws Exception {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(twoLevelManager(), state);
+        Game game = new Game(twoLevelManager());
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(gameState -> events.add("state")));
@@ -127,8 +135,9 @@ class LevelChangedEventTest {
     @Test
     @DisplayName("Should complete all levels without firing a level changed event")
     void shouldCompleteAllLevelsWithoutFiringLevelChangedEvent() throws Exception {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(singleLevelManager(), state);
+        Game game = new Game(singleLevelManager());
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(
@@ -136,7 +145,7 @@ class LevelChangedEventTest {
         ));
         navigation.addListener(levelNavigationListener(levelNavigation -> events.add("level")));
 
-        state.win();
+        winSingleLevel(state);
         events.clear();
 
         assertFalse(navigation.nextLevel());
@@ -151,6 +160,16 @@ class LevelChangedEventTest {
 
     private LevelManager twoLevelManager() {
         return new LevelManager(new NumberedLevelSeeder());
+    }
+
+    private void winCrossingLevel(GameState state) {
+        Node node = state.getField().getNodes().get(2);
+        drag(node, 0, -100);
+    }
+
+    private void winSingleLevel(GameState state) {
+        Node node = state.getField().getNodes().get(1);
+        drag(node, 0, -200);
     }
 
     private GameStateListener gameStateListener(Consumer<GameState> handler) {
@@ -184,13 +203,18 @@ class LevelChangedEventTest {
     private static class SingleLevelSeeder extends Seeder {
         @Override
         public List<Level> seed() {
-            return List.of(singleNodeLevel(3));
+            return List.of(crossingLevel(3));
         }
 
-        protected Level singleNodeLevel(int maxMoves) {
-            return level(maxMoves, () -> {
-                Field field = field();
-                node(field, 0, 0);
+        protected Level crossingLevel(int maxMoves) {
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 100);
+                Node c = createNode(field, 0, 100);
+                Node d = createNode(field, 100, 0);
+                createEdge(field, a, b);
+                createEdge(field, c, d);
                 return field;
             });
         }
@@ -200,9 +224,19 @@ class LevelChangedEventTest {
         @Override
         public List<Level> seed() {
             return List.of(
-                singleNodeLevel(3),
-                singleNodeLevel(7)
+                crossingLevel(3),
+                createLevel(7, () -> {
+                    Field field = createField();
+                    createNode(field, 0, 0);
+                    return field;
+                })
             );
         }
+    }
+
+    private void drag(Node node, double x, double y) {
+        node.startDragging();
+        node.updateDragging(new Point2D.Double(x, y));
+        node.stopDragging();
     }
 }

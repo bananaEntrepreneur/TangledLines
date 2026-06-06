@@ -1,12 +1,19 @@
 package events;
 
 import model.game.Field;
-import model.game.state.GameState;
+import model.game.Game;
+import model.game.GameState;
+import model.game.LevelNavigation;
+import model.level.Level;
+import model.level.LevelManager;
+import model.level.seeder.Seeder;
 import model.listeners.GameStateListener;
 import model.listeners.ListenerPriority;
+import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,6 +21,7 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("GameStateListener.onGameStateChanged Event Tests")
 class GameStateChangedEventTest {
@@ -21,89 +29,128 @@ class GameStateChangedEventTest {
     @Test
     @DisplayName("Should call game state listeners in order after move count changes")
     void shouldCallGameStateListenersInOrderAfterMoveCountChanges() {
-        GameState state = new GameState(new Field(), 3);
+        Game game = new Game(new LevelManager(new CrossingSeeder()));
+        GameState state = game.getState();
+        Node node = state.getField().getNodes().get(0);
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(changedState -> events.add("first:" + describe(changedState))));
         state.addListener(gameStateListener(changedState -> events.add("second:" + describe(changedState))));
 
-        state.incrementMoveCount();
+        drag(node, 10, 0);
 
         assertEquals(List.of(
-            "first:maxMoves=3 moves=1 gameOver=false",
-            "second:maxMoves=3 moves=1 gameOver=false"
+            "first:maxMoves=5 moves=1 finished=false",
+            "second:maxMoves=5 moves=1 finished=false"
         ), events);
     }
 
     @Test
     @DisplayName("Should call game state listeners in order after level state changes")
     void shouldCallGameStateListenersInOrderAfterLevelStateChanges() {
-        GameState state = new GameState(new Field(), 3);
-        Field nextField = new Field();
+        Game game = new Game(new LevelManager(new CrossingSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(changedState -> events.add(
-            "first:field=" + (changedState.getField() == nextField) + " " + describe(changedState)
+            "first:field=true " + describe(changedState)
         )));
         state.addListener(gameStateListener(changedState -> events.add(
-            "second:field=" + (changedState.getField() == nextField) + " " + describe(changedState)
+            "second:field=true " + describe(changedState)
         )));
 
-        state.incrementMoveCount();
+        drag(state.getField().getNodes().get(0), 10, 0);
         events.clear();
 
-        state.loadLevel(nextField, 5);
+        navigation.restartLevel();
 
         assertEquals(List.of(
-            "first:field=true maxMoves=5 moves=0 gameOver=false",
-            "second:field=true maxMoves=5 moves=0 gameOver=false"
+            "first:field=true maxMoves=5 moves=0 finished=false",
+            "second:field=true maxMoves=5 moves=0 finished=false"
         ), events);
     }
 
     @Test
     @DisplayName("Should notify each unique game state listener once per state change")
     void shouldNotifyEachUniqueGameStateListenerOncePerStateChange() {
-        GameState state = new GameState(new Field(), 3);
+        Game game = new Game(new LevelManager(new CrossingSeeder()));
+        GameState state = game.getState();
         AtomicInteger notificationCount = new AtomicInteger();
         GameStateListener listener = gameStateListener(changedState -> notificationCount.incrementAndGet());
-
-        state.addListener(null);
         state.addListener(listener);
         state.addListener(listener);
 
-        state.incrementMoveCount();
+        drag(state.getField().getNodes().get(0), 10, 0);
 
         assertEquals(1, notificationCount.get());
     }
 
     @Test
-    @DisplayName("Should notify listeners after win, lose, and all-levels-complete transitions")
+    @DisplayName("Should notify listeners after level result and all-levels-complete transitions")
     void shouldNotifyListenersAfterTerminalStateTransitions() {
-        GameState state = new GameState(new Field(), 3);
+        Game game = new Game(new LevelManager(new WinAndFinishSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(changedState -> events.add(describeTerminalState(changedState))));
 
-        state.win();
-        state.lose();
-        state.completeAllLevels();
+        drag(state.getField().getNodes().get(0), 10, 0);
+        navigation.restartLevel();
+        drag(state.getField().getNodes().get(1), 0, -200);
+        navigation.nextLevel();
+        drag(state.getField().getNodes().get(0), 50, 0);
+        navigation.nextLevel();
 
         assertEquals(List.of(
-            "gameOver=true win=true allComplete=false",
-            "gameOver=true win=false allComplete=false",
-            "gameOver=false win=false allComplete=true"
+            "finished=false won=false allComplete=false",
+            "finished=false won=false allComplete=false",
+            "finished=false won=false allComplete=false",
+            "finished=true won=true allComplete=false",
+            "finished=false won=false allComplete=false",
+            "finished=false won=false allComplete=false",
+            "finished=true won=true allComplete=false",
+            "finished=false won=false allComplete=true"
         ), events);
+    }
+
+    @Test
+    @DisplayName("Should not overwrite the current level result after it is finished")
+    void shouldNotOverwriteCurrentLevelResultAfterItIsFinished() {
+        Game game = new Game(new LevelManager(new WinAndFinishSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
+        List<String> events = new ArrayList<>();
+
+        state.addListener(gameStateListener(changedState -> events.add(describeTerminalState(changedState))));
+
+        drag(state.getField().getNodes().get(1), 0, -200);
+        events.clear();
+
+        navigation.nextLevel();
+        events.clear();
+
+        drag(state.getField().getNodes().get(0), 10, 0);
+        events.clear();
+
+        drag(state.getField().getNodes().get(0), 20, 0);
+
+        assertEquals(List.of(), events);
+        assertTrue(state.isCurrentLevelWon());
     }
 
     @Test
     @DisplayName("Should pass the changed game state instance to listeners")
     void shouldPassChangedGameStateInstanceToListeners() {
-        GameState state = new GameState(new Field(), 3);
+        Game game = new Game(new LevelManager(new CrossingSeeder()));
+        GameState state = game.getState();
+        Node node = state.getField().getNodes().get(0);
         List<GameState> notifiedStates = new ArrayList<>();
 
         state.addListener(gameStateListener(notifiedStates::add));
 
-        state.incrementMoveCount();
+        drag(node, 10, 0);
 
         assertEquals(1, notifiedStates.size());
         assertSame(state, notifiedStates.get(0));
@@ -112,36 +159,37 @@ class GameStateChangedEventTest {
     @Test
     @DisplayName("Should reset terminal status when loading a level")
     void shouldResetTerminalStatusWhenLoadingLevel() {
-        GameState state = new GameState(new Field(), 3);
+        Game game = new Game(new LevelManager(new WinAndFinishSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         state.addListener(gameStateListener(changedState -> events.add(
             describeTerminalState(changedState) + " moves=" + changedState.getMoveCount()
         )));
 
-        state.incrementMoveCount();
-        state.win();
+        drag(state.getField().getNodes().get(2), 0, -100);
         events.clear();
 
-        state.loadLevel(new Field(), 5);
+        navigation.restartLevel();
 
-        assertEquals(List.of("gameOver=false win=false allComplete=false moves=0"), events);
+        assertEquals(List.of("finished=false won=false allComplete=false moves=0"), events);
     }
 
     private String describe(GameState state) {
         return String.format(
-            "maxMoves=%d moves=%d gameOver=%s",
-            state.getMaxMoves(),
+            "maxMoves=%d moves=%d finished=%s",
+            state.getMaxMoveCount(),
             state.getMoveCount(),
-            state.isGameOver()
+            state.isCurrentLevelFinished()
         );
     }
 
     private String describeTerminalState(GameState state) {
         return String.format(
-            "gameOver=%s win=%s allComplete=%s",
-            state.isGameOver(),
-            state.isWin(),
+            "finished=%s won=%s allComplete=%s",
+            state.isCurrentLevelFinished(),
+            state.isCurrentLevelWon(),
             state.isAllLevelsComplete()
         );
     }
@@ -158,5 +206,61 @@ class GameStateChangedEventTest {
                 return ListenerPriority.MEDIUM;
             }
         };
+    }
+
+    private void drag(Node node, double x, double y) {
+        node.startDragging();
+        node.updateDragging(new Point2D.Double(x, y));
+        node.stopDragging();
+    }
+
+    private static class CrossingSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(createLevel(5, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 100);
+                Node c = createNode(field, 0, 100);
+                Node d = createNode(field, 100, 0);
+                createEdge(field, a, b);
+                createEdge(field, c, d);
+                return field;
+            }));
+        }
+    }
+
+    private static class OneLevelSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(createLevel(5, () -> {
+                Field field = createField();
+                createEdge(field, createNode(field, 0, 0), createNode(field, 100, 0));
+                return field;
+            }));
+        }
+    }
+
+    private static class WinAndFinishSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(
+                createLevel(2, () -> {
+                    Field field = createField();
+                    Node a = createNode(field, 0, 0);
+                    Node b = createNode(field, 100, 100);
+                    Node c = createNode(field, 0, 100);
+                    Node d = createNode(field, 100, 0);
+                    createEdge(field, a, b);
+                    createEdge(field, c, d);
+                    return field;
+                }),
+                createLevel(1, () -> {
+                    Field field = createField();
+                    createEdge(field, createNode(field, 0, 0), createNode(field, 100, 0));
+                    return field;
+                })
+            );
+        }
     }
 }

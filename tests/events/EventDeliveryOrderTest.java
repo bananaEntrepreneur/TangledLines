@@ -1,8 +1,9 @@
 package events;
 
 import model.game.Field;
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
+import model.game.Game;
+import model.game.GameState;
+import model.game.LevelNavigation;
 import model.level.Level;
 import model.level.LevelManager;
 import model.level.seeder.Seeder;
@@ -45,19 +46,107 @@ class EventDeliveryOrderTest {
     }
 
     @Test
+    @DisplayName("Should deliver node listeners by priority regardless of registration order")
+    void shouldDeliverNodeListenersByPriority() {
+        Node node = new Node(new Point2D.Double(0, 0));
+        List<String> events = new ArrayList<>();
+
+        node.addListener(nodeListener("view", ListenerPriority.LOW, events));
+        node.addListener(nodeListener("rules", ListenerPriority.HIGH, events));
+        node.addListener(nodeListener("panel", ListenerPriority.MEDIUM, events));
+
+        node.startDragging();
+        node.updateDragging(new Point2D.Double(10, 0));
+
+        assertEquals(List.of(
+            "rules:dragging",
+            "panel:dragging",
+            "view:dragging"
+        ), events);
+    }
+
+    @Test
+    @DisplayName("Should let game update state before view observes committed node movement")
+    void shouldLetGameUpdateStateBeforeViewObservesCommittedNodeMovement() {
+        Game game = new Game(new LevelManager(new CrossingLevelSeeder()));
+        GameState state = game.getState();
+        Node node = state.getField().getNodes().get(2);
+        List<String> events = new ArrayList<>();
+
+        node.addListener(new NodeListener() {
+            @Override
+            public void onMoved(Node movedNode) {
+                events.add((movedNode.isDragging() ? "view:dragging" : "view:committed")
+                    + " moves=" + state.getMoveCount()
+                    + " win=" + state.isCurrentLevelWon());
+            }
+
+            @Override
+            public ListenerPriority getPriority() {
+                return ListenerPriority.MEDIUM;
+            }
+        });
+
+        node.startDragging();
+        node.updateDragging(new Point2D.Double(0, -100));
+        node.stopDragging();
+
+        assertEquals(List.of(
+            "view:dragging moves=0 win=false",
+            "view:committed moves=1 win=true"
+        ), events);
+    }
+
+    @Test
     @DisplayName("Should deliver level navigation events to model before view")
     void shouldDeliverLevelNavigationEventsToModelBeforeView() {
-        GameState state = new GameState(new Field(), 3);
-        LevelNavigation navigation = new LevelNavigation(new LevelManager(new TwoLevelSeeder()), state);
+        Game game = new Game(new LevelManager(new TwoLevelSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
         navigation.addListener(levelNavigationListener("view", ListenerPriority.LOW, events));
         navigation.addListener(levelNavigationListener("model", ListenerPriority.MEDIUM, events));
 
-        state.win();
+        winCrossingLevel(state);
 
         assertTrue(navigation.nextLevel());
         assertEquals(List.of("model:index=1", "view:index=1"), events);
+    }
+
+    @Test
+    @DisplayName("Should deliver level navigation listeners by priority")
+    void shouldDeliverLevelNavigationListenersByPriority() {
+        Game game = new Game(new LevelManager(new TwoLevelSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
+        List<String> events = new ArrayList<>();
+
+        navigation.addListener(levelNavigationListener("view", ListenerPriority.LOW, events));
+        navigation.addListener(levelNavigationListener("rules", ListenerPriority.HIGH, events));
+        navigation.addListener(levelNavigationListener("model", ListenerPriority.MEDIUM, events));
+
+        winCrossingLevel(state);
+
+        assertTrue(navigation.nextLevel());
+        assertEquals(List.of("rules:index=1", "model:index=1", "view:index=1"), events);
+    }
+
+    @Test
+    @DisplayName("Should deliver game state listeners by priority")
+    void shouldDeliverGameStateListenersByPriority() {
+        Game game = new Game(new LevelManager(new CrossingLevelSeeder()));
+        GameState state = game.getState();
+        Node node = state.getField().getNodes().get(0);
+        List<String> events = new ArrayList<>();
+
+        state.addListener(gameStateListener("view", ListenerPriority.LOW, events));
+        state.addListener(gameStateListener("rules", ListenerPriority.HIGH, events));
+        state.addListener(gameStateListener("model", ListenerPriority.MEDIUM, events));
+
+        drag(node, 10, 0);
+
+        assertEquals(List.of("rules:moves=1", "model:moves=1", "view:moves=1"), events);
     }
 
     private NodeListener nodeListener(
@@ -96,21 +185,86 @@ class EventDeliveryOrderTest {
         };
     }
 
+    private model.listeners.GameStateListener gameStateListener(
+            String name,
+            ListenerPriority priority,
+            List<String> events
+    ) {
+        return new model.listeners.GameStateListener() {
+            @Override
+            public void onGameStateChanged(GameState gameState) {
+                events.add(name + ":moves=" + gameState.getMoveCount());
+            }
+
+            @Override
+            public ListenerPriority getPriority() {
+                return priority;
+            }
+        };
+    }
+
     private static class TwoLevelSeeder extends Seeder {
         @Override
         public List<Level> seed() {
             return List.of(
-                singleNodeLevel(3),
-                singleNodeLevel(4)
+                crossingLevel(3),
+                createLevel(4, () -> {
+                    Field field = createField();
+                    createNode(field, 0, 0);
+                    return field;
+                })
             );
         }
 
-        private Level singleNodeLevel(int maxMoves) {
-            return level(maxMoves, () -> {
-                Field field = field();
-                node(field, 0, 0);
+        private Level crossingLevel(int maxMoves) {
+            return createLevel(maxMoves, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 100);
+                Node c = createNode(field, 0, 100);
+                Node d = createNode(field, 100, 0);
+                createEdge(field, a, b);
+                createEdge(field, c, d);
                 return field;
             });
         }
+    }
+
+    private static class OneLevelSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(createLevel(3, () -> {
+                Field field = createField();
+                createNode(field, 0, 0);
+                return field;
+            }));
+        }
+    }
+
+    private static class CrossingLevelSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(createLevel(3, () -> {
+                Field field = createField();
+                Node a = createNode(field, 0, 0);
+                Node b = createNode(field, 100, 100);
+                Node c = createNode(field, 0, 100);
+                Node d = createNode(field, 100, 0);
+                createEdge(field, a, b);
+                createEdge(field, c, d);
+                return field;
+            }));
+        }
+    }
+
+    private void winCrossingLevel(GameState state) {
+        Node node = state.getField().getNodes().get(2);
+        drag(node, 0, -100);
+    }
+
+    private void drag(Node node, double x, double y) {
+        node.startDragging();
+        node.updateDragging(new Point2D.Double(x, y));
+        node.stopDragging();
     }
 }
