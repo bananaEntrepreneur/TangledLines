@@ -66,6 +66,28 @@ class EventDeliveryOrderTest {
     }
 
     @Test
+    @DisplayName("Should execute node listener body before calling the next listener")
+    void shouldExecuteNodeListenerBodyBeforeCallingNextListener() {
+        Node node = new Node(new Point2D.Double(0, 0));
+        List<String> events = new ArrayList<>();
+        int[] step = {0};
+
+        node.addListener(nodeExecutionListener("view", Priority.LOW, events, step, 2, 3));
+        node.addListener(nodeExecutionListener("panel", Priority.MEDIUM, events, step, 1, 2));
+        node.addListener(nodeExecutionListener("rules", Priority.HIGH, events, step, 0, 1));
+
+        node.startDragging();
+        node.updateDragging(new Point2D.Double(10, 0));
+
+        assertEquals(List.of(
+            "rules:before=0 dragging=true",
+            "panel:before=1 dragging=true",
+            "view:before=2 dragging=true"
+        ), events);
+        assertEquals(3, step[0]);
+    }
+
+    @Test
     @DisplayName("Should let game update state before view observes committed node movement")
     void shouldLetGameUpdateStateBeforeViewObservesCommittedNodeMovement() {
         Game game = new Game(new LevelManager(new CrossingLevelSeeder()));
@@ -149,6 +171,53 @@ class EventDeliveryOrderTest {
         assertEquals(List.of("rules:moves=1", "model:moves=1", "view:moves=1"), events);
     }
 
+    @Test
+    @DisplayName("Should execute game state listener body before calling the next listener")
+    void shouldExecuteGameStateListenerBodyBeforeCallingNextListener() {
+        Game game = new Game(new LevelManager(new CrossingLevelSeeder()));
+        GameState state = game.getState();
+        Node node = state.getField().getNodes().get(0);
+        List<String> events = new ArrayList<>();
+        int[] step = {0};
+
+        state.addListener(gameStateExecutionListener("view", Priority.LOW, events, step, 2, 3));
+        state.addListener(gameStateExecutionListener("model", Priority.MEDIUM, events, step, 1, 2));
+        state.addListener(gameStateExecutionListener("rules", Priority.HIGH, events, step, 0, 1));
+
+        drag(node, 10, 0);
+
+        assertEquals(List.of(
+            "rules:before=0 moves=1",
+            "model:before=1 moves=1",
+            "view:before=2 moves=1"
+        ), events);
+        assertEquals(3, step[0]);
+    }
+
+    @Test
+    @DisplayName("Should execute level navigation listener body before calling the next listener")
+    void shouldExecuteLevelNavigationListenerBodyBeforeCallingNextListener() {
+        Game game = new Game(new LevelManager(new TwoLevelSeeder()));
+        GameState state = game.getState();
+        LevelNavigation navigation = game.getLevelNavigation();
+        List<String> events = new ArrayList<>();
+        int[] step = {0};
+
+        navigation.addListener(levelNavigationExecutionListener("view", Priority.LOW, events, step, 2, 3));
+        navigation.addListener(levelNavigationExecutionListener("model", Priority.MEDIUM, events, step, 1, 2));
+        navigation.addListener(levelNavigationExecutionListener("rules", Priority.HIGH, events, step, 0, 1));
+
+        winCrossingLevel(state);
+        assertTrue(navigation.nextLevel());
+
+        assertEquals(List.of(
+            "rules:before=0 index=1",
+            "model:before=1 index=1",
+            "view:before=2 index=1"
+        ), events);
+        assertEquals(3, step[0]);
+    }
+
     private NodeListener nodeListener(
             String name,
             Priority priority,
@@ -158,6 +227,29 @@ class EventDeliveryOrderTest {
             @Override
             public void onMoved(Node node) {
                 events.add(name + ":" + (node.isDragging() ? "dragging" : "committed"));
+            }
+
+            @Override
+            public Priority getPriority() {
+                return priority;
+            }
+        };
+    }
+
+    private NodeListener nodeExecutionListener(
+            String name,
+            Priority priority,
+            List<String> events,
+            int[] step,
+            int expectedStep,
+            int nextStep
+    ) {
+        return new NodeListener() {
+            @Override
+            public void onMoved(Node node) {
+                events.add(name + ":before=" + step[0] + " dragging=" + node.isDragging());
+                assertEquals(expectedStep, step[0]);
+                step[0] = nextStep;
             }
 
             @Override
@@ -185,6 +277,29 @@ class EventDeliveryOrderTest {
         };
     }
 
+    private LevelNavigationListener levelNavigationExecutionListener(
+            String name,
+            Priority priority,
+            List<String> events,
+            int[] step,
+            int expectedStep,
+            int nextStep
+    ) {
+        return new LevelNavigationListener() {
+            @Override
+            public void onLevelChanged(LevelNavigation levelNavigation) {
+                events.add(name + ":before=" + step[0] + " index=" + levelNavigation.getCurrentLevelIndex());
+                assertEquals(expectedStep, step[0]);
+                step[0] = nextStep;
+            }
+
+            @Override
+            public Priority getPriority() {
+                return priority;
+            }
+        };
+    }
+
     private model.listeners.GameStateListener gameStateListener(
             String name,
             Priority priority,
@@ -194,6 +309,29 @@ class EventDeliveryOrderTest {
             @Override
             public void onGameStateChanged(GameState gameState) {
                 events.add(name + ":moves=" + gameState.getMoveCount());
+            }
+
+            @Override
+            public Priority getPriority() {
+                return priority;
+            }
+        };
+    }
+
+    private model.listeners.GameStateListener gameStateExecutionListener(
+            String name,
+            Priority priority,
+            List<String> events,
+            int[] step,
+            int expectedStep,
+            int nextStep
+    ) {
+        return new model.listeners.GameStateListener() {
+            @Override
+            public void onGameStateChanged(GameState gameState) {
+                events.add(name + ":before=" + step[0] + " moves=" + gameState.getMoveCount());
+                assertEquals(expectedStep, step[0]);
+                step[0] = nextStep;
             }
 
             @Override
