@@ -108,6 +108,23 @@ class GameIntegrationTest {
             assertSame(_state().getField(), _field());
             assertNotSame(oldField, _field());
         }
+
+        @Test
+        @DisplayName("Should detach from old field nodes after next level")
+        void shouldDetachFromOldFieldNodesAfterNextLevel() {
+            Field oldField = _field();
+            winCrossingLevel();
+
+            assertTrue(_nav().nextLevel());
+            Field currentField = _field();
+
+            Node oldNode = oldField.getNodes().get(0);
+            drag(oldNode, new Point2D.Double(50, 50));
+
+            assertEquals(0, _state().getMoveCount());
+            assertSame(currentField, _field());
+            assertNotSame(oldField, _field());
+        }
     }
 
     @Nested
