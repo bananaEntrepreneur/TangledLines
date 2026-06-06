@@ -33,8 +33,8 @@ class OverheatingEdgeTest extends EdgeBehaviorContract {
 
         nodeC.startDragging();
         nodeC.updateDragging(new Point2D.Double(200, -50));
-        edge.onMoved(nodeC);
         nodeC.stopDragging();
+        drag(nodeA, 100, 0);
 
         assertTrue(edge.isActive());
         assertEquals(0.0, edge.getHeat(), 0.01);

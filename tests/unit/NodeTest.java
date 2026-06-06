@@ -305,5 +305,9 @@ class NodeTest {
             return _notified;
         }
 
+        @Override
+        public model.listeners.ListenerPriority getPriority() {
+            return model.listeners.ListenerPriority.MEDIUM;
+        }
     }
 }

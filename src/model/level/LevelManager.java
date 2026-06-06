@@ -1,46 +1,27 @@
 package model.level;
 
 import model.game.Field;
-import model.level.loader.JsonLevelLoader;
-import model.level.loader.LevelLoader;
+import model.level.seeder.Seeder;
+import model.level.seeder.SimpleSeeder;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 public class LevelManager {
     private final List<Level> _levels;
     private int _currentLevelIndex = 0;
-    private final LevelFactory _factory;
-    private final LevelLoader _levelLoader;
 
-    public LevelManager(String levelsDirectory) throws LevelLoadException {
-        this(levelsDirectory, new JsonLevelLoader());
-    }
-
-    public LevelManager(String levelsDirectory, LevelLoader levelLoader)
-            throws LevelLoadException {
-        this(levelsDirectory, levelLoader, new LevelFactory());
-    }
-
-    public LevelManager(String levelsDirectory, LevelLoader levelLoader, LevelFactory factory)
-            throws LevelLoadException {
-        if (levelLoader == null) {
-            throw new IllegalArgumentException("Level loader cannot be null");
+    public LevelManager(Seeder seeder) {
+        if (seeder == null) {
+            throw new IllegalArgumentException("Seeder cannot be null");
         }
-        if (factory == null) {
-            throw new IllegalArgumentException("Level factory cannot be null");
-        }
-        _levelLoader = levelLoader;
-        _factory = factory;
-        _levels = loadAllLevels(levelsDirectory);
+        _levels = seedLevels(seeder);
     }
 
     public Field getCurrentField() {
         if (_levels.isEmpty()) {
             throw new IllegalStateException("No levels available");
         }
-        return _factory.createField(_levels.get(_currentLevelIndex));
+        return _levels.get(_currentLevelIndex).createField();
     }
 
     public Field nextField() {
@@ -55,7 +36,7 @@ public class LevelManager {
         if (_levels.isEmpty()) {
             throw new IllegalStateException("No levels available");
         }
-        return _levels.get(_currentLevelIndex).getMaxMoves();
+        return _levels.get(_currentLevelIndex).getMaxMoveCount();
     }
 
     public boolean hasLevels() {
@@ -74,33 +55,16 @@ public class LevelManager {
         return _currentLevelIndex < _levels.size() - 1;
     }
 
-    private List<Level> loadAllLevels(String directory) throws LevelLoadException {
-        File dir = new File(directory);
-        if (!dir.exists() || !dir.isDirectory()) {
-            return Collections.emptyList();
+    private List<Level> seedLevels(Seeder seeder) {
+        List<Level> levels = seeder.seed();
+        if (levels == null) {
+            throw new IllegalArgumentException("Seeder cannot return null");
         }
-
-        List<String> files = new ArrayList<>();
-        File[] levelFiles = dir.listFiles((dirPath, name) -> name.matches("level\\d+\\.json"));
-        if (levelFiles != null) {
-            Arrays.sort(levelFiles, (a, b) -> {
-                int numA = Integer.parseInt(a.getName().replaceAll("\\D", ""));
-                int numB = Integer.parseInt(b.getName().replaceAll("\\D", ""));
-                return Integer.compare(numA, numB);
-            });
-            for (File file : levelFiles) {
-                files.add(file.getPath());
+        for (Level level : levels) {
+            if (level == null) {
+                throw new IllegalArgumentException("Seeder cannot return null levels");
             }
         }
-
-        List<Level> levels = new ArrayList<>();
-        for (String path : files) {
-            try {
-                levels.add(_levelLoader.load(path));
-            } catch (IOException e) {
-                throw new LevelLoadException("Failed to load: " + path);
-            }
-        }
-        return levels;
+        return List.copyOf(levels);
     }
 }

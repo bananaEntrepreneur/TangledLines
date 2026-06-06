@@ -14,9 +14,10 @@ public class Field {
     private final List<Node> _nodes = new ArrayList<>();
     private final List<Edge> _edges = new ArrayList<>();
 
-    public void createNode(Point2D position) {
+    public Node createNode(Point2D position) {
         Node node = new Node(position);
         addNode(node);
+        return node;
     }
 
     public Edge createEdge(Node nodeA, Node nodeB) {

@@ -1,6 +1,7 @@
 package events;
 
 import model.listeners.NodeListener;
+import model.listeners.ListenerPriority;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -22,8 +24,8 @@ class NodeMovedEventTest {
         Node node = new Node(new Point2D.Double(0, 0));
         List<String> events = new ArrayList<>();
 
-        node.addListener(movedNode -> events.add("first:" + describe(movedNode)));
-        node.addListener(movedNode -> events.add("second:" + describe(movedNode)));
+        node.addListener(nodeListener(movedNode -> events.add("first:" + describe(movedNode))));
+        node.addListener(nodeListener(movedNode -> events.add("second:" + describe(movedNode))));
 
         node.startDragging();
         node.updateDragging(new Point2D.Double(10, 0));
@@ -42,7 +44,7 @@ class NodeMovedEventTest {
     void shouldNotifyEachUniqueNodeListenerOncePerMovementEvent() {
         Node node = new Node(new Point2D.Double(0, 0));
         AtomicInteger notificationCount = new AtomicInteger();
-        NodeListener listener = movedNode -> notificationCount.incrementAndGet();
+        NodeListener listener = nodeListener(movedNode -> notificationCount.incrementAndGet());
 
         node.addListener(null);
         node.addListener(listener);
@@ -60,8 +62,8 @@ class NodeMovedEventTest {
         Node node = new Node(new Point2D.Double(0, 0));
         AtomicInteger activeListenerNotifications = new AtomicInteger();
         AtomicInteger removedListenerNotifications = new AtomicInteger();
-        NodeListener activeListener = movedNode -> activeListenerNotifications.incrementAndGet();
-        NodeListener removedListener = movedNode -> removedListenerNotifications.incrementAndGet();
+        NodeListener activeListener = nodeListener(movedNode -> activeListenerNotifications.incrementAndGet());
+        NodeListener removedListener = nodeListener(movedNode -> removedListenerNotifications.incrementAndGet());
 
         node.addListener(activeListener);
         node.addListener(removedListener);
@@ -81,7 +83,7 @@ class NodeMovedEventTest {
         Node node = new Node(new Point2D.Double(0, 0));
         List<Node> notifiedNodes = new ArrayList<>();
 
-        node.addListener(notifiedNodes::add);
+        node.addListener(nodeListener(notifiedNodes::add));
 
         node.startDragging();
         node.updateDragging(new Point2D.Double(10, 0));
@@ -96,7 +98,7 @@ class NodeMovedEventTest {
         Node node = new Node(new Point2D.Double(0, 0));
         AtomicInteger notificationCount = new AtomicInteger();
 
-        node.addListener(movedNode -> notificationCount.incrementAndGet());
+        node.addListener(nodeListener(movedNode -> notificationCount.incrementAndGet()));
 
         node.updateDragging(new Point2D.Double(10, 0));
         node.startDragging();
@@ -113,5 +115,19 @@ class NodeMovedEventTest {
             node.getPosition().getX(),
             node.getDragPosition().getX()
         );
+    }
+
+    private NodeListener nodeListener(Consumer<Node> handler) {
+        return new NodeListener() {
+            @Override
+            public void onMoved(Node node) {
+                handler.accept(node);
+            }
+
+            @Override
+            public ListenerPriority getPriority() {
+                return ListenerPriority.MEDIUM;
+            }
+        };
     }
 }

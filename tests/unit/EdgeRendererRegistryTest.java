@@ -15,6 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Edge Renderer Registry Tests")
 class EdgeRendererRegistryTest {
+    static {
+        System.setProperty("java.awt.headless", "true");
+    }
 
     @Test
     @DisplayName("Should use registered renderer for custom edge")

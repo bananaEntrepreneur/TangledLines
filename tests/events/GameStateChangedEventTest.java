@@ -3,12 +3,14 @@ package events;
 import model.game.Field;
 import model.game.state.GameState;
 import model.listeners.GameStateListener;
+import model.listeners.ListenerPriority;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -22,8 +24,8 @@ class GameStateChangedEventTest {
         GameState state = new GameState(new Field(), 3);
         List<String> events = new ArrayList<>();
 
-        state.addListener(changedState -> events.add("first:" + describe(changedState)));
-        state.addListener(changedState -> events.add("second:" + describe(changedState)));
+        state.addListener(gameStateListener(changedState -> events.add("first:" + describe(changedState))));
+        state.addListener(gameStateListener(changedState -> events.add("second:" + describe(changedState))));
 
         state.incrementMoveCount();
 
@@ -40,10 +42,12 @@ class GameStateChangedEventTest {
         Field nextField = new Field();
         List<String> events = new ArrayList<>();
 
-        state.addListener(changedState -> events.add("first:field=" + (changedState.getField() == nextField)
-            + " " + describe(changedState)));
-        state.addListener(changedState -> events.add("second:field=" + (changedState.getField() == nextField)
-            + " " + describe(changedState)));
+        state.addListener(gameStateListener(changedState -> events.add(
+            "first:field=" + (changedState.getField() == nextField) + " " + describe(changedState)
+        )));
+        state.addListener(gameStateListener(changedState -> events.add(
+            "second:field=" + (changedState.getField() == nextField) + " " + describe(changedState)
+        )));
 
         state.incrementMoveCount();
         events.clear();
@@ -61,7 +65,7 @@ class GameStateChangedEventTest {
     void shouldNotifyEachUniqueGameStateListenerOncePerStateChange() {
         GameState state = new GameState(new Field(), 3);
         AtomicInteger notificationCount = new AtomicInteger();
-        GameStateListener listener = changedState -> notificationCount.incrementAndGet();
+        GameStateListener listener = gameStateListener(changedState -> notificationCount.incrementAndGet());
 
         state.addListener(null);
         state.addListener(listener);
@@ -78,7 +82,7 @@ class GameStateChangedEventTest {
         GameState state = new GameState(new Field(), 3);
         List<String> events = new ArrayList<>();
 
-        state.addListener(changedState -> events.add(describeTerminalState(changedState)));
+        state.addListener(gameStateListener(changedState -> events.add(describeTerminalState(changedState))));
 
         state.win();
         state.lose();
@@ -97,7 +101,7 @@ class GameStateChangedEventTest {
         GameState state = new GameState(new Field(), 3);
         List<GameState> notifiedStates = new ArrayList<>();
 
-        state.addListener(notifiedStates::add);
+        state.addListener(gameStateListener(notifiedStates::add));
 
         state.incrementMoveCount();
 
@@ -111,8 +115,9 @@ class GameStateChangedEventTest {
         GameState state = new GameState(new Field(), 3);
         List<String> events = new ArrayList<>();
 
-        state.addListener(changedState -> events.add(describeTerminalState(changedState)
-            + " moves=" + changedState.getMoveCount()));
+        state.addListener(gameStateListener(changedState -> events.add(
+            describeTerminalState(changedState) + " moves=" + changedState.getMoveCount()
+        )));
 
         state.incrementMoveCount();
         state.win();
@@ -139,5 +144,19 @@ class GameStateChangedEventTest {
             state.isWin(),
             state.isAllLevelsComplete()
         );
+    }
+
+    private GameStateListener gameStateListener(Consumer<GameState> handler) {
+        return new GameStateListener() {
+            @Override
+            public void onGameStateChanged(GameState gameState) {
+                handler.accept(gameState);
+            }
+
+            @Override
+            public ListenerPriority getPriority() {
+                return ListenerPriority.MEDIUM;
+            }
+        };
     }
 }

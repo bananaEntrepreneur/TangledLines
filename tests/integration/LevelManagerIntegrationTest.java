@@ -1,33 +1,28 @@
 package integration;
 
 import model.game.Field;
-import model.level.LevelLoadException;
+import model.level.Level;
 import model.level.LevelManager;
+import model.level.seeder.Seeder;
+import model.units.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Integration — LevelManager")
 class LevelManagerIntegrationTest {
 
-    @TempDir
-    private Path _levelsDirectory;
     private LevelManager _levelManager;
 
     @BeforeEach
-    void setUp() throws IOException, LevelLoadException {
-        writeLevel(1, 3, 4, 2);
-        writeLevel(2, 4, 3, 1);
-        writeLevel(3, 5, 2, 0);
-        _levelManager = new LevelManager(_levelsDirectory.toString());
+    void setUp() {
+        _levelManager = new LevelManager(new TestSeeder());
     }
 
     @Nested
@@ -58,7 +53,7 @@ class LevelManagerIntegrationTest {
         }
 
         @Test
-        @DisplayName("Should report level count from available level files")
+        @DisplayName("Should report level count from seeded levels")
         void shouldReportTotalLevels() {
             assertEquals(3, _levelManager.getTotalLevels());
         }
@@ -127,39 +122,28 @@ class LevelManagerIntegrationTest {
         }
     }
 
-    private void writeLevel(int number, int maxMoves, int nodeCount, int edgeCount) throws IOException {
-        Files.writeString(_levelsDirectory.resolve("level" + number + ".json"), levelJson(maxMoves, nodeCount, edgeCount));
-    }
-
-    private String levelJson(int maxMoves, int nodeCount, int edgeCount) {
-        StringBuilder nodes = new StringBuilder();
-        for (int i = 0; i < nodeCount; i++) {
-            if (i > 0) {
-                nodes.append(",");
-            }
-            nodes.append("""
-                
-                    { "x": %d, "y": %d }""".formatted(i * 100, i * 50));
+    private static class TestSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(
+                testLevel(3, 4, 2),
+                testLevel(4, 3, 1),
+                testLevel(5, 2, 0)
+            );
         }
 
-        StringBuilder edges = new StringBuilder();
-        for (int i = 0; i < edgeCount; i++) {
-            if (i > 0) {
-                edges.append(",");
-            }
-            edges.append("""
-                
-                    { "nodeA": %d, "nodeB": %d }""".formatted(i, i + 1));
+        private Level testLevel(int maxMoves, int nodeCount, int edgeCount) {
+            return level(maxMoves, () -> {
+                Field field = field();
+                List<Node> nodes = new ArrayList<>();
+                for (int i = 0; i < nodeCount; i++) {
+                    nodes.add(node(field, i * 100, i * 50));
+                }
+                for (int i = 0; i < edgeCount; i++) {
+                    edge(field, nodes.get(i), nodes.get(i + 1));
+                }
+                return field;
+            });
         }
-
-        return """
-            {
-              "maxMoves": %d,
-              "nodes": [%s
-              ],
-              "edges": [%s
-              ]
-            }
-            """.formatted(maxMoves, nodes, edges);
     }
 }

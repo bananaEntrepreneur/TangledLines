@@ -4,34 +4,28 @@ import model.game.Field;
 import model.game.Game;
 import model.game.state.GameState;
 import model.game.state.LevelNavigation;
-import model.level.LevelLoadException;
+import model.level.Level;
 import model.level.LevelManager;
+import model.level.seeder.Seeder;
 import model.units.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Integration — Game + LevelManager")
 class GameIntegrationTest {
 
-    @TempDir
-    private Path _levelsDirectory;
     private Game _game;
 
     @BeforeEach
-    void setUp() throws IOException, LevelLoadException {
-        Files.writeString(_levelsDirectory.resolve("level1.json"), crossingLevel(3));
-        Files.writeString(_levelsDirectory.resolve("level2.json"), clearLevel(4));
-        _game = new Game(new LevelManager(_levelsDirectory.toString()));
+    void setUp() {
+        _game = new Game(new LevelManager(new TestSeeder()));
     }
 
     private GameState _state() { return _game.getState(); }
@@ -172,37 +166,34 @@ class GameIntegrationTest {
         node.stopDragging();
     }
 
-    private String crossingLevel(int maxMoves) {
-        return """
-            {
-              "maxMoves": %d,
-              "nodes": [
-                { "x": 0, "y": 0 },
-                { "x": 100, "y": 100 },
-                { "x": 0, "y": 100 },
-                { "x": 100, "y": 0 }
-              ],
-              "edges": [
-                { "nodeA": 0, "nodeB": 1 },
-                { "nodeA": 2, "nodeB": 3 }
-              ]
-            }
-            """.formatted(maxMoves);
-    }
+    private static class TestSeeder extends Seeder {
+        @Override
+        public List<Level> seed() {
+            return List.of(crossingLevel(3), clearLevel(4));
+        }
 
-    private String clearLevel(int maxMoves) {
-        return """
-            {
-              "maxMoves": %d,
-              "nodes": [
-                { "x": 0, "y": 0 },
-                { "x": 100, "y": 0 }
-              ],
-              "edges": [
-                { "nodeA": 0, "nodeB": 1 }
-              ]
-            }
-            """.formatted(maxMoves);
+        private Level crossingLevel(int maxMoves) {
+            return level(maxMoves, () -> {
+                Field field = field();
+                Node a = node(field, 0, 0);
+                Node b = node(field, 100, 100);
+                Node c = node(field, 0, 100);
+                Node d = node(field, 100, 0);
+                edge(field, a, b);
+                edge(field, c, d);
+                return field;
+            });
+        }
+
+        private Level clearLevel(int maxMoves) {
+            return level(maxMoves, () -> {
+                Field field = field();
+                Node a = node(field, 0, 0);
+                Node b = node(field, 100, 0);
+                edge(field, a, b);
+                return field;
+            });
+        }
     }
 
 }
