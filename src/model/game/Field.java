@@ -25,11 +25,7 @@ public class Field {
     }
 
     public StretchableEdge createStretchableEdge(Node nodeA, Node nodeB, double stretchPercent) {
-        StretchableEdge newEdge = new StretchableEdge(nodeA, nodeB, stretchPercent);
-
-        addEdge(newEdge);
-
-        return newEdge;
+        return (StretchableEdge) addEdge(new StretchableEdge(nodeA, nodeB, stretchPercent));
     }
 
     public BreakableEdge createBreakableEdge(Node nodeA, Node nodeB, double breakPercent) {
@@ -42,11 +38,7 @@ public class Field {
             double heatPerIntersection,
             double coolPerMove,
             double criticalHeat) {
-        OverheatingEdge newEdge = new OverheatingEdge(nodeA, nodeB, heatPerIntersection, coolPerMove, criticalHeat, this);
-
-        addEdge(newEdge);
-
-        return newEdge;
+        return (OverheatingEdge) addEdge(new OverheatingEdge(nodeA, nodeB, heatPerIntersection, coolPerMove, criticalHeat, this));
     }
 
     public boolean hasIntersections() {
