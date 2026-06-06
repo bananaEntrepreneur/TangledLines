@@ -48,9 +48,6 @@ public class Field {
 
         addEdge(newEdge);
 
-        nodeA.addListener(newEdge);
-        nodeB.addListener(newEdge);
-
         return newEdge;
     }
 

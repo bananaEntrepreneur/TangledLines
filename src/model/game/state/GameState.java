@@ -28,6 +28,7 @@ public class GameState {
     public void addListener(GameStateListener listener) {
         if (listener != null && !_listeners.contains(listener)) {
             _listeners.add(listener);
+            _listeners.sort((a, b) -> b.getPriority().getValue() - a.getPriority().getValue());
         }
     }
 

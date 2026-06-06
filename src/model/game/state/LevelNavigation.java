@@ -20,6 +20,7 @@ public class LevelNavigation {
     public void addListener(LevelNavigationListener listener) {
         if (listener != null && !_listeners.contains(listener)) {
             _listeners.add(listener);
+            _listeners.sort((a, b) -> b.getPriority().getValue() - a.getPriority().getValue());
         }
     }
 

@@ -1,6 +1,7 @@
 package view;
 
 import model.game.state.GameState;
+import model.listeners.ListenerPriority;
 import model.listeners.NodeListener;
 import model.units.Node;
 import view.style.GameStyle;
@@ -11,10 +12,22 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GamePanel extends JPanel implements NodeListener {
+public class GamePanel extends JPanel {
     private final GameState _gameState;
     private final List<NodeWidget> _nodeWidgets = new ArrayList<>();
     private final EdgePanel _edgePanel;
+    private final NodeListener _nodeListener = new NodeListener() {
+        @Override
+        public void onMoved(Node node) {
+            updateWidgetPosition(node);
+            _edgePanel.repaint();
+        }
+
+        @Override
+        public ListenerPriority getPriority() {
+            return ListenerPriority.MEDIUM;
+        }
+    };
 
     public GamePanel(GameState gameState) {
         _gameState = gameState;
@@ -31,7 +44,7 @@ public class GamePanel extends JPanel implements NodeListener {
 
     public void recreateWidgets() {
         for (NodeWidget widget : _nodeWidgets) {
-            widget.getNode().removeListener(this);
+            widget.getNode().removeListener(_nodeListener);
             remove(widget);
         }
         _nodeWidgets.clear();
@@ -67,13 +80,7 @@ public class GamePanel extends JPanel implements NodeListener {
         );
         add(widget);
         _nodeWidgets.add(widget);
-        node.addListener(this);
-    }
-
-    @Override
-    public void onMoved(Node node) {
-        updateWidgetPosition(node);
-        _edgePanel.repaint();
+        node.addListener(_nodeListener);
     }
 
     private void updateWidgetPosition(Node node) {

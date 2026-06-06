@@ -1,10 +1,22 @@
 package model.units;
 
+import model.listeners.ListenerPriority;
 import model.listeners.NodeListener;
 
-public class BreakableEdge extends TensionedEdge implements NodeListener {
+public class BreakableEdge extends TensionedEdge {
     private final double _breakStretchPercent;
     private boolean _broken = false;
+    private final NodeListener _listener = new NodeListener() {
+        @Override
+        public void onMoved(Node node) {
+            determineBrokeStatus();
+        }
+
+        @Override
+        public ListenerPriority getPriority() {
+            return ListenerPriority.HIGH;
+        }
+    };
 
     public BreakableEdge(Node nodeA, Node nodeB, double breakStretchPercent) {
         super(nodeA, nodeB);
@@ -13,8 +25,8 @@ public class BreakableEdge extends TensionedEdge implements NodeListener {
         }
         _breakStretchPercent = breakStretchPercent;
 
-        nodeA.addListener(this);
-        nodeB.addListener(this);
+        nodeA.addListener(_listener);
+        nodeB.addListener(_listener);
     }
 
     public double getBreakLength() {
@@ -39,8 +51,7 @@ public class BreakableEdge extends TensionedEdge implements NodeListener {
         return getCurrentLength() >= breakLength * 0.9;
     }
 
-    @Override
-    public void onMoved(Node node) {
+    private void determineBrokeStatus() {
         if (!_broken && getCurrentStretchFactor() >= 1.0 + _breakStretchPercent / 100.0) {
             _broken = true;
         }

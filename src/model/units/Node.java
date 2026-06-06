@@ -56,6 +56,7 @@ public class Node {
     public void addListener(NodeListener listener) {
         if (listener != null && !_listeners.contains(listener)) {
             _listeners.add(listener);
+            _listeners.sort((a, b) -> b.getPriority().getValue() - a.getPriority().getValue());
         }
     }
 
@@ -66,6 +67,8 @@ public class Node {
             _movementConstraints.add(constraint);
         }
     }
+
+    public void removeMovementConstraint(NodeMovementConstraint constraint) {_movementConstraints.remove(constraint);}
 
     private void setPosition(Point2D newPosition) {
         if (newPosition == null || newPosition.equals(_position)) {

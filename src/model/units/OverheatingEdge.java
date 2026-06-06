@@ -1,11 +1,12 @@
 package model.units;
 
+import model.listeners.ListenerPriority;
 import model.listeners.NodeListener;
 import model.game.Field;
 
 import java.awt.geom.Point2D;
 
-public class OverheatingEdge extends Edge implements NodeListener {
+public class OverheatingEdge extends Edge {
     private final double _heatPerIntersection;
     private final double _coolPerMove;
     private final double _criticalHeat;
@@ -15,6 +16,17 @@ public class OverheatingEdge extends Edge implements NodeListener {
     private Point2D _lastMovePosition;
     private double _heat = 0;
     private boolean _burnedOut = false;
+    private final NodeListener _listener = new NodeListener() {
+        @Override
+        public void onMoved(Node node) {
+            determineBurnStatus(node);
+        }
+
+        @Override
+        public ListenerPriority getPriority() {
+            return ListenerPriority.HIGH;
+        }
+    };
 
     public OverheatingEdge(
             Node nodeA,
@@ -43,8 +55,8 @@ public class OverheatingEdge extends Edge implements NodeListener {
         _field = field;
         _referenceLength = Math.max(1.0, nodeA.getPosition().distance(nodeB.getPosition()));
 
-        nodeA.addListener(this);
-        nodeB.addListener(this);
+        nodeA.addListener(_listener);
+        nodeB.addListener(_listener);
     }
 
     @Override
@@ -52,8 +64,13 @@ public class OverheatingEdge extends Edge implements NodeListener {
         return !_burnedOut;
     }
 
-    @Override
-    public void onMoved(Node node) {
+    public double getHeat() {
+        return _heat;
+    }
+
+    public double getHeatRatio() { return Math.min(1.0, _heat / _criticalHeat); }
+
+    private void determineBurnStatus(Node node) {
         if (_burnedOut) {
             return;
         }
@@ -74,12 +91,6 @@ public class OverheatingEdge extends Edge implements NodeListener {
             _burnedOut = true;
         }
     }
-
-    public double getHeat() {
-        return _heat;
-    }
-
-    public double getHeatRatio() { return Math.min(1.0, _heat / _criticalHeat); }
 
     private double getMoveRatio(Node node) {
         Point2D currentPosition = currentPosition(node);
