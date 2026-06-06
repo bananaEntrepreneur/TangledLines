@@ -1,7 +1,5 @@
 package model.game;
 
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
 import model.level.LevelManager;
 import model.listeners.LevelNavigationListener;
 import model.listeners.ListenerPriority;
@@ -15,7 +13,7 @@ public class Game {
     private final NodeListener _nodeListener = new NodeListener() {
         @Override
         public void onMoved(Node node) {
-            checkAfterMove(node);
+            updateStateAfterNodeMovement(node);
         }
 
         @Override
@@ -36,17 +34,17 @@ public class Game {
     };
 
     public Game(LevelManager levelManager) {
-        _state = new GameState(levelManager.getCurrentField(), levelManager.getCurrentMaxMoves());
+        _state = new GameState(levelManager.createCurrentField(), levelManager.getCurrentMaxMoveCount());
         _navigation = new LevelNavigation(levelManager, _state);
         _navigation.addListener(_levelNavigationListener);
         attachToNodesFromCurrentField();
     }
 
     public GameState getState() { return _state; }
-    public LevelNavigation getNavigation() { return _navigation; }
+    public LevelNavigation getLevelNavigation() { return _navigation; }
 
-    private void checkAfterMove(Node node) {
-        if (_state.isGameOver() || _state.isAllLevelsComplete()) return;
+    private void updateStateAfterNodeMovement(Node node) {
+        if (_state.isCurrentLevelFinished() || _state.isAllLevelsComplete()) return;
 
         boolean hasIntersections = _observedField.hasIntersections();
 
@@ -59,11 +57,11 @@ public class Game {
             return;
         }
 
-        _state.incrementMoveCount();
+        _state.recordCommittedMove();
 
         if (!hasIntersections) {
             _state.win();
-        } else if (_state.getMoveCount() >= _state.getMaxMoves()) {
+        } else if (_state.getMoveCount() >= _state.getMaxMoveCount()) {
             _state.lose();
         }
     }

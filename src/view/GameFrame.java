@@ -1,7 +1,7 @@
 package view;
 
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
+import model.game.GameState;
+import model.game.LevelNavigation;
 import view.style.GameStyle;
 
 import javax.swing.*;
@@ -50,7 +50,7 @@ public class GameFrame extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        _levelLabel = new JLabel(GameStyle.LABEL_LEVEL + "1/" + _navigation.getTotalLevels());
+        _levelLabel = new JLabel(GameStyle.LABEL_LEVEL + "1/" + _navigation.getTotalLevelCount());
         panel.add(_levelLabel);
 
         _nextLevelButton = new JButton(GameStyle.BUTTON_NEXT_LEVEL);
@@ -65,9 +65,7 @@ public class GameFrame extends JFrame {
         return panel;
     }
 
-    private void handleNextLevel() {
-        _navigation.nextLevel();
-    }
+    private void handleNextLevel() { _navigation.nextLevel(); }
 
     private void handleRestartLevel() {
         _navigation.restartLevel();
@@ -75,11 +73,11 @@ public class GameFrame extends JFrame {
 
     private void updateLevelLabel() {
         _levelLabel.setText(
-            GameStyle.LABEL_LEVEL + (_navigation.getCurrentLevelIndex() + 1) + "/" + _navigation.getTotalLevels()
+            GameStyle.LABEL_LEVEL + (_navigation.getCurrentLevelIndex() + 1) + "/" + _navigation.getTotalLevelCount()
         );
     }
 
     private void updateButtons() {
-        _nextLevelButton.setEnabled(_gameState.isWin() && _navigation.hasNextLevel());
+        _nextLevelButton.setEnabled(_gameState.isCurrentLevelWon() && _navigation.hasNextLevel());
     }
 }

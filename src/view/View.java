@@ -1,7 +1,7 @@
 package view;
 
-import model.game.state.GameState;
-import model.game.state.LevelNavigation;
+import model.game.GameState;
+import model.game.LevelNavigation;
 import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
 import model.listeners.ListenerPriority;

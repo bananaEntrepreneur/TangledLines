@@ -9,7 +9,7 @@ public class BreakableEdge extends TensionedEdge {
     private final NodeListener _listener = new NodeListener() {
         @Override
         public void onMoved(Node node) {
-            determineBrokeStatus();
+            updateBrokenState();
         }
 
         @Override
@@ -51,7 +51,7 @@ public class BreakableEdge extends TensionedEdge {
         return getCurrentLength() >= breakLength * 0.9;
     }
 
-    private void determineBrokeStatus() {
+    private void updateBrokenState() {
         if (!_broken && getCurrentStretchFactor() >= 1.0 + _breakStretchPercent / 100.0) {
             _broken = true;
         }

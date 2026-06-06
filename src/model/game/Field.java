@@ -29,9 +29,6 @@ public class Field {
 
         addEdge(newEdge);
 
-        nodeA.addMovementConstraint(newEdge);
-        nodeB.addMovementConstraint(newEdge);
-
         return newEdge;
     }
 
@@ -95,7 +92,7 @@ public class Field {
     public List<Node> getNodes() { return List.copyOf(_nodes); }
     public List<Edge> getEdges() { return List.copyOf(_edges); }
 
-    public Edge addEdge(Edge edge) {
+    private Edge addEdge(Edge edge) {
         if (edge == null) {
             throw new IllegalArgumentException("Edge cannot be null");
         }

@@ -1,6 +1,5 @@
-package model.game.state;
+package model.game;
 
-import model.game.Field;
 import model.level.LevelManager;
 import model.listeners.LevelNavigationListener;
 
@@ -12,7 +11,13 @@ public class LevelNavigation {
     private final GameState _gameState;
     private final List<LevelNavigationListener> _listeners = new ArrayList<>();
 
-    public LevelNavigation(LevelManager levelManager, GameState gameState) {
+    LevelNavigation(LevelManager levelManager, GameState gameState) {
+        if (levelManager == null) {
+            throw new IllegalArgumentException("Level manager cannot be null");
+        }
+        if (gameState == null) {
+            throw new IllegalArgumentException("Game state cannot be null");
+        }
         _levelManager = levelManager;
         _gameState = gameState;
     }
@@ -25,30 +30,30 @@ public class LevelNavigation {
     }
 
     public boolean nextLevel() {
-        if (!_gameState.isGameOver() || !_gameState.isWin()) {
+        if (!_gameState.isCurrentLevelFinished() || !_gameState.isCurrentLevelWon()) {
             return false;
         }
 
         Field nextField = _levelManager.nextField();
         if (nextField == null) {
-            _gameState.completeAllLevels();
+            _gameState.allLevelsComplete();
             return false;
         }
 
-        _gameState.loadLevel(nextField, _levelManager.getCurrentMaxMoves());
+        _gameState.startLevel(nextField, _levelManager.getCurrentMaxMoveCount());
         notifyLevelChanged();
         return true;
     }
 
     public void restartLevel() {
-        Field currentField = _levelManager.getCurrentField();
-        _gameState.loadLevel(currentField, _levelManager.getCurrentMaxMoves());
+        Field currentField = _levelManager.createCurrentField();
+        _gameState.startLevel(currentField, _levelManager.getCurrentMaxMoveCount());
         notifyLevelChanged();
     }
 
     public int getCurrentLevelIndex() { return _levelManager.getCurrentLevelIndex(); }
 
-    public int getTotalLevels() { return _levelManager.getTotalLevels(); }
+    public int getTotalLevelCount() { return _levelManager.getTotalLevelCount(); }
 
     public boolean hasNextLevel() { return _levelManager.hasNextLevel(); }
 

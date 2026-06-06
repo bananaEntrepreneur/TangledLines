@@ -62,13 +62,13 @@ public class Node {
 
     public void removeListener(NodeListener listener) { _listeners.remove(listener); }
 
-    public void addMovementConstraint(NodeMovementConstraint constraint) {
+    void addMovementConstraint(NodeMovementConstraint constraint) {
         if (constraint != null && !_movementConstraints.contains(constraint)) {
             _movementConstraints.add(constraint);
         }
     }
 
-    public void removeMovementConstraint(NodeMovementConstraint constraint) {_movementConstraints.remove(constraint);}
+    void removeMovementConstraint(NodeMovementConstraint constraint) { _movementConstraints.remove(constraint); }
 
     private void setPosition(Point2D newPosition) {
         if (newPosition == null || newPosition.equals(_position)) {

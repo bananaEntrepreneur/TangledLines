@@ -19,7 +19,7 @@ public class OverheatingEdge extends Edge {
     private final NodeListener _listener = new NodeListener() {
         @Override
         public void onMoved(Node node) {
-            determineBurnStatus(node);
+            updateHeatState(node);
         }
 
         @Override
@@ -70,7 +70,7 @@ public class OverheatingEdge extends Edge {
 
     public double getHeatRatio() { return Math.min(1.0, _heat / _criticalHeat); }
 
-    private void determineBurnStatus(Node node) {
+    private void updateHeatState(Node node) {
         if (_burnedOut) {
             return;
         }

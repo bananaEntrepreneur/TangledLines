@@ -1,6 +1,6 @@
 package view;
 
-import model.game.state.GameState;
+import model.game.GameState;
 import model.units.Edge;
 import model.units.Node;
 import view.style.GameStyle;
@@ -56,15 +56,15 @@ public class EdgePanel extends JPanel {
         g2d.setColor(GameStyle.DEFAULT_STATUS_COLOR);
         g2d.setFont(new Font(GameStyle.STATUS_FONT_NAME, Font.BOLD, GameStyle.STATUS_FONT_SIZE));
 
-        String status = GameStyle.LABEL_MOVES + state.getMoveCount() + "/" + state.getMaxMoves();
+        String status = GameStyle.LABEL_MOVES + state.getMoveCount() + "/" + state.getMaxMoveCount();
 
         if (state.isAllLevelsComplete()) {
             status = GameStyle.STATUS_ALL_COMPLETE;
             g2d.setColor(GameStyle.ALL_COMPLETE_STATUS_COLOR);
             g2d.setFont(new Font(GameStyle.STATUS_FONT_NAME, Font.BOLD, GameStyle.GAME_OVER_FONT_SIZE));
-        } else if (state.isGameOver()) {
-            status = state.isWin() ? GameStyle.STATUS_LEVEL_COMPLETE : GameStyle.STATUS_GAME_OVER;
-            g2d.setColor(state.isWin() ? GameStyle.WIN_STATUS_COLOR : GameStyle.LOSE_STATUS_COLOR);
+        } else if (state.isCurrentLevelFinished()) {
+            status = state.isCurrentLevelWon() ? GameStyle.STATUS_LEVEL_COMPLETE : GameStyle.STATUS_GAME_OVER;
+            g2d.setColor(state.isCurrentLevelWon() ? GameStyle.WIN_STATUS_COLOR : GameStyle.LOSE_STATUS_COLOR);
             g2d.setFont(new Font(GameStyle.STATUS_FONT_NAME, Font.BOLD, GameStyle.GAME_OVER_FONT_SIZE));
         }
 

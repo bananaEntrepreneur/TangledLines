@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         LevelManager levelManager = new LevelManager(new SimpleSeeder());
         Game game = new Game(levelManager);
-        View view = new View(game.getState(), game.getNavigation());
+        View view = new View(game.getState(), game.getLevelNavigation());
         view.show();
     }
 }

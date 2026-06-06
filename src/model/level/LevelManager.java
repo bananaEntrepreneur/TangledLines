@@ -2,7 +2,6 @@ package model.level;
 
 import model.game.Field;
 import model.level.seeder.Seeder;
-import model.level.seeder.SimpleSeeder;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class LevelManager {
         _levels = seedLevels(seeder);
     }
 
-    public Field getCurrentField() {
+    public Field createCurrentField() {
         if (_levels.isEmpty()) {
             throw new IllegalStateException("No levels available");
         }
@@ -29,21 +28,17 @@ public class LevelManager {
             return null;
         }
         _currentLevelIndex++;
-        return getCurrentField();
+        return createCurrentField();
     }
 
-    public int getCurrentMaxMoves() {
+    public int getCurrentMaxMoveCount() {
         if (_levels.isEmpty()) {
             throw new IllegalStateException("No levels available");
         }
         return _levels.get(_currentLevelIndex).getMaxMoveCount();
     }
 
-    public boolean hasLevels() {
-        return !_levels.isEmpty();
-    }
-
-    public int getTotalLevels() {
+    public int getTotalLevelCount() {
         return _levels.size();
     }
 

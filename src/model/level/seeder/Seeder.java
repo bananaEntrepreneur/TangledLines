@@ -15,23 +15,23 @@ import java.util.function.Supplier;
 public abstract class Seeder {
     public abstract List<Level> seed();
 
-    protected Level level(int maxMoveCount, Supplier<Field> fieldSupplier) {
+    protected Level createLevel(int maxMoveCount, Supplier<Field> fieldSupplier) {
         return new Level(maxMoveCount, fieldSupplier);
     }
 
-    protected Field field() {
+    protected Field createField() {
         return new Field();
     }
 
-    protected Node node(Field field, double x, double y) {
+    protected Node createNode(Field field, double x, double y) {
         return field.createNode(new Point2D.Double(x, y));
     }
 
-    protected Edge edge(Field field, Node nodeA, Node nodeB) {
+    protected Edge createEdge(Field field, Node nodeA, Node nodeB) {
         return field.createEdge(nodeA, nodeB);
     }
 
-    protected StretchableEdge stretchableEdge(
+    protected StretchableEdge createStretchableEdge(
             Field field,
             Node nodeA,
             Node nodeB,
@@ -40,7 +40,7 @@ public abstract class Seeder {
         return field.createStretchableEdge(nodeA, nodeB, stretchPercent);
     }
 
-    protected BreakableEdge breakableEdge(
+    protected BreakableEdge createBreakableEdge(
             Field field,
             Node nodeA,
             Node nodeB,
@@ -49,7 +49,7 @@ public abstract class Seeder {
         return field.createBreakableEdge(nodeA, nodeB, breakPercent);
     }
 
-    protected OverheatingEdge overheatingEdge(
+    protected OverheatingEdge createOverheatingEdge(
             Field field,
             Node nodeA,
             Node nodeB,

@@ -1,6 +1,6 @@
 package view;
 
-import model.game.state.GameState;
+import model.game.GameState;
 import model.listeners.ListenerPriority;
 import model.listeners.NodeListener;
 import model.units.Node;

@@ -23,193 +23,193 @@ public class SimpleSeeder extends Seeder {
     }
 
     private Level firstLevel() {
-        return level(3, () -> {
-            Field field = field();
+        return createLevel(3, () -> {
+            Field field = createField();
 
-            Node a = node(field, 200, 100);
-            Node b = node(field, 600, 100);
-            Node c = node(field, 200, 500);
-            Node d = node(field, 600, 500);
+            Node a = createNode(field, 200, 100);
+            Node b = createNode(field, 600, 100);
+            Node c = createNode(field, 200, 500);
+            Node d = createNode(field, 600, 500);
 
-            edge(field, a, d);
-            edge(field, b, c);
-            edge(field, a, b);
-            edge(field, c, d);
-            edge(field, a, c);
-            edge(field, b, d);
+            createEdge(field, a, d);
+            createEdge(field, b, c);
+            createEdge(field, a, b);
+            createEdge(field, c, d);
+            createEdge(field, a, c);
+            createEdge(field, b, d);
 
             return field;
         });
     }
 
     private Level secondLevel() {
-        return level(4, () -> {
-            Field field = field();
+        return createLevel(4, () -> {
+            Field field = createField();
 
-            Node a = node(field, 200, 100);
-            Node b = node(field, 600, 100);
-            Node c = node(field, 200, 400);
-            Node d = node(field, 600, 400);
+            Node a = createNode(field, 200, 100);
+            Node b = createNode(field, 600, 100);
+            Node c = createNode(field, 200, 400);
+            Node d = createNode(field, 600, 400);
 
-            stretchableEdge(field, a, b, 20);
-            stretchableEdge(field, c, d, 20);
-            edge(field, a, d);
-            edge(field, b, c);
+            createStretchableEdge(field, a, b, 20);
+            createStretchableEdge(field, c, d, 20);
+            createEdge(field, a, d);
+            createEdge(field, b, c);
 
             return field;
         });
     }
 
     private Level thirdLevel() {
-        return level(3, () -> {
-            Field field = field();
+        return createLevel(3, () -> {
+            Field field = createField();
 
-            Node a = node(field, 300, 100);
-            Node b = node(field, 500, 100);
-            Node c = node(field, 300, 350);
-            Node d = node(field, 500, 350);
+            Node a = createNode(field, 300, 100);
+            Node b = createNode(field, 500, 100);
+            Node c = createNode(field, 300, 350);
+            Node d = createNode(field, 500, 350);
 
-            breakableEdge(field, a, b, 80);
-            breakableEdge(field, c, d, 80);
-            edge(field, a, d);
-            edge(field, b, c);
+            createBreakableEdge(field, a, b, 80);
+            createBreakableEdge(field, c, d, 80);
+            createEdge(field, a, d);
+            createEdge(field, b, c);
 
             return field;
         });
     }
 
     private Level fourthLevel() {
-        return level(5, () -> {
-            Field field = field();
+        return createLevel(5, () -> {
+            Field field = createField();
 
-            Node a = node(field, 150, 150);
-            Node b = node(field, 650, 150);
-            Node c = node(field, 150, 400);
-            Node d = node(field, 650, 400);
-            Node e = node(field, 400, 80);
+            Node a = createNode(field, 150, 150);
+            Node b = createNode(field, 650, 150);
+            Node c = createNode(field, 150, 400);
+            Node d = createNode(field, 650, 400);
+            Node e = createNode(field, 400, 80);
 
-            stretchableEdge(field, a, e, 25);
-            stretchableEdge(field, b, e, 25);
-            edge(field, a, b);
-            edge(field, a, c);
-            edge(field, b, d);
-            edge(field, c, d);
-            edge(field, c, e);
-            edge(field, d, e);
+            createStretchableEdge(field, a, e, 25);
+            createStretchableEdge(field, b, e, 25);
+            createEdge(field, a, b);
+            createEdge(field, a, c);
+            createEdge(field, b, d);
+            createEdge(field, c, d);
+            createEdge(field, c, e);
+            createEdge(field, d, e);
 
             return field;
         });
     }
 
     private Level fifthLevel() {
-        return level(4, () -> {
-            Field field = field();
+        return createLevel(4, () -> {
+            Field field = createField();
 
-            Node a = node(field, 150, 150);
-            Node b = node(field, 600, 200);
-            Node c = node(field, 200, 450);
-            Node d = node(field, 650, 400);
-            Node e = node(field, 400, 100);
+            Node a = createNode(field, 150, 150);
+            Node b = createNode(field, 600, 200);
+            Node c = createNode(field, 200, 450);
+            Node d = createNode(field, 650, 400);
+            Node e = createNode(field, 400, 100);
 
-            breakableEdge(field, a, b, 20);
-            breakableEdge(field, c, d, 20);
-            breakableEdge(field, a, d, 20);
-            breakableEdge(field, b, c, 20);
-            edge(field, a, e);
-            edge(field, b, e);
-            edge(field, c, e);
-            edge(field, d, e);
+            createBreakableEdge(field, a, b, 20);
+            createBreakableEdge(field, c, d, 20);
+            createBreakableEdge(field, a, d, 20);
+            createBreakableEdge(field, b, c, 20);
+            createEdge(field, a, e);
+            createEdge(field, b, e);
+            createEdge(field, c, e);
+            createEdge(field, d, e);
 
             return field;
         });
     }
 
     private Level sixthLevel() {
-        return level(5, () -> {
-            Field field = field();
+        return createLevel(5, () -> {
+            Field field = createField();
 
-            Node a = node(field, 100, 150);
-            Node b = node(field, 400, 100);
-            Node c = node(field, 700, 150);
-            Node d = node(field, 100, 400);
-            Node e = node(field, 400, 350);
-            Node f = node(field, 700, 400);
+            Node a = createNode(field, 100, 150);
+            Node b = createNode(field, 400, 100);
+            Node c = createNode(field, 700, 150);
+            Node d = createNode(field, 100, 400);
+            Node e = createNode(field, 400, 350);
+            Node f = createNode(field, 700, 400);
 
-            stretchableEdge(field, a, d, 50);
-            stretchableEdge(field, b, e, 50);
-            stretchableEdge(field, c, f, 50);
-            edge(field, a, b);
-            edge(field, b, c);
-            edge(field, d, e);
-            edge(field, e, f);
-            edge(field, a, e);
-            edge(field, b, d);
-            edge(field, b, f);
-            edge(field, c, e);
+            createStretchableEdge(field, a, d, 50);
+            createStretchableEdge(field, b, e, 50);
+            createStretchableEdge(field, c, f, 50);
+            createEdge(field, a, b);
+            createEdge(field, b, c);
+            createEdge(field, d, e);
+            createEdge(field, e, f);
+            createEdge(field, a, e);
+            createEdge(field, b, d);
+            createEdge(field, b, f);
+            createEdge(field, c, e);
 
             return field;
         });
     }
 
     private Level seventhLevel() {
-        return level(4, () -> {
-            Field field = field();
+        return createLevel(4, () -> {
+            Field field = createField();
 
-            Node a = node(field, 200, 120);
-            Node b = node(field, 500, 120);
-            Node c = node(field, 200, 300);
-            Node d = node(field, 500, 300);
-            Node e = node(field, 350, 400);
+            Node a = createNode(field, 200, 120);
+            Node b = createNode(field, 500, 120);
+            Node c = createNode(field, 200, 300);
+            Node d = createNode(field, 500, 300);
+            Node e = createNode(field, 350, 400);
 
-            breakableEdge(field, a, b, 50);
-            breakableEdge(field, c, d, 50);
-            stretchableEdge(field, a, c, 35);
-            stretchableEdge(field, b, d, 35);
-            edge(field, a, e);
-            edge(field, b, e);
-            edge(field, c, e);
-            edge(field, d, e);
+            createBreakableEdge(field, a, b, 50);
+            createBreakableEdge(field, c, d, 50);
+            createStretchableEdge(field, a, c, 35);
+            createStretchableEdge(field, b, d, 35);
+            createEdge(field, a, e);
+            createEdge(field, b, e);
+            createEdge(field, c, e);
+            createEdge(field, d, e);
 
             return field;
         });
     }
 
     private Level eighthLevel() {
-        return level(6, () -> {
-            Field field = field();
+        return createLevel(6, () -> {
+            Field field = createField();
 
-            Node a = node(field, 120, 120);
-            Node b = node(field, 420, 420);
-            Node c = node(field, 120, 420);
-            Node d = node(field, 420, 120);
+            Node a = createNode(field, 120, 120);
+            Node b = createNode(field, 420, 420);
+            Node c = createNode(field, 120, 420);
+            Node d = createNode(field, 420, 120);
 
-            overheatingEdge(field, a, b, 30, 15, 100);
-            edge(field, c, d);
+            createOverheatingEdge(field, a, b, 30, 15, 100);
+            createEdge(field, c, d);
 
             return field;
         });
     }
 
     private Level ninthLevel() {
-        return level(6, () -> {
-            Field field = field();
+        return createLevel(6, () -> {
+            Field field = createField();
 
-            Node a = node(field, 100, 100);
-            Node b = node(field, 700, 100);
-            Node c = node(field, 100, 500);
-            Node d = node(field, 700, 500);
-            Node e = node(field, 400, 300);
+            Node a = createNode(field, 100, 100);
+            Node b = createNode(field, 700, 100);
+            Node c = createNode(field, 100, 500);
+            Node d = createNode(field, 700, 500);
+            Node e = createNode(field, 400, 300);
 
-            edge(field, a, b);
-            edge(field, c, d);
-            edge(field, a, c);
-            edge(field, b, d);
-            edge(field, a, d);
-            edge(field, b, c);
-            stretchableEdge(field, a, e, 40);
-            stretchableEdge(field, b, e, 40);
-            breakableEdge(field, c, e, 15);
-            breakableEdge(field, d, e, 15);
+            createEdge(field, a, b);
+            createEdge(field, c, d);
+            createEdge(field, a, c);
+            createEdge(field, b, d);
+            createEdge(field, a, d);
+            createEdge(field, b, c);
+            createStretchableEdge(field, a, e, 40);
+            createStretchableEdge(field, b, e, 40);
+            createBreakableEdge(field, c, e, 15);
+            createBreakableEdge(field, d, e, 15);
 
             return field;
         });
