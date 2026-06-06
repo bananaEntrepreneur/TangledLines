@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("GameStateListener.onGameStateChanged Event Tests")
-class GameStateChangedEventTest {
+@DisplayName("Game State Event Tests")
+class GameStateEventTest {
 
     @Test
     @DisplayName("Should call game state listeners in order after move count changes")

@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Model Event Protocol Scenario Tests")
-class ModelProtocolScenarioTest {
+@DisplayName("Model Event Protocol Tests")
+class ModelEventProtocolTest {
 
     @Test
     @DisplayName("Should publish node preview and commit events with model state after each command")

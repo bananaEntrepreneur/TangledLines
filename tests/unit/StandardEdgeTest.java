@@ -13,7 +13,7 @@ import java.awt.geom.Point2D;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Edge Unit Tests")
+@DisplayName("Standard Edge Tests")
 class StandardEdgeTest extends EdgeBehaviorContract {
 
     private Point2D _point1;

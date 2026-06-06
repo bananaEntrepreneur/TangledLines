@@ -15,8 +15,8 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-@DisplayName("NodeListener.onMoved Event Tests")
-class NodeMovedEventTest {
+@DisplayName("Node Movement Event Tests")
+class NodeMovementEventTest {
 
     @Test
     @DisplayName("Should call node listeners in order after drag state changes")

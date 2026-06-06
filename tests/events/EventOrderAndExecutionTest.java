@@ -21,8 +21,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Event Delivery Order Tests")
-class EventDeliveryOrderTest {
+@DisplayName("Event Order and Execution Tests")
+class EventOrderAndExecutionTest {
 
     @Test
     @DisplayName("Should deliver node movement events to model before view")

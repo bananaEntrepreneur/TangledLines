@@ -11,8 +11,8 @@ import java.awt.geom.Point2D;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Edge Integration Tests")
-class EdgeIntegrationTest {
+@DisplayName("Edge Geometry Integration Tests")
+class EdgeGeometryIntegrationTest {
 
     @Nested
     @DisplayName("Dynamic Node Movement Tests")

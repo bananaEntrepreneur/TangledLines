@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integration — LevelManager")
+@DisplayName("Integration - Level Manager")
 class LevelManagerIntegrationTest {
 
     private LevelManager _levelManager;

@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("LevelNavigationListener.onLevelChanged Event Tests")
-class LevelChangedEventTest {
+@DisplayName("Level Navigation Event Tests")
+class LevelNavigationEventTest {
 
     @Test
     @DisplayName("Should call level navigation listeners in order after state changes")

@@ -18,8 +18,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integration — Game + LevelManager")
-class GameIntegrationTest {
+@DisplayName("Integration - Game Flow")
+class GameFlowIntegrationTest {
 
     private Game _game;
 

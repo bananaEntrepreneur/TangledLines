@@ -1,4 +1,4 @@
-package e2e;
+package end2end;
 
 import model.game.Field;
 import model.game.Game;
@@ -18,8 +18,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("End-to-End Game Tests")
-class GameE2ETest {
+@DisplayName("End-to-End Game Flow")
+class GameFlowEndToEndTest {
 
     private Game _game;
 

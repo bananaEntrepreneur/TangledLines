@@ -13,8 +13,8 @@ import java.awt.geom.Point2D;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integration — Field, Node, Edge")
-class FieldNodeEdgeIntegrationTest {
+@DisplayName("Integration - Field Graph")
+class FieldGraphIntegrationTest {
 
     @Nested
     @DisplayName("Field + Edge Geometry")
