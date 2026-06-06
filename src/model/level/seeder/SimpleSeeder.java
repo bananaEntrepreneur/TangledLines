@@ -17,8 +17,7 @@ public class SimpleSeeder extends Seeder {
             fifthLevel(),
             sixthLevel(),
             seventhLevel(),
-            eighthLevel(),
-            ninthLevel()
+            eighthLevel()
         );
     }
 
@@ -185,31 +184,6 @@ public class SimpleSeeder extends Seeder {
 
             createOverheatingEdge(field, a, b, 30, 15, 100);
             createEdge(field, c, d);
-
-            return field;
-        });
-    }
-
-    private Level ninthLevel() {
-        return createLevel(6, () -> {
-            Field field = createField();
-
-            Node a = createNode(field, 100, 100);
-            Node b = createNode(field, 700, 100);
-            Node c = createNode(field, 100, 500);
-            Node d = createNode(field, 700, 500);
-            Node e = createNode(field, 400, 300);
-
-            createEdge(field, a, b);
-            createEdge(field, c, d);
-            createEdge(field, a, c);
-            createEdge(field, b, d);
-            createEdge(field, a, d);
-            createEdge(field, b, c);
-            createStretchableEdge(field, a, e, 40);
-            createStretchableEdge(field, b, e, 40);
-            createBreakableEdge(field, c, e, 15);
-            createBreakableEdge(field, d, e, 15);
 
             return field;
         });
