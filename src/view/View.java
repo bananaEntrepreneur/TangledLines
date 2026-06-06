@@ -4,7 +4,7 @@ import model.game.GameState;
 import model.game.LevelNavigation;
 import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 
 public class View {
     private final GameFrame _frame;
@@ -15,8 +15,8 @@ public class View {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.LOW;
+        public Priority getPriority() {
+            return Priority.LOW;
         }
     };
     private final LevelNavigationListener _levelNavigationListener = new LevelNavigationListener() {
@@ -27,8 +27,8 @@ public class View {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.LOW;
+        public Priority getPriority() {
+            return Priority.LOW;
         }
     };
 

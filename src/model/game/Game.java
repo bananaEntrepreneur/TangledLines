@@ -2,7 +2,7 @@ package model.game;
 
 import model.level.LevelManager;
 import model.listeners.LevelNavigationListener;
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.listeners.NodeListener;
 import model.units.Node;
 
@@ -17,8 +17,8 @@ public class Game {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.HIGH;
+        public Priority getPriority() {
+            return Priority.HIGH;
         }
     };
     private final LevelNavigationListener _levelNavigationListener = new LevelNavigationListener() {
@@ -28,8 +28,8 @@ public class Game {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.MEDIUM;
+        public Priority getPriority() {
+            return Priority.MEDIUM;
         }
     };
 

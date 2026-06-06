@@ -1,13 +1,13 @@
 package model.listeners;
 
-public enum ListenerPriority {
+public enum Priority {
     LOW(0),
     MEDIUM(50),
     HIGH(100);
 
     private final int _value;
 
-    ListenerPriority(int value) {
+    Priority(int value) {
         _value = value;
     }
 

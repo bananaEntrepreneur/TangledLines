@@ -8,7 +8,7 @@ import model.level.Level;
 import model.level.LevelManager;
 import model.level.seeder.Seeder;
 import model.listeners.LevelNavigationListener;
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.listeners.NodeListener;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +30,8 @@ class EventDeliveryOrderTest {
         Node node = new Node(new Point2D.Double(0, 0));
         List<String> events = new ArrayList<>();
 
-        node.addListener(nodeListener("view", ListenerPriority.MEDIUM, events));
-        node.addListener(nodeListener("model", ListenerPriority.HIGH, events));
+        node.addListener(nodeListener("view", Priority.MEDIUM, events));
+        node.addListener(nodeListener("model", Priority.HIGH, events));
 
         node.startDragging();
         node.updateDragging(new Point2D.Double(10, 0));
@@ -51,9 +51,9 @@ class EventDeliveryOrderTest {
         Node node = new Node(new Point2D.Double(0, 0));
         List<String> events = new ArrayList<>();
 
-        node.addListener(nodeListener("view", ListenerPriority.LOW, events));
-        node.addListener(nodeListener("rules", ListenerPriority.HIGH, events));
-        node.addListener(nodeListener("panel", ListenerPriority.MEDIUM, events));
+        node.addListener(nodeListener("view", Priority.LOW, events));
+        node.addListener(nodeListener("rules", Priority.HIGH, events));
+        node.addListener(nodeListener("panel", Priority.MEDIUM, events));
 
         node.startDragging();
         node.updateDragging(new Point2D.Double(10, 0));
@@ -82,8 +82,8 @@ class EventDeliveryOrderTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
-                return ListenerPriority.MEDIUM;
+            public Priority getPriority() {
+                return Priority.MEDIUM;
             }
         });
 
@@ -105,8 +105,8 @@ class EventDeliveryOrderTest {
         LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
-        navigation.addListener(levelNavigationListener("view", ListenerPriority.LOW, events));
-        navigation.addListener(levelNavigationListener("model", ListenerPriority.MEDIUM, events));
+        navigation.addListener(levelNavigationListener("view", Priority.LOW, events));
+        navigation.addListener(levelNavigationListener("model", Priority.MEDIUM, events));
 
         winCrossingLevel(state);
 
@@ -122,9 +122,9 @@ class EventDeliveryOrderTest {
         LevelNavigation navigation = game.getLevelNavigation();
         List<String> events = new ArrayList<>();
 
-        navigation.addListener(levelNavigationListener("view", ListenerPriority.LOW, events));
-        navigation.addListener(levelNavigationListener("rules", ListenerPriority.HIGH, events));
-        navigation.addListener(levelNavigationListener("model", ListenerPriority.MEDIUM, events));
+        navigation.addListener(levelNavigationListener("view", Priority.LOW, events));
+        navigation.addListener(levelNavigationListener("rules", Priority.HIGH, events));
+        navigation.addListener(levelNavigationListener("model", Priority.MEDIUM, events));
 
         winCrossingLevel(state);
 
@@ -140,9 +140,9 @@ class EventDeliveryOrderTest {
         Node node = state.getField().getNodes().get(0);
         List<String> events = new ArrayList<>();
 
-        state.addListener(gameStateListener("view", ListenerPriority.LOW, events));
-        state.addListener(gameStateListener("rules", ListenerPriority.HIGH, events));
-        state.addListener(gameStateListener("model", ListenerPriority.MEDIUM, events));
+        state.addListener(gameStateListener("view", Priority.LOW, events));
+        state.addListener(gameStateListener("rules", Priority.HIGH, events));
+        state.addListener(gameStateListener("model", Priority.MEDIUM, events));
 
         drag(node, 10, 0);
 
@@ -151,7 +151,7 @@ class EventDeliveryOrderTest {
 
     private NodeListener nodeListener(
             String name,
-            ListenerPriority priority,
+            Priority priority,
             List<String> events
     ) {
         return new NodeListener() {
@@ -161,7 +161,7 @@ class EventDeliveryOrderTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
+            public Priority getPriority() {
                 return priority;
             }
         };
@@ -169,7 +169,7 @@ class EventDeliveryOrderTest {
 
     private LevelNavigationListener levelNavigationListener(
             String name,
-            ListenerPriority priority,
+            Priority priority,
             List<String> events
     ) {
         return new LevelNavigationListener() {
@@ -179,7 +179,7 @@ class EventDeliveryOrderTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
+            public Priority getPriority() {
                 return priority;
             }
         };
@@ -187,7 +187,7 @@ class EventDeliveryOrderTest {
 
     private model.listeners.GameStateListener gameStateListener(
             String name,
-            ListenerPriority priority,
+            Priority priority,
             List<String> events
     ) {
         return new model.listeners.GameStateListener() {
@@ -197,7 +197,7 @@ class EventDeliveryOrderTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
+            public Priority getPriority() {
                 return priority;
             }
         };

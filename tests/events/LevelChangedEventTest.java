@@ -9,7 +9,7 @@ import model.level.LevelManager;
 import model.level.seeder.Seeder;
 import model.listeners.GameStateListener;
 import model.listeners.LevelNavigationListener;
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -180,8 +180,8 @@ class LevelChangedEventTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
-                return ListenerPriority.MEDIUM;
+            public Priority getPriority() {
+                return Priority.MEDIUM;
             }
         };
     }
@@ -194,8 +194,8 @@ class LevelChangedEventTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
-                return ListenerPriority.MEDIUM;
+            public Priority getPriority() {
+                return Priority.MEDIUM;
             }
         };
     }

@@ -1,7 +1,7 @@
 package events;
 
 import model.listeners.NodeListener;
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.units.Node;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -125,8 +125,8 @@ class NodeMovedEventTest {
             }
 
             @Override
-            public ListenerPriority getPriority() {
-                return ListenerPriority.MEDIUM;
+            public Priority getPriority() {
+                return Priority.MEDIUM;
             }
         };
     }

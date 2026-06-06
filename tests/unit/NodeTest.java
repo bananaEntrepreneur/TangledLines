@@ -1,6 +1,7 @@
 package unit;
 
 import model.listeners.NodeListener;
+import model.listeners.Priority;
 import model.units.Node;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -306,8 +307,8 @@ class NodeTest {
         }
 
         @Override
-        public model.listeners.ListenerPriority getPriority() {
-            return model.listeners.ListenerPriority.MEDIUM;
+        public Priority getPriority() {
+            return Priority.MEDIUM;
         }
     }
 }

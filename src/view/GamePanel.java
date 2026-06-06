@@ -1,7 +1,7 @@
 package view;
 
 import model.game.GameState;
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.listeners.NodeListener;
 import model.units.Node;
 import view.style.GameStyle;
@@ -24,8 +24,8 @@ public class GamePanel extends JPanel {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.MEDIUM;
+        public Priority getPriority() {
+            return Priority.MEDIUM;
         }
     };
 

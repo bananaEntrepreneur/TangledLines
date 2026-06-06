@@ -1,6 +1,6 @@
 package model.units;
 
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.listeners.NodeListener;
 import model.game.Field;
 
@@ -23,8 +23,8 @@ public class OverheatingEdge extends Edge {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.HIGH;
+        public Priority getPriority() {
+            return Priority.HIGH;
         }
     };
 

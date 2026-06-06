@@ -1,5 +1,5 @@
 package model.listeners;
 
 public interface Listener {
-    ListenerPriority getPriority();
+    Priority getPriority();
 }

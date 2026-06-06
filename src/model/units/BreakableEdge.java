@@ -1,6 +1,6 @@
 package model.units;
 
-import model.listeners.ListenerPriority;
+import model.listeners.Priority;
 import model.listeners.NodeListener;
 
 public class BreakableEdge extends TensionedEdge {
@@ -13,8 +13,8 @@ public class BreakableEdge extends TensionedEdge {
         }
 
         @Override
-        public ListenerPriority getPriority() {
-            return ListenerPriority.HIGH;
+        public Priority getPriority() {
+            return Priority.HIGH;
         }
     };
 
